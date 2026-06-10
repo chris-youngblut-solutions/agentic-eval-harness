@@ -134,11 +134,11 @@ class ToolError(ValueError):
 
 
 def _eval_node(node: ast.expr) -> float:
-    if isinstance(node, ast.Constant) and isinstance(node.value, (int, float)):
+    if isinstance(node, ast.Constant) and isinstance(node.value, int | float):
         return float(node.value)
     if isinstance(node, ast.BinOp) and type(node.op) in _BIN_OPS:
         return _BIN_OPS[type(node.op)](_eval_node(node.left), _eval_node(node.right))
-    if isinstance(node, ast.UnaryOp) and isinstance(node.op, (ast.USub, ast.UAdd)):
+    if isinstance(node, ast.UnaryOp) and isinstance(node.op, ast.USub | ast.UAdd):
         value = _eval_node(node.operand)
         return -value if isinstance(node.op, ast.USub) else value
     raise ToolError(f"unsupported expression element: {ast.dump(node)}")
