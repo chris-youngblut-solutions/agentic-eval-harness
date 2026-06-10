@@ -1,0 +1,105 @@
+# Golden set. Expected values are derived from the committed fixtures
+# (fixtures/corpus/*, fixtures/orders.csv) — if a fixture changes, recompute.
+# checker.type: numeric (tolerance), exact (case-insensitive), regex.
+# expected_tools: every listed tool must have been called for partial credit.
+
+cases:
+  # --- calculator: single-step arithmetic ---
+  - id: calc-basic-product
+    prompt: "What is 17 * 23?"
+    checker: {type: numeric, expected: "391"}
+    expected_tools: [calculator]
+  - id: calc-discounted-total
+    prompt: "An order is 14 units at $89.50 each with a 12% discount. What is the total in dollars?"
+    checker: {type: numeric, expected: "1102.64"}
+    expected_tools: [calculator]
+  - id: calc-percent-change
+    prompt: "A reading went from 412 to 538. What is the percent increase, to two decimals?"
+    checker: {type: numeric, expected: "30.58", tolerance: 0.02}
+    expected_tools: [calculator]
+  - id: calc-floor-division
+    prompt: "How many full 36-unit crates can be packed from 850 units?"
+    checker: {type: numeric, expected: "23"}
+    expected_tools: [calculator]
+  - id: calc-compound
+    prompt: "What is (250 - 86) * 3 + 41?"
+    checker: {type: numeric, expected: "533"}
+    expected_tools: [calculator]
+  - id: calc-leap-february-hours
+    prompt: "How many hours are there in February of a leap year?"
+    checker: {type: numeric, expected: "696"}
+    expected_tools: []
+
+  # --- corpus: document lookup ---
+  - id: corpus-hx300-torque
+    prompt: "What is the mounting bolt torque for the HX-300 pump, in Nm?"
+    checker: {type: numeric, expected: "24"}
+    expected_tools: [file_search]
+  - id: corpus-hx500-impeller
+    prompt: "What is the impeller part number for the HX-500 pump?"
+    checker: {type: regex, expected: "IMP-6620"}
+    expected_tools: [file_search]
+  - id: corpus-cr12-firmware
+    prompt: "What firmware version does the CR-12 controller run?"
+    checker: {type: regex, expected: "4\\.2\\.1"}
+    expected_tools: [file_search]
+  - id: corpus-cr12-channels
+    prompt: "How many relay channels does the CR-12 controller have?"
+    checker: {type: numeric, expected: "8"}
+    expected_tools: [file_search]
+  - id: corpus-hx300-seal-kit
+    prompt: "Which seal kit does the HX-300 pump take?"
+    checker: {type: regex, expected: "SK-300-V"}
+    expected_tools: [file_search]
+  - id: corpus-watchdog
+    prompt: "What is the CR-12 watchdog timeout in milliseconds?"
+    checker: {type: numeric, expected: "1500"}
+    expected_tools: [file_search]
+
+  # --- csv: orders-table aggregation ---
+  - id: csv-completed-count
+    prompt: "How many orders in the orders table are completed?"
+    checker: {type: numeric, expected: "19"}
+    expected_tools: [csv_query]
+  - id: csv-west-completed
+    prompt: "How many completed orders came from the west region?"
+    checker: {type: numeric, expected: "7"}
+    expected_tools: [csv_query]
+  - id: csv-west-avg-quantity
+    prompt: "What is the average quantity of completed west-region orders, to two decimals?"
+    checker: {type: numeric, expected: "6.71", tolerance: 0.01}
+    expected_tools: [csv_query]
+  - id: csv-controllers-max-price
+    prompt: "What is the highest unit price among controller orders (any status)?"
+    checker: {type: numeric, expected: "225"}
+    expected_tools: [csv_query]
+  - id: csv-sensors-units
+    prompt: "How many sensor units were sold across completed orders (sum of quantity)?"
+    checker: {type: numeric, expected: "35"}
+    expected_tools: [csv_query]
+  - id: csv-harness-units
+    prompt: "What is the total quantity across completed harness orders?"
+    checker: {type: numeric, expected: "57"}
+    expected_tools: [csv_query]
+
+  # --- multi-step: combine tools ---
+  - id: multi-flow-combined
+    prompt: "What is the combined rated flow of the HX-300 and HX-500 pumps, in L/min?"
+    checker: {type: numeric, expected: "820"}
+    expected_tools: [file_search, calculator]
+    max_turns: 10
+  - id: multi-interval-gap
+    prompt: "How many hours longer is the HX-500 service interval than the HX-300's?"
+    checker: {type: numeric, expected: "250"}
+    expected_tools: [file_search, calculator]
+    max_turns: 10
+  - id: multi-completed-minus-cancelled
+    prompt: "How many more completed orders are there than cancelled orders in the orders table?"
+    checker: {type: numeric, expected: "16"}
+    expected_tools: [csv_query]
+    max_turns: 10
+  - id: multi-east-west-completed
+    prompt: "Completed orders: how many came from east and west regions combined?"
+    checker: {type: numeric, expected: "12"}
+    expected_tools: [csv_query]
+    max_turns: 10

@@ -1,0 +1,71 @@
+# Reusable workflows for setup steps shared across language-specific CIs.
+# Callers reference these via:
+#   jobs:
+#     setup:
+#       uses: ./.github/workflows/_reusable.yml
+#       with:
+#         job: checkout
+
+name: _reusable
+
+on:
+  workflow_call:
+    inputs:
+      job:
+        description: "Which sub-job to run: checkout-only | preflight"
+        required: true
+        type: string
+      ref:
+        description: "Git ref to check out"
+        required: false
+        type: string
+        default: ""
+      fetch-depth:
+        description: "git fetch depth (0 = full history)"
+        required: false
+        type: number
+        default: 1
+
+permissions:
+  contents: read
+
+jobs:
+  checkout-only:
+    if: inputs.job == 'checkout-only'
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@a5ac7e51b41094c92402da3b24376905380afc29  # v4.1.7
+        with:
+          ref: ${{ inputs.ref }}
+          fetch-depth: ${{ inputs.fetch-depth }}
+          persist-credentials: false
+
+  preflight:
+    # Universal floor every language CI should call before its real jobs:
+    # checkout + pre-commit on all files.
+    if: inputs.job == 'preflight'
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@a5ac7e51b41094c92402da3b24376905380afc29  # v4.1.7
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Set up Python (for pre-commit framework)
+        uses: actions/setup-python@0b93645e9fea7318ecaed2b359559ac225c90a2b  # v5.3.0
+        with:
+          python-version: "3.13"
+
+      - name: Cache pre-commit
+        uses: actions/cache@1bd1e32a3bdc45362d1e726936510720a7c30a57  # v4.2.0
+        with:
+          path: ~/.cache/pre-commit
+          key: pre-commit-${{ runner.os }}-${{ hashFiles('.pre-commit-config.yaml') }}
+
+      - name: Install pre-commit
+        run: pip install --upgrade pip pre-commit
+
+      - name: Run pre-commit on all files
+        run: pre-commit run --all-files --show-diff-on-failure
