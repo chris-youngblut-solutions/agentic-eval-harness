@@ -12,7 +12,9 @@ deterministic tools — `calculator` (AST-evaluated arithmetic), `file_search` +
 committed orders table) — and explicit stop conditions: a `submit_answer` tool call
 (the only success path), a turn cap, and a tool-error budget. The harness runs the
 golden set against the loop, scores each case (1.0 correct answer / 0.5 right tools
-wrong answer / 0.0), writes a scorecard to `eval/history/`, and diffs runs.
+wrong answer / 0.0), writes a scorecard to `eval/history/`, and diffs runs. The
+machinery is test-covered without a key; the first live scorecard lands with the
+first recorded run (see Limits).
 
 The loop is backend-agnostic: `live` calls the API (optionally recording each
 assistant turn to JSONL); `replay` re-runs recorded turns through the identical loop
@@ -27,8 +29,12 @@ Requires [uv](https://docs.astral.sh/uv/); the live backend requires
 ```sh
 git clone https://github.com/in-loop/agentic-eval-harness && cd agentic-eval-harness
 uv sync --all-extras
-uv run pytest                      # 16 tests: tools, every stop condition, rubric, replay
+uv run pytest          # 16 tests: tools, every stop condition, rubric, replay — no key needed
+```
 
+With `ANTHROPIC_API_KEY` set:
+
+```sh
 uv run agentic-eval run "What is the mounting bolt torque for the HX-300 pump?"
 uv run agentic-eval eval --record  # full golden set, live, records transcripts
 uv run agentic-eval eval --backend replay   # re-score from recorded transcripts (no key)

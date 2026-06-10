@@ -21,7 +21,7 @@ eval/history/      one scorecard JSON per run
 
 ## Decisions
 
-- **Own the loop; no agent framework.** The loop is ~90 lines over the Messages API
+- **Own the loop; no agent framework.** The loop is under 70 lines over the Messages API
   (manual tool-use loop per the API docs). A framework would hide exactly the part
   this repo exists to demonstrate: stop conditions, error budgets, tool plumbing,
   and the seam that makes replay possible.
