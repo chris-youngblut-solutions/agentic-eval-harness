@@ -4,6 +4,7 @@
 
 set shell := ["bash", "-euo", "pipefail", "-c"]
 set dotenv-load := true
+set allow-duplicate-recipes := true
 
 # Show all recipes when invoked with no arguments.
 default:
