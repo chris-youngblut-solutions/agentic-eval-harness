@@ -64,7 +64,7 @@ Update when the layout changes.
   domain's `eval/<name>/cases.yaml` expectations. For `industrial`, regenerate logs
   with `uv run python -m agentic_eval.domains.industrial.generate`; for `trust_safety`,
   `uv run python -m agentic_eval.domains.trust_safety.generate`.
-- `eval/<name>/` — cases.yaml, transcripts/ (recorded model turns), history/ (scorecards).
+- `eval/<name>/` — cases.yaml, transcripts/ (recorded conversation: task + assistant turns + tool_result outputs), history/ (scorecards).
 - `tests/` — scripted-backend tests; no network, no key. Keep it that way.
 - `.github/workflows/` — CI; SHA-pinned actions.
 

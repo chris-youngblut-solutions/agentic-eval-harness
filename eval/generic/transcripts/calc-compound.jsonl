@@ -1,2 +1,4 @@
-{"content": [{"caller": {"type": "direct"}, "id": "toolu_01PBGGnT8eUEibB9qCAjdP7c", "input": {"expression": "(250 - 86) * 3 + 41"}, "name": "calculator", "type": "tool_use"}]}
-{"content": [{"caller": {"type": "direct"}, "id": "toolu_01UNMzWqv7r3EmLMx1DY5ULF", "input": {"answer": "533"}, "name": "submit_answer", "type": "tool_use"}]}
+{"content": "What is (250 - 86) * 3 + 41?", "role": "user"}
+{"content": [{"caller": {"type": "direct"}, "id": "toolu_01PBGGnT8eUEibB9qCAjdP7c", "input": {"expression": "(250 - 86) * 3 + 41"}, "name": "calculator", "type": "tool_use"}], "role": "assistant"}
+{"content": [{"content": "533", "is_error": false, "tool_use_id": "toolu_01PBGGnT8eUEibB9qCAjdP7c", "type": "tool_result"}], "role": "user"}
+{"content": [{"caller": {"type": "direct"}, "id": "toolu_01UNMzWqv7r3EmLMx1DY5ULF", "input": {"answer": "533"}, "name": "submit_answer", "type": "tool_use"}], "role": "assistant"}

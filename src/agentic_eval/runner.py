@@ -1,8 +1,9 @@
 """CLI: run one task, run the eval, or diff the last two runs.
 
 agentic-eval run "What is 17 * 23?"            one task, live backend
-agentic-eval eval --record                      full eval, live, record transcripts
+agentic-eval eval --record                      full eval, live, record full transcripts
 agentic-eval eval --backend replay              full eval from recorded transcripts
+agentic-eval eval --backend replay --record     regenerate transcripts keyless (replay + re-record)
 agentic-eval report                             diff the two most recent scorecards
 """
 
@@ -51,14 +52,18 @@ def cmd_eval(args: argparse.Namespace) -> None:
         transcript_path = domain.transcripts_dir / f"{case.id}.jsonl"
         backend: ModelBackend
         if args.backend == "live":
-            backend = LiveBackend(
-                model=args.model, record_path=transcript_path if args.record else None
-            )
+            backend = LiveBackend(model=args.model)
         else:
             if not transcript_path.exists():
                 sys.exit(f"no transcript for {case.id}; run the live eval with --record first")
             backend = ReplayBackend(transcript_path)
-        result = run_task(case.prompt, backend, domain, max_turns=case.max_turns)
+        result = run_task(
+            case.prompt,
+            backend,
+            domain,
+            max_turns=case.max_turns,
+            record_path=transcript_path if args.record else None,
+        )
         case_score = scoring.score_case(case, result)
         scores.append(case_score)
         status = "PASS" if case_score.passed else f"{case_score.score:.1f}"
@@ -102,7 +107,11 @@ def main() -> None:
     p_eval.add_argument("--domain", default=DEFAULT_DOMAIN, help="domain pack to evaluate")
     p_eval.add_argument("--backend", choices=["live", "replay"], default="live")
     p_eval.add_argument("--model", default=DEFAULT_MODEL)
-    p_eval.add_argument("--record", action="store_true", help="record transcripts (live only)")
+    p_eval.add_argument(
+        "--record",
+        action="store_true",
+        help="record full transcripts (works with --backend replay to regenerate them keyless)",
+    )
     p_eval.add_argument("--min-pass", type=int, default=None, help="exit nonzero below this")
     p_eval.set_defaults(func=cmd_eval)
 

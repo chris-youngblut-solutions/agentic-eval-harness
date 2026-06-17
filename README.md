@@ -31,10 +31,11 @@ with `--domain`. Three ship in the box:
   moderation case, or harmful content (no real policy text, no real toxic content).
   18 cases.
 
-The loop is backend-agnostic: `live` calls the API (optionally recording each
-assistant turn to JSONL); `replay` re-runs recorded turns through the identical loop
-and tool code with no key and no network. Tools execute for real in both — they are
-deterministic, so a replayed run reproduces its scorecard exactly.
+The loop is backend-agnostic: `live` calls the API (optionally recording the full
+conversation — model turns plus the tools' outputs — to JSONL); `replay` re-runs the
+recorded model turns through the identical loop and tool code with no key and no
+network. Tools execute for real in both — they are deterministic, so a replayed run
+reproduces its scorecard, and the recorded outputs, exactly.
 
 ## Run
 
@@ -44,15 +45,16 @@ Requires [uv](https://docs.astral.sh/uv/); the live backend requires
 ```sh
 git clone https://github.com/in-loop/agentic-eval-harness && cd agentic-eval-harness
 uv sync --all-extras
-uv run pytest          # 57 tests: engine, tools, scoring, all domains, replay — no key needed
+uv run pytest          # 64 tests: engine, tools, scoring, all domains, replay — no key needed
 ```
 
 With `ANTHROPIC_API_KEY` set (every command takes `--domain`, default `generic`):
 
 ```sh
 uv run agentic-eval run "What is the mounting bolt torque for the HX-300 pump?"
-uv run agentic-eval eval --domain industrial --record   # a domain's golden set, live, records transcripts
+uv run agentic-eval eval --domain industrial --record   # a domain's golden set, live, records full transcripts
 uv run agentic-eval eval --domain industrial --backend replay   # re-score from transcripts (no key)
+uv run agentic-eval eval --domain industrial --backend replay --record  # regenerate transcripts keyless
 uv run agentic-eval report --domain industrial          # per-case diff of the two most recent scorecards
 ```
 
@@ -80,15 +82,17 @@ uv run agentic-eval report --domain industrial          # per-case diff of the t
   `agentic-eval report` diffs the last two (per-case deltas, regressions named).
   `--min-pass N` makes `eval` exit nonzero below a floor, for CI gating.
 - **Reproducibility**: fixtures are committed; tools are pure functions of them;
-  `--record` captures model turns so a scored run can be replayed byte-for-byte.
+  `--record` captures the full conversation (model turns + tool outputs), so a scored
+  run replays byte-for-byte — and `eval --backend replay --record` regenerates the
+  transcripts with no key.
 
 ## Limits
 
-- No live scorecard is committed yet for either domain: the first `eval --record` run
-  against the API is pending. The harness machinery (loop, scoring, regression diff,
-  replay) is fully covered by the test suite via scripted backends.
-- CI runs lint/type/tests only. The replay-eval smoke step lands together with the
-  first recorded transcripts.
+- Committed scorecards and transcripts are present for all three domains (live runs,
+  `claude-opus-4-8`); `eval --backend replay` reproduces them with no key, and the
+  recorded transcripts include the tools' outputs.
+- CI runs lint / type / tests; the loop, scoring, regression diff, and replay are
+  covered by the test suite via scripted/replay backends (no key, no network).
 - The `industrial` corpus is synthetic; decode ground-truth is a curated public-standard
   signal subset (opendbc-ag, MIT). It contains no real machine serials, operator/farm
   identifiers, or proprietary/OEM signal definitions (see `fixtures/industrial/PROVENANCE.md`).

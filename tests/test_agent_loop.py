@@ -7,6 +7,8 @@ import json
 from pathlib import Path
 from typing import Any, cast
 
+import pytest
+
 from agentic_eval.agent import ReplayBackend, run_task
 from agentic_eval.domains.generic import DOMAIN
 
@@ -91,3 +93,87 @@ def test_replay_backend_replays_recorded_turns(tmp_path: Path) -> None:
     assert result.stop_reason == "answered"
     assert result.answer == "24"
     assert result.tools_called == ["csv_query"]
+
+
+def test_record_writes_full_transcript_then_replays(tmp_path: Path) -> None:
+    backend = ScriptedBackend(
+        [
+            [
+                {"type": "text", "text": "Using the calculator."},
+                tool_use("t1", "calculator", {"expression": "17 * 23"}),
+            ],
+            [tool_use("t2", "submit_answer", {"answer": "391"})],
+        ]
+    )
+    record = tmp_path / "case.jsonl"
+    result = run_task("What is 17 * 23?", backend, DOMAIN, record_path=record)
+    assert result.answer == "391"
+
+    messages = [json.loads(line) for line in record.read_text().splitlines() if line]
+    # the recorded file is the full conversation: task, assistant turn, the tool's
+    # result, and the submit — not just the assistant turns.
+    assert [m["role"] for m in messages] == ["user", "assistant", "user", "assistant"]
+    tool_results = [
+        block
+        for message in messages
+        if message["role"] == "user" and isinstance(message["content"], list)
+        for block in message["content"]
+        if block.get("type") == "tool_result"
+    ]
+    assert tool_results[0]["content"] == "391"
+    assert tool_results[0]["is_error"] is False
+
+    # and the full transcript replays through the identical loop (replay reads
+    # the assistant turns; the tool runs again and reproduces the same result).
+    replayed = run_task("What is 17 * 23?", ReplayBackend(record), DOMAIN)
+    assert replayed.answer == "391"
+    assert replayed.tools_called == ["calculator"]
+
+
+def test_replay_record_regenerates_full_transcript_from_legacy(tmp_path: Path) -> None:
+    # a legacy untagged transcript (assistant turns only) ...
+    record = tmp_path / "case.jsonl"
+    turns = [
+        [tool_use("t1", "calculator", {"expression": "2 + 2"})],
+        [tool_use("t2", "submit_answer", {"answer": "4"})],
+    ]
+    record.write_text("".join(json.dumps({"content": t}) + "\n" for t in turns))
+
+    # ... replay+record over the SAME file upgrades it to the full role-tagged form
+    # with the tool's observed output (the keyless-regenerate path the CLI documents).
+    run_task("2 + 2?", ReplayBackend(record), DOMAIN, record_path=record)
+    messages = [json.loads(line) for line in record.read_text().splitlines() if line]
+    assert [m["role"] for m in messages] == ["user", "assistant", "user", "assistant"]
+    tool_results = [
+        block
+        for message in messages
+        if isinstance(message["content"], list)
+        for block in message["content"]
+        if block.get("type") == "tool_result"
+    ]
+    assert tool_results[0]["content"] == "4"
+
+
+def test_records_transcript_for_non_answered_run(tmp_path: Path) -> None:
+    # recording fires for every stop reason, not only `answered`
+    record = tmp_path / "case.jsonl"
+    backend = ScriptedBackend(
+        [[{"type": "text", "text": "It is 4."}]]
+    )  # no tool -> stopped_no_answer
+    result = run_task("2 + 2?", backend, DOMAIN, record_path=record)
+    assert result.stop_reason == "stopped_no_answer"
+    messages = [json.loads(line) for line in record.read_text().splitlines() if line]
+    assert [m["role"] for m in messages] == ["user", "assistant"]
+
+
+def test_replay_record_does_not_clobber_on_short_replay(tmp_path: Path) -> None:
+    # one non-submit turn: the loop needs a 2nd turn that isn't recorded, so replay
+    # raises. The committed transcript must be left intact, not overwritten partial.
+    record = tmp_path / "case.jsonl"
+    record.write_text(
+        json.dumps({"content": [tool_use("t1", "calculator", {"expression": "2 + 2"})]}) + "\n"
+    )
+    original = record.read_text()
+    with pytest.raises(RuntimeError):
+        run_task("2 + 2?", ReplayBackend(record), DOMAIN, record_path=record)
+    assert record.read_text() == original

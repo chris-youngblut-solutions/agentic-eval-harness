@@ -5,9 +5,10 @@
 ```
 src/agentic_eval/                     ENGINE (domain-agnostic)
   runner.py        CLI (run | eval | report), all take --domain
-  agent.py         plan-act-observe loop; ModelBackend protocol; run_task(task, backend, domain)
-                     LiveBackend   -> Anthropic API (records JSONL with --record)
-                     ReplayBackend -> recorded turns, no key, no network
+  agent.py         plan-act-observe loop; ModelBackend protocol; run_task(..., record_path)
+                     run_task records the full conversation as JSONL when given record_path
+                     LiveBackend   -> Anthropic API
+                     ReplayBackend -> recorded assistant turns, no key, no network
   domain.py        Domain(name, system_prompt, tool_schemas, execute_tool); load_domain(name)
   cases.py         golden-set loading; checkers (numeric/exact/regex/set); metric/hard_gate
   scoring.py       rubric, scorecard, per-metric rollup, hard gates, history, regression diff
@@ -20,7 +21,7 @@ src/agentic_eval/                     ENGINE (domain-agnostic)
 
 fixtures/<domain>/        committed fixtures (the tools' only world)
 eval/<domain>/cases.yaml  prompt + checker + expected tools + metric + hard_gate
-eval/<domain>/transcripts/  recorded assistant turns (one JSONL per case)
+eval/<domain>/transcripts/  recorded conversation: task + assistant turns + tool_result turns (one JSONL per case)
 eval/<domain>/history/      one scorecard JSON per run
 ```
 
@@ -49,10 +50,14 @@ eval/<domain>/history/      one scorecard JSON per run
   schema tool call, so scoring never parses prose. An assistant turn with no tool
   call is an explicit failure mode (`stopped_no_answer`), not a success path.
 - **Backend seam for replay.** The only nondeterministic component is the model.
-  Recording its turns (wire-shape content blocks, JSONL) and replaying them through
-  the identical loop + tool code gives CI a deterministic full-path execution with
-  no key. Tools re-execute for real on replay; they are pure functions of committed
-  fixtures, so results match the recording.
+  `run_task` records the full conversation as role-tagged JSONL (the task, each
+  assistant turn, and the user turns carrying the tools' `tool_result` outputs);
+  replaying the assistant turns through the identical loop + tool code gives CI a
+  deterministic full-path execution with no key. Tools re-execute for real on replay;
+  they are pure functions of committed fixtures, so the outputs match the recording —
+  which is why `eval --backend replay --record` can regenerate a faithful transcript
+  keyless. Recording the outputs (not just the model turns) makes the transcript a
+  fully observable plan-act-observe trace, not only what the model proposed.
 - **Mechanical checkers only.** Numeric-with-tolerance, exact, regex. LLM-as-judge
   adds a second model's variance to the thing being measured; for closed-form tasks
   it is unnecessary.
@@ -77,9 +82,9 @@ eval/<domain>/history/      one scorecard JSON per run
 Built and tested: the engine (loop, runner, scoring), the domain seam, three domain
 packs (generic + industrial + trust_safety — tools, golden sets, fixtures), the rubric
 with per-metric rollups + hard gates, regression tracking, record/replay, CLI, CI
-(lint/type/tests); 57 keyless tests. Pending: the first live run and its committed
-scorecard + transcripts per domain (needs `ANTHROPIC_API_KEY`; one command:
-`uv run agentic-eval eval --domain <name> --record`). The industrial corpus is synthetic
+(lint/type/tests); 64 keyless tests. Committed live scorecards + transcripts for all
+three domains (`claude-opus-4-8`); the transcripts carry the tools' outputs and
+`eval --backend replay` reproduces the scorecards keyless. The industrial corpus is synthetic
 and its decode ground-truth is public-standard only (see `fixtures/industrial/PROVENANCE.md`);
 safety bounds are illustrative; latency (p50/p95) is a live-only metric, not in the
 keyless golden set. The trust_safety pack is methodology-only — the policy, content

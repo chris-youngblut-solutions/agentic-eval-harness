@@ -1,2 +1,4 @@
-{"content": [{"caller": {"type": "direct"}, "id": "toolu_012QET672ZKKzKev2VmprRoB", "input": {"column": "order_id", "filters": [{"column": "status", "op": "eq", "value": "completed"}], "operation": "count"}, "name": "csv_query", "type": "tool_use"}]}
-{"content": [{"caller": {"type": "direct"}, "id": "toolu_01CuCPJJbHSAnEMw4MQ4mrSp", "input": {"answer": "19"}, "name": "submit_answer", "type": "tool_use"}]}
+{"content": "How many orders in the orders table are completed?", "role": "user"}
+{"content": [{"caller": {"type": "direct"}, "id": "toolu_012QET672ZKKzKev2VmprRoB", "input": {"column": "order_id", "filters": [{"column": "status", "op": "eq", "value": "completed"}], "operation": "count"}, "name": "csv_query", "type": "tool_use"}], "role": "assistant"}
+{"content": [{"content": "19", "is_error": false, "tool_use_id": "toolu_012QET672ZKKzKev2VmprRoB", "type": "tool_result"}], "role": "user"}
+{"content": [{"caller": {"type": "direct"}, "id": "toolu_01CuCPJJbHSAnEMw4MQ4mrSp", "input": {"answer": "19"}, "name": "submit_answer", "type": "tool_use"}], "role": "assistant"}
