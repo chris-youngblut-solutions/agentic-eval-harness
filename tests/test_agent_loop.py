@@ -8,6 +8,7 @@ from pathlib import Path
 from typing import Any, cast
 
 from agentic_eval.agent import ReplayBackend, run_task
+from agentic_eval.domains.generic import DOMAIN
 
 
 class ScriptedBackend:
@@ -39,7 +40,7 @@ def test_answered_via_submit_answer() -> None:
             [tool_use("t2", "submit_answer", {"answer": "391"})],
         ]
     )
-    result = run_task("What is 17 * 23?", backend)
+    result = run_task("What is 17 * 23?", backend, DOMAIN)
     assert result.stop_reason == "answered"
     assert result.answer == "391"
     assert result.tools_called == ["calculator"]
@@ -57,7 +58,7 @@ def test_answered_via_submit_answer() -> None:
 
 def test_stopped_no_answer_on_plain_text() -> None:
     backend = ScriptedBackend([[{"type": "text", "text": "It is 391."}]])
-    result = run_task("What is 17 * 23?", backend)
+    result = run_task("What is 17 * 23?", backend, DOMAIN)
     assert result.stop_reason == "stopped_no_answer"
     assert result.answer is None
 
@@ -65,7 +66,7 @@ def test_stopped_no_answer_on_plain_text() -> None:
 def test_stopped_max_turns() -> None:
     looping_turn = [tool_use("t", "calculator", {"expression": "1 + 1"})]
     backend = ScriptedBackend([looping_turn] * 3)
-    result = run_task("loop forever", backend, max_turns=3)
+    result = run_task("loop forever", backend, DOMAIN, max_turns=3)
     assert result.stop_reason == "stopped_max_turns"
     assert result.turns == 3
 
@@ -73,7 +74,7 @@ def test_stopped_max_turns() -> None:
 def test_stopped_after_tool_error_budget() -> None:
     bad_turn = [tool_use("t", "calculator", {"expression": "not math"})]
     backend = ScriptedBackend([bad_turn] * 8)
-    result = run_task("break the calculator", backend, max_turns=8)
+    result = run_task("break the calculator", backend, DOMAIN, max_turns=8)
     assert result.stop_reason == "stopped_tool_errors"
     assert result.turns == 4  # budget of 3 errors; the 4th-turn error exceeds it
 
@@ -86,7 +87,7 @@ def test_replay_backend_replays_recorded_turns(tmp_path: Path) -> None:
     record = tmp_path / "case.jsonl"
     record.write_text("".join(json.dumps({"content": t}) + "\n" for t in turns))
 
-    result = run_task("How many orders are there?", ReplayBackend(record))
+    result = run_task("How many orders are there?", ReplayBackend(record), DOMAIN)
     assert result.stop_reason == "answered"
     assert result.answer == "24"
     assert result.tools_called == ["csv_query"]

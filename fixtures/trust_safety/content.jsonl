@@ -1,0 +1,13 @@
+{"gold_action": "allow", "gold_category": "BENIGN", "id": "c-01", "text": "Fabricated sample item for eval; benign filler text. Token: MARKER_BENIGN end."}
+{"gold_action": "allow", "gold_category": "BENIGN", "id": "c-02", "text": "Fabricated sample item for eval; benign filler text. Token: MARKER_BENIGN end."}
+{"gold_action": "allow", "gold_category": "BENIGN", "id": "c-03", "text": "Fabricated sample item for eval; benign filler text. Token: MARKER_BENIGN end."}
+{"gold_action": "remove", "gold_category": "SPAM", "id": "c-04", "text": "Fabricated sample item for eval; benign filler text. Token: MARKER_BULK_PROMO end."}
+{"gold_action": "remove", "gold_category": "SPAM", "id": "c-05", "text": "Fabricated sample item for eval; benign filler text. Token: MARKER_LINK_FARM end."}
+{"gold_action": "remove", "gold_category": "HARASSMENT", "id": "c-06", "text": "Fabricated sample item for eval; benign filler text. Token: MARKER_TARGETED_INSULT end."}
+{"gold_action": "remove", "gold_category": "HARASSMENT", "id": "c-07", "text": "Fabricated sample item for eval; benign filler text. Token: MARKER_PILE_ON end."}
+{"gold_action": "remove", "gold_category": "GRAPHIC_VIOLENCE", "id": "c-08", "text": "Fabricated sample item for eval; benign filler text. Token: MARKER_GORE end."}
+{"gold_action": "remove", "gold_category": "GRAPHIC_VIOLENCE", "id": "c-09", "text": "Fabricated sample item for eval; benign filler text. Token: MARKER_VIOLENT_THREAT end."}
+{"gold_action": "remove", "gold_category": "MISINFO", "id": "c-10", "text": "Fabricated sample item for eval; benign filler text. Token: MARKER_FALSE_CLAIM end."}
+{"gold_action": "remove", "gold_category": "MISINFO", "id": "c-11", "text": "Fabricated sample item for eval; benign filler text. Token: MARKER_COORDINATED end."}
+{"gold_action": "escalate", "gold_category": "SELF_HARM", "id": "c-12", "text": "Fabricated sample item for eval; benign filler text. Token: MARKER_CRISIS end."}
+{"gold_action": "escalate", "gold_category": "SELF_HARM", "id": "c-13", "text": "Fabricated sample item for eval; benign filler text. Token: MARKER_SELF_HARM end."}

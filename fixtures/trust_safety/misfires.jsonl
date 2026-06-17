@@ -1,0 +1,6 @@
+{"gold_rca_class": "policy_gap", "id": "m-01"}
+{"gold_rca_class": "policy_gap", "id": "m-02"}
+{"gold_rca_class": "classifier_threshold", "id": "m-03"}
+{"gold_rca_class": "classifier_threshold", "id": "m-04"}
+{"gold_rca_class": "label_ambiguity", "id": "m-05"}
+{"gold_rca_class": "label_ambiguity", "id": "m-06"}

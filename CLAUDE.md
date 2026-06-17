@@ -11,12 +11,17 @@ ideas) belong in `CLAUDE.local.md` (gitignored).
 
 ## What this is
 
-A plan-act-observe agent loop (Anthropic SDK, manual loop) over four offline
-deterministic tools, plus the eval harness that scores it: 22-case golden set,
-mechanical checkers, partial-credit rubric, scorecard history + regression
-diff, and a record/replay backend seam so CI runs the full path without an
-API key. It does NOT use an agent framework, LLM judges, or online tools —
-see docs/design.md for why.
+A plan-act-observe agent loop (Anthropic SDK, manual loop) over offline
+deterministic tools, plus the eval harness that scores it — across pluggable
+domain packs selected with `--domain`. Mechanical checkers
+(numeric/exact/regex/set-F1), partial-credit rubric, per-metric rollups, hard
+gates, scorecard history + regression diff, and a record/replay backend seam so
+CI runs the full path without an API key. Three domains ship: `generic` (22 cases),
+`industrial` (CAN/ISOBUS edge decode + diagnostics, 17 cases; public-standard
+decode ground-truth from opendbc-ag over a synthetic corpus), and `trust_safety`
+(content-enforcement, 18 cases; methodology-only — a fully synthetic, generic policy
+with abstract MARKER tokens and benign filler, no real policy or harmful content). It
+does NOT use an agent framework, LLM judges, or online tools — see docs/design.md for why.
 
 ## Build / test / lint
 
@@ -46,12 +51,20 @@ Three to five bullets. Where the code lives, what each top-level dir
 does, key invariants a newcomer can't infer from a `tree` listing.
 Update when the layout changes.
 
-- `src/agentic_eval/` — loop (agent.py), tools (tools.py), golden set + checkers
-  (cases.py), rubric + history (scoring.py), CLI (runner.py).
-- `fixtures/` — the tools' entire world (corpus + orders.csv), committed; case
-  expected-values derive from these. Changing a fixture means recomputing
-  eval/cases.yaml expectations.
-- `eval/` — cases.yaml, transcripts/ (recorded model turns), history/ (scorecards).
+- `src/agentic_eval/` — engine (domain-agnostic): loop (agent.py), CLI (runner.py),
+  domain seam (domain.py), golden-set loading + checkers (cases.py), rubric + rollups
+  + history (scoring.py).
+- `src/agentic_eval/domains/<name>/` — a domain pack: `tools.py` + `__init__.py`
+  exporting `DOMAIN`. `industrial` also has `codec.py` (bit-field decode/encode) and
+  `generate.py` (deterministic corpus generator); `trust_safety` has `policy.py`
+  (synthetic policy + fixture loaders) and `generate.py`. Adding a domain is
+  additive — no engine edit.
+- `fixtures/<name>/` — that domain's committed fixtures (the tools' only world);
+  case expected-values derive from these. Changing a fixture means recomputing the
+  domain's `eval/<name>/cases.yaml` expectations. For `industrial`, regenerate logs
+  with `uv run python -m agentic_eval.domains.industrial.generate`; for `trust_safety`,
+  `uv run python -m agentic_eval.domains.trust_safety.generate`.
+- `eval/<name>/` — cases.yaml, transcripts/ (recorded model turns), history/ (scorecards).
 - `tests/` — scripted-backend tests; no network, no key. Keep it that way.
 - `.github/workflows/` — CI; SHA-pinned actions.
 

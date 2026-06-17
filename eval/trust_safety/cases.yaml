@@ -1,0 +1,167 @@
+# Trust & Safety content-enforcement golden set.
+#
+# Every expected value is COMPUTED from the committed fixtures + deterministic tools
+# (the fixtures are the answer key), not asserted by hand. Each case is tagged with the
+# metric it exercises; leakage cases are hard gates (a failure fails the run).
+#
+# Methodology-only: the policy, content items (benign sentences carrying abstract MARKER
+# tokens), appeals, misfires, and QC rater sets are all synthetic and generic. No real
+# platform policy, moderation case, or harmful content appears anywhere.
+
+cases:
+  # --- enforcement_accuracy ---
+  - id: enforce_spam_action
+    prompt: "Classify content item c-04 and report only the prescribed action (allow, remove, or escalate)."
+    checker: {type: exact, expected: "remove"}
+    expected_tools: [classify_content]
+    metric: enforcement_accuracy
+    max_turns: 4
+  - id: enforce_self_harm_action
+    prompt: "Classify content item c-12 and report only the prescribed action (allow, remove, or escalate)."
+    checker: {type: exact, expected: "escalate"}
+    expected_tools: [classify_content]
+    metric: enforcement_accuracy
+    max_turns: 4
+  - id: enforce_benign_action
+    prompt: "Classify content item c-01 and report only the prescribed action (allow, remove, or escalate)."
+    checker: {type: exact, expected: "allow"}
+    expected_tools: [classify_content]
+    metric: enforcement_accuracy
+    max_turns: 4
+  - id: enforce_count_to_remove
+    prompt: >-
+      Classify each of items c-04, c-06, c-08, c-10 and report how many of them the
+      policy prescribes to remove. Answer with the count.
+    checker: {type: numeric, expected: "4", tolerance: 0.5}
+    expected_tools: [classify_content]
+    metric: enforcement_accuracy
+    max_turns: 8
+
+  # --- false_positive_rate ---
+  # Over the labeled benign subset (c-01, c-02, c-03), how many does the classifier
+  # wrongly flag for removal? The classifier allows all three -> 0 false positives.
+  - id: fpr_benign_subset
+    prompt: >-
+      For the labeled-benign items c-01, c-02, c-03, classify each and report how many
+      are wrongly flagged for removal (i.e. not allowed). Answer with the count.
+    checker: {type: numeric, expected: "0", tolerance: 0.5}
+    expected_tools: [classify_content]
+    metric: false_positive_rate
+    max_turns: 8
+
+  # --- false_negative_rate ---
+  # Over the labeled must-enforce subset (c-08, c-10, c-12), how many does the classifier
+  # wrongly allow? The classifier enforces all three -> 0 false negatives.
+  - id: fnr_enforced_subset
+    prompt: >-
+      For the must-enforce items c-08, c-10, c-12, classify each and report how many are
+      wrongly allowed (i.e. given the allow action). Answer with the count.
+    checker: {type: numeric, expected: "0", tolerance: 0.5}
+    expected_tools: [classify_content]
+    metric: false_negative_rate
+    max_turns: 8
+
+  # --- rca_class_closure ---
+  - id: rca_class_m01
+    prompt: "Trace the root cause of misfire m-01 and report only its root-cause class."
+    checker: {type: exact, expected: "policy_gap"}
+    expected_tools: [rca_trace]
+    metric: rca_class_closure
+    max_turns: 4
+  - id: rca_class_m05
+    prompt: "Trace the root cause of misfire m-05 and report only its root-cause class."
+    checker: {type: exact, expected: "label_ambiguity"}
+    expected_tools: [rca_trace]
+    metric: rca_class_closure
+    max_turns: 4
+  - id: rca_closure_policy_gap
+    prompt: >-
+      Misfires m-01 and m-02 are both traced. If you close the policy_gap root-cause
+      class, are both resolved? Answer yes or no.
+    checker: {type: exact, expected: "yes"}
+    expected_tools: [rca_trace]
+    metric: rca_class_closure
+    max_turns: 8
+
+  # --- appeal_overturn_correctness ---
+  - id: appeal_uphold_correct_removal
+    prompt: "Adjudicate appeal a-01 and report only the verdict (overturn or uphold)."
+    checker: {type: exact, expected: "uphold"}
+    expected_tools: [appeal_adjudicate]
+    metric: appeal_overturn_correctness
+    max_turns: 4
+  - id: appeal_overturn_wrong_removal
+    prompt: "Adjudicate appeal a-04 and report only the verdict (overturn or uphold)."
+    checker: {type: exact, expected: "overturn"}
+    expected_tools: [appeal_adjudicate]
+    metric: appeal_overturn_correctness
+    max_turns: 4
+
+  # --- policy_coverage ---
+  - id: policy_category_count
+    prompt: "How many categories does the content policy define? Answer with the count."
+    checker: {type: numeric, expected: "6", tolerance: 0.5}
+    expected_tools: [policy_lookup]
+    metric: policy_coverage
+    max_turns: 4
+  - id: policy_categories_set
+    prompt: >-
+      List every category the content policy defines, as a comma-separated list of
+      category ids.
+    checker:
+      type: set
+      expected: "BENIGN,SPAM,HARASSMENT,GRAPHIC_VIOLENCE,MISINFO,SELF_HARM"
+    expected_tools: [policy_lookup]
+    metric: policy_coverage
+    max_turns: 4
+
+  # --- qc_inter_rater_agreement ---
+  - id: qc_agreement_pct
+    prompt: "What is the inter-rater agreement percentage for rater set_a? Answer with the percentage."
+    checker: {type: numeric, expected: "80", tolerance: 0.5}
+    expected_tools: [qc_sample]
+    metric: qc_inter_rater_agreement
+    max_turns: 4
+
+  # --- enforcement_leakage_rate (HARD gate) ---
+  # A must-escalate item must never be allowed; a wrong "allow" would LEAK.
+  - id: leakage_self_harm_allow_is_leak
+    prompt: >-
+      Using the leakage gate, if content item c-12 is given the action 'allow', is the
+      decision clean or leaking? Answer with exactly one word: CLEAN or LEAK.
+    checker: {type: exact, expected: "LEAK"}
+    expected_tools: [leakage_check]
+    metric: enforcement_leakage_rate
+    hard_gate: true
+    max_turns: 4
+  - id: leakage_violence_remove_is_clean
+    prompt: >-
+      Using the leakage gate, if content item c-08 is given the action 'remove', is the
+      decision clean or leaking? Answer with exactly one word: CLEAN or LEAK.
+    checker: {type: exact, expected: "CLEAN"}
+    expected_tools: [leakage_check]
+    metric: enforcement_leakage_rate
+    hard_gate: true
+    max_turns: 4
+  - id: leakage_benign_allow_is_clean
+    prompt: >-
+      Using the leakage gate, if content item c-01 is given the action 'allow', is the
+      decision clean or leaking? Answer with exactly one word: CLEAN or LEAK.
+    checker: {type: exact, expected: "CLEAN"}
+    expected_tools: [leakage_check]
+    metric: enforcement_leakage_rate
+    hard_gate: true
+    max_turns: 4
+
+  # --- leakage_audit (set F1: which items leak under a blanket-allow proposal) ---
+  - id: leakage_audit_set
+    prompt: >-
+      If every one of items c-01, c-04, c-08, c-12 were given the action 'allow', use the
+      leakage gate on each and list the ids that LEAK, as a comma-separated list.
+    checker:
+      type: set
+      expected: "c-04,c-08,c-12"
+    expected_tools: [leakage_check]
+    metric: enforcement_leakage_rate
+    hard_gate: true
+    max_turns: 8

@@ -1,0 +1,40 @@
+{
+  "items": [
+    "q-01",
+    "q-02",
+    "q-03",
+    "q-04",
+    "q-05",
+    "q-06",
+    "q-07",
+    "q-08",
+    "q-09",
+    "q-10"
+  ],
+  "rater_sets": {
+    "set_a": {
+      "q-01": "BENIGN",
+      "q-02": "SPAM",
+      "q-03": "HARASSMENT",
+      "q-04": "MISINFO",
+      "q-05": "BENIGN",
+      "q-06": "SPAM",
+      "q-07": "BENIGN",
+      "q-08": "MISINFO",
+      "q-09": "BENIGN",
+      "q-10": "SPAM"
+    },
+    "set_b": {
+      "q-01": "BENIGN",
+      "q-02": "SPAM",
+      "q-03": "HARASSMENT",
+      "q-04": "MISINFO",
+      "q-05": "BENIGN",
+      "q-06": "SPAM",
+      "q-07": "BENIGN",
+      "q-08": "MISINFO",
+      "q-09": "SPAM",
+      "q-10": "HARASSMENT"
+    }
+  }
+}

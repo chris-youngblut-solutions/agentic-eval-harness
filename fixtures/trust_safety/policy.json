@@ -1,0 +1,48 @@
+{
+  "_provenance": "Fully SYNTHETIC and GENERIC content-policy taxonomy authored for this evaluation. It is NOT any real platform's content policy, community guidelines, or trust-and-safety taxonomy, and reproduces no real policy text. Categories key on abstract MARKER tokens (e.g. MARKER_BULK_PROMO), never on real harmful content; content items in the fixtures are benign fabricated sentences carrying those marker tokens. No real moderation cases, queue mechanics, classifier internals, or platform tooling are represented. Prescribed actions, severities, and root-cause classes are illustrative constructs for exercising eval metrics, not operational rules for any real system.",
+  "_schema": "Each category has id, name, markers (abstract tokens that key the category), action (allow | remove | escalate), and severity (low | medium | high). Action 'escalate' routes high-severity, leakage-sensitive items to human support rather than auto-removing.",
+  "categories": [
+    {
+      "id": "BENIGN",
+      "name": "Benign / allowed",
+      "markers": ["MARKER_BENIGN"],
+      "action": "allow",
+      "severity": "low"
+    },
+    {
+      "id": "SPAM",
+      "name": "Spam / bulk promotion",
+      "markers": ["MARKER_BULK_PROMO", "MARKER_LINK_FARM"],
+      "action": "remove",
+      "severity": "low"
+    },
+    {
+      "id": "HARASSMENT",
+      "name": "Harassment / targeted abuse",
+      "markers": ["MARKER_TARGETED_INSULT", "MARKER_PILE_ON"],
+      "action": "remove",
+      "severity": "medium"
+    },
+    {
+      "id": "GRAPHIC_VIOLENCE",
+      "name": "Graphic violence",
+      "markers": ["MARKER_GORE", "MARKER_VIOLENT_THREAT"],
+      "action": "remove",
+      "severity": "high"
+    },
+    {
+      "id": "MISINFO",
+      "name": "Coordinated misinformation",
+      "markers": ["MARKER_FALSE_CLAIM", "MARKER_COORDINATED"],
+      "action": "remove",
+      "severity": "medium"
+    },
+    {
+      "id": "SELF_HARM",
+      "name": "Self-harm / crisis",
+      "markers": ["MARKER_CRISIS", "MARKER_SELF_HARM"],
+      "action": "escalate",
+      "severity": "high"
+    }
+  ]
+}

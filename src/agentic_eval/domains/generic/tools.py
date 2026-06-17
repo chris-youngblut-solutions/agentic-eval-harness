@@ -1,5 +1,5 @@
-"""The agent's tools. All four are offline and deterministic: same input,
-same output, no network — which is what makes the eval reproducible."""
+"""The generic domain's tools. All four are offline and deterministic: same
+input, same output, no network — which is what makes the eval reproducible."""
 
 from __future__ import annotations
 
@@ -11,7 +11,9 @@ from collections.abc import Callable
 from pathlib import Path
 from typing import Any
 
-FIXTURES_DIR = Path(__file__).resolve().parents[2] / "fixtures"
+from agentic_eval.domain import ROOT
+
+FIXTURES_DIR = ROOT / "fixtures" / "generic"
 
 TOOL_SCHEMAS: list[dict[str, Any]] = [
     {

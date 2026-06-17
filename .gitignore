@@ -36,6 +36,8 @@ CLAUDE.local.md
 *.log
 *.log.*
 logs/
+# ...except committed synthetic eval-corpus logs under fixtures/<domain>/logs/
+!fixtures/**/logs/
 coverage/
 .coverage
 .coverage.*

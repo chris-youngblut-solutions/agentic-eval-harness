@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import pytest
 
-from agentic_eval import tools
+from agentic_eval.domains.generic import tools
 
 
 def test_calculator_basic() -> None:

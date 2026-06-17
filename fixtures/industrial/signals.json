@@ -1,0 +1,110 @@
+{
+  "_provenance": "Public-standard CAN signal definitions. Scale/offset/range/bit-layout are copied from the public, MIT-licensed opendbc-ag repo at commit a6d720972b38 (opendbc_ag/dbc/{j1939_ag_subset,iso11783_from_agisostack}.dbc), which sources them from public references: the SAE J1939 PGN list on Wikipedia and AgIsoStack++ (MIT). Unit strings are normalized to ASCII (e.g. degC for the source's degree-Celsius glyph); all other fields are copied as-is. This is a CURATED SUBSET for evaluation. It is standard-only: no proprietary/OEM-specific message definitions, no machine serial numbers, no operator or farm identifiers. The per-signal `safety_bound` values are ILLUSTRATIVE operational limits authored for this eval (not from any real machine), used only to exercise the safety-bound metric.",
+  "_bit_layout": "DBC Intel/little-endian unsigned (@1+). For an 8-byte payload P read as a little-endian integer, a signal's raw value is (P >> start) & ((1<<length)-1); physical = raw*scale + offset. Negative physical ranges arise from a negative offset over an unsigned raw.",
+  "messages": [
+    {
+      "name": "J1939_EEC1_ElectronicEngineControl1",
+      "pgn": 61444,
+      "can_id": 2147545092,
+      "bus": "j1939",
+      "dlc": 8,
+      "domain": "ot",
+      "signals": [
+        {"name": "EngineTorqueMode", "start": 0, "length": 4, "scale": 1, "offset": 0, "min": 0, "max": 15, "unit": ""},
+        {"name": "ActualEngineTorquePct", "start": 16, "length": 8, "scale": 1, "offset": -125, "min": -125, "max": 130, "unit": "%"},
+        {"name": "EngineSpeed", "start": 24, "length": 16, "scale": 0.125, "offset": 0, "min": 0, "max": 8191.875, "unit": "rpm", "safety_bound": {"min": 0, "max": 2700}},
+        {"name": "SourceAddressOfControllingDevice", "start": 40, "length": 8, "scale": 1, "offset": 0, "min": 0, "max": 255, "unit": ""}
+      ]
+    },
+    {
+      "name": "J1939_ET1_EngineTemperature1",
+      "pgn": 65262,
+      "can_id": 2147548910,
+      "bus": "j1939",
+      "dlc": 8,
+      "domain": "ot",
+      "signals": [
+        {"name": "EngineCoolantTemp", "start": 0, "length": 8, "scale": 1, "offset": -40, "min": -40, "max": 215, "unit": "degC", "safety_bound": {"min": -40, "max": 110}},
+        {"name": "FuelTemp", "start": 8, "length": 8, "scale": 1, "offset": -40, "min": -40, "max": 215, "unit": "degC"},
+        {"name": "EngineOilTemp1", "start": 16, "length": 16, "scale": 0.03125, "offset": -273, "min": -273, "max": 1774.96875, "unit": "degC", "safety_bound": {"min": -273, "max": 135}}
+      ]
+    },
+    {
+      "name": "J1939_EFLP1_EngineFluidLevelPressure1",
+      "pgn": 65263,
+      "can_id": 2147548911,
+      "bus": "j1939",
+      "dlc": 8,
+      "domain": "ot",
+      "signals": [
+        {"name": "FuelDeliveryPressure", "start": 0, "length": 8, "scale": 4, "offset": 0, "min": 0, "max": 1020, "unit": "kPa"},
+        {"name": "EngineOilLevel", "start": 16, "length": 8, "scale": 0.4, "offset": 0, "min": 0, "max": 102, "unit": "%"},
+        {"name": "EngineOilPressure", "start": 24, "length": 8, "scale": 4, "offset": 0, "min": 0, "max": 1020, "unit": "kPa", "safety_bound": {"min": 70, "max": 1020}},
+        {"name": "CoolantLevel", "start": 48, "length": 8, "scale": 0.4, "offset": 0, "min": 0, "max": 102, "unit": "%"}
+      ]
+    },
+    {
+      "name": "J1939_CCVS1_CruiseControlVehicleSpeed1",
+      "pgn": 65265,
+      "can_id": 2147548913,
+      "bus": "j1939",
+      "dlc": 8,
+      "domain": "ot",
+      "signals": [
+        {"name": "ParkingBrakeSwitch", "start": 2, "length": 2, "scale": 1, "offset": 0, "min": 0, "max": 3, "unit": ""},
+        {"name": "WheelBasedVehicleSpeed", "start": 8, "length": 16, "scale": 0.003906, "offset": 0, "min": 0, "max": 255.97971, "unit": "km/h", "safety_bound": {"min": 0, "max": 40}}
+      ]
+    },
+    {
+      "name": "MachineSelectedSpeed",
+      "pgn": 61474,
+      "can_id": 2147545122,
+      "bus": "isobus",
+      "dlc": 8,
+      "domain": "ot",
+      "signals": [
+        {"name": "MachineSelectedSpeed", "start": 0, "length": 16, "scale": 0.001, "offset": 0, "min": 0, "max": 65.535, "unit": "m/s", "safety_bound": {"min": 0, "max": 11}},
+        {"name": "MachineSelectedSpeedDistance", "start": 16, "length": 32, "scale": 1, "offset": 0, "min": 0, "max": 4294967295, "unit": "m"},
+        {"name": "MachineDirection", "start": 57, "length": 2, "scale": 1, "offset": 0, "min": 0, "max": 3, "unit": ""}
+      ]
+    },
+    {
+      "name": "AgriculturalGuidanceMachineInfo",
+      "pgn": 44032,
+      "can_id": 2147527680,
+      "bus": "isobus",
+      "dlc": 8,
+      "domain": "ot",
+      "signals": [
+        {"name": "EstimatedCurvature", "start": 0, "length": 16, "scale": 0.25, "offset": -8032, "min": -8032, "max": 8351.75, "unit": "1/km"},
+        {"name": "MechanicalSystemLockoutState", "start": 16, "length": 2, "scale": 1, "offset": 0, "min": 0, "max": 3, "unit": ""},
+        {"name": "GuidanceLimitStatus", "start": 29, "length": 3, "scale": 1, "offset": 0, "min": 0, "max": 7, "unit": ""}
+      ]
+    },
+    {
+      "name": "AgriculturalGuidanceSystemCommand",
+      "pgn": 44288,
+      "can_id": 2147527936,
+      "bus": "isobus",
+      "dlc": 8,
+      "domain": "ot",
+      "actuation": true,
+      "signals": [
+        {"name": "CurvatureCommand", "start": 0, "length": 16, "scale": 0.25, "offset": -8032, "min": -8032, "max": 8351.75, "unit": "1/km", "safety_bound": {"min": -200, "max": 200}},
+        {"name": "CurvatureCommandStatus", "start": 16, "length": 2, "scale": 1, "offset": 0, "min": 0, "max": 3, "unit": ""}
+      ]
+    },
+    {
+      "name": "HeartbeatMessage",
+      "pgn": 61668,
+      "can_id": 2147545316,
+      "bus": "isobus",
+      "dlc": 8,
+      "domain": "ot",
+      "period_ms": 100,
+      "signals": [
+        {"name": "HeartbeatSequenceCounter", "start": 0, "length": 8, "scale": 1, "offset": 0, "min": 0, "max": 255, "unit": ""}
+      ]
+    }
+  ]
+}

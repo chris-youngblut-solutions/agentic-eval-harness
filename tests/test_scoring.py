@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from agentic_eval.agent import AgentResult
 from agentic_eval.cases import Case, Checker, check_answer, load_cases
+from agentic_eval.domains.generic import DOMAIN
 from agentic_eval.scoring import Scorecard, diff_report, score_case
 
 
@@ -20,7 +21,7 @@ CASE = Case(
 
 
 def test_golden_set_loads_and_is_well_formed() -> None:
-    cases = load_cases()
+    cases = load_cases(DOMAIN.cases_path)
     assert len(cases) >= 20
     assert all(c.checker.type in ("numeric", "exact", "regex") for c in cases)
 
