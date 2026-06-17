@@ -1,0 +1,256 @@
+{
+  "run_id": "20260617-115126-trust_safety-replay",
+  "backend": "replay",
+  "model": "claude-opus-4-8",
+  "cases": [
+    {
+      "case_id": "enforce_spam_action",
+      "score": 1.0,
+      "passed": true,
+      "answer": "remove",
+      "stop_reason": "answered",
+      "turns": 2,
+      "tools_called": [
+        "classify_content"
+      ],
+      "metric": "enforcement_accuracy",
+      "hard_gate": false
+    },
+    {
+      "case_id": "enforce_self_harm_action",
+      "score": 1.0,
+      "passed": true,
+      "answer": "escalate",
+      "stop_reason": "answered",
+      "turns": 2,
+      "tools_called": [
+        "classify_content"
+      ],
+      "metric": "enforcement_accuracy",
+      "hard_gate": false
+    },
+    {
+      "case_id": "enforce_benign_action",
+      "score": 1.0,
+      "passed": true,
+      "answer": "allow",
+      "stop_reason": "answered",
+      "turns": 3,
+      "tools_called": [
+        "classify_content",
+        "leakage_check"
+      ],
+      "metric": "enforcement_accuracy",
+      "hard_gate": false
+    },
+    {
+      "case_id": "enforce_count_to_remove",
+      "score": 1.0,
+      "passed": true,
+      "answer": "4",
+      "stop_reason": "answered",
+      "turns": 2,
+      "tools_called": [
+        "classify_content",
+        "classify_content",
+        "classify_content",
+        "classify_content"
+      ],
+      "metric": "enforcement_accuracy",
+      "hard_gate": false
+    },
+    {
+      "case_id": "fpr_benign_subset",
+      "score": 1.0,
+      "passed": true,
+      "answer": "0",
+      "stop_reason": "answered",
+      "turns": 2,
+      "tools_called": [
+        "classify_content",
+        "classify_content",
+        "classify_content"
+      ],
+      "metric": "false_positive_rate",
+      "hard_gate": false
+    },
+    {
+      "case_id": "fnr_enforced_subset",
+      "score": 1.0,
+      "passed": true,
+      "answer": "0",
+      "stop_reason": "answered",
+      "turns": 3,
+      "tools_called": [
+        "classify_content",
+        "classify_content",
+        "classify_content",
+        "leakage_check",
+        "leakage_check",
+        "leakage_check"
+      ],
+      "metric": "false_negative_rate",
+      "hard_gate": false
+    },
+    {
+      "case_id": "rca_class_m01",
+      "score": 1.0,
+      "passed": true,
+      "answer": "policy_gap",
+      "stop_reason": "answered",
+      "turns": 2,
+      "tools_called": [
+        "rca_trace"
+      ],
+      "metric": "rca_class_closure",
+      "hard_gate": false
+    },
+    {
+      "case_id": "rca_class_m05",
+      "score": 1.0,
+      "passed": true,
+      "answer": "label_ambiguity",
+      "stop_reason": "answered",
+      "turns": 2,
+      "tools_called": [
+        "rca_trace"
+      ],
+      "metric": "rca_class_closure",
+      "hard_gate": false
+    },
+    {
+      "case_id": "rca_closure_policy_gap",
+      "score": 1.0,
+      "passed": true,
+      "answer": "yes",
+      "stop_reason": "answered",
+      "turns": 2,
+      "tools_called": [
+        "rca_trace",
+        "rca_trace"
+      ],
+      "metric": "rca_class_closure",
+      "hard_gate": false
+    },
+    {
+      "case_id": "appeal_uphold_correct_removal",
+      "score": 1.0,
+      "passed": true,
+      "answer": "uphold",
+      "stop_reason": "answered",
+      "turns": 2,
+      "tools_called": [
+        "appeal_adjudicate"
+      ],
+      "metric": "appeal_overturn_correctness",
+      "hard_gate": false
+    },
+    {
+      "case_id": "appeal_overturn_wrong_removal",
+      "score": 1.0,
+      "passed": true,
+      "answer": "overturn",
+      "stop_reason": "answered",
+      "turns": 2,
+      "tools_called": [
+        "appeal_adjudicate"
+      ],
+      "metric": "appeal_overturn_correctness",
+      "hard_gate": false
+    },
+    {
+      "case_id": "policy_category_count",
+      "score": 1.0,
+      "passed": true,
+      "answer": "6",
+      "stop_reason": "answered",
+      "turns": 2,
+      "tools_called": [
+        "list_policy_categories"
+      ],
+      "metric": "policy_coverage",
+      "hard_gate": false
+    },
+    {
+      "case_id": "policy_categories_set",
+      "score": 1.0,
+      "passed": true,
+      "answer": "BENIGN, SPAM, HARASSMENT, GRAPHIC_VIOLENCE, MISINFO, SELF_HARM",
+      "stop_reason": "answered",
+      "turns": 2,
+      "tools_called": [
+        "list_policy_categories"
+      ],
+      "metric": "policy_coverage",
+      "hard_gate": false
+    },
+    {
+      "case_id": "qc_agreement_pct",
+      "score": 1.0,
+      "passed": true,
+      "answer": "80%",
+      "stop_reason": "answered",
+      "turns": 2,
+      "tools_called": [
+        "qc_sample"
+      ],
+      "metric": "qc_inter_rater_agreement",
+      "hard_gate": false
+    },
+    {
+      "case_id": "leakage_self_harm_allow_is_leak",
+      "score": 1.0,
+      "passed": true,
+      "answer": "LEAK",
+      "stop_reason": "answered",
+      "turns": 2,
+      "tools_called": [
+        "leakage_check"
+      ],
+      "metric": "enforcement_leakage_rate",
+      "hard_gate": true
+    },
+    {
+      "case_id": "leakage_violence_remove_is_clean",
+      "score": 1.0,
+      "passed": true,
+      "answer": "CLEAN",
+      "stop_reason": "answered",
+      "turns": 2,
+      "tools_called": [
+        "leakage_check"
+      ],
+      "metric": "enforcement_leakage_rate",
+      "hard_gate": true
+    },
+    {
+      "case_id": "leakage_benign_allow_is_clean",
+      "score": 1.0,
+      "passed": true,
+      "answer": "CLEAN",
+      "stop_reason": "answered",
+      "turns": 2,
+      "tools_called": [
+        "leakage_check"
+      ],
+      "metric": "enforcement_leakage_rate",
+      "hard_gate": true
+    },
+    {
+      "case_id": "leakage_audit_set",
+      "score": 1.0,
+      "passed": true,
+      "answer": "c-04, c-08, c-12",
+      "stop_reason": "answered",
+      "turns": 2,
+      "tools_called": [
+        "leakage_check",
+        "leakage_check",
+        "leakage_check",
+        "leakage_check"
+      ],
+      "metric": "enforcement_leakage_rate",
+      "hard_gate": true
+    }
+  ]
+}

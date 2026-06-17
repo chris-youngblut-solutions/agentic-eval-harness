@@ -31,6 +31,16 @@ def test_policy_lookup_lists_all_when_empty() -> None:
     assert "SELF_HARM" in out["categories"]
 
 
+def test_list_policy_categories_is_a_zero_arg_discovery_tool() -> None:
+    # Reachable discovery affordance (the strict schema forbids the empty-category
+    # call), so an agent can enumerate categories without guessing names.
+    content, is_error = tools.execute_tool("list_policy_categories", {})
+    assert not is_error
+    out = json.loads(content)
+    assert len(out["categories"]) == 6
+    assert "SELF_HARM" in out["categories"]
+
+
 def test_policy_lookup_returns_rule_for_category() -> None:
     out = json.loads(tools.policy_lookup("SPAM"))
     assert out["action"] == "remove"

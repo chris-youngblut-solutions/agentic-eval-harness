@@ -1,0 +1,2 @@
+{"content": [{"caller": {"type": "direct"}, "id": "toolu_01NVXogYNBq3vQsw2Zz952yY", "input": {"expression": "850 // 36"}, "name": "calculator", "type": "tool_use"}]}
+{"content": [{"caller": {"type": "direct"}, "id": "toolu_01QdWxiY2zcbxc3hJNVhgLoi", "input": {"answer": "23"}, "name": "submit_answer", "type": "tool_use"}]}

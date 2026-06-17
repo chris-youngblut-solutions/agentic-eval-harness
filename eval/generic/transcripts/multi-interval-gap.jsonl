@@ -1,0 +1,3 @@
+{"content": [{"text": "I'll search for the service intervals of both pumps.", "type": "text"}, {"caller": {"type": "direct"}, "id": "toolu_013BF4Fc9ntFcLuHzRp1rB6Z", "input": {"pattern": "service interval"}, "name": "file_search", "type": "tool_use"}]}
+{"content": [{"caller": {"type": "direct"}, "id": "toolu_01C6fLe8sNRr5zQnhTYdrcK8", "input": {"expression": "750 - 500"}, "name": "calculator", "type": "tool_use"}]}
+{"content": [{"caller": {"type": "direct"}, "id": "toolu_019hDWJUoFMBeUvpVfgiSECZ", "input": {"answer": "250 hours"}, "name": "submit_answer", "type": "tool_use"}]}

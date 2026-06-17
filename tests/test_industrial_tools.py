@@ -60,6 +60,15 @@ def test_fault_check_finds_the_four_injected_faults() -> None:
     }
 
 
+def test_fault_check_rejects_unknown_signal() -> None:
+    # A bogus non-empty signal must fail loudly (like query_signal), not
+    # silently return zero faults — the empty/omitted-signal scan-all path
+    # is the only intended way to filter, so this guards against the
+    # silent-empty trap that made an agent guess signal names.
+    with pytest.raises(tools.ToolError):
+        tools.fault_check("faults", "NotARealSignal")
+
+
 def test_safety_bound_check_within_and_violation() -> None:
     assert tools.safety_bound_check("EngineSpeed", 1500).startswith("WITHIN")
     assert tools.safety_bound_check("EngineSpeed", 3010).startswith("VIOLATION")

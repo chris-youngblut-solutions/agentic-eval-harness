@@ -50,6 +50,21 @@ def test_csv_query_numeric_filter() -> None:
     assert big == "4"  # rows 1003, 1008, 1014, 1019
 
 
+def test_csv_query_distinct_discovers_vocabulary() -> None:
+    # The discovery affordance: list a column's unique values so an agent can
+    # find the right filter values instead of guessing them literally.
+    assert tools.csv_query("distinct", "status", []) == '["cancelled", "completed", "returned"]'
+    assert (
+        tools.csv_query("distinct", "category", [])
+        == '["actuators", "controllers", "harnesses", "sensors"]'
+    )
+    # distinct respects filters and returns [] (not an error) on an empty selection.
+    empty = tools.csv_query(
+        "distinct", "status", [{"column": "region", "op": "eq", "value": "nowhere"}]
+    )
+    assert empty == "[]"
+
+
 def test_execute_tool_returns_error_flag() -> None:
     content, is_error = tools.execute_tool("calculator", {"expression": "nope nope"})
     assert is_error and "tool error" in content

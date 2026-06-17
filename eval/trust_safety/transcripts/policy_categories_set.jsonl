@@ -1,0 +1,2 @@
+{"content": [{"text": "I'll look up all the policy categories.", "type": "text"}, {"caller": {"type": "direct"}, "id": "toolu_01GdBhJYsQpe9v2n7jhnTnsi", "input": {}, "name": "list_policy_categories", "type": "tool_use"}]}
+{"content": [{"caller": {"type": "direct"}, "id": "toolu_01RkXSM68NjHt29iJ1dfHZYf", "input": {"answer": "BENIGN, SPAM, HARASSMENT, GRAPHIC_VIOLENCE, MISINFO, SELF_HARM"}, "name": "submit_answer", "type": "tool_use"}]}

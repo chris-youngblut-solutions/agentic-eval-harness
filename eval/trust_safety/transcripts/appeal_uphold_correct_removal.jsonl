@@ -1,0 +1,2 @@
+{"content": [{"text": "I'll adjudicate appeal a-01.", "type": "text"}, {"caller": {"type": "direct"}, "id": "toolu_01Na4MsQW4MTXmGDyNxwUTnM", "input": {"appeal_id": "a-01"}, "name": "appeal_adjudicate", "type": "tool_use"}]}
+{"content": [{"caller": {"type": "direct"}, "id": "toolu_01CqAipfj5yNe8qVHYqb2KBH", "input": {"answer": "uphold"}, "name": "submit_answer", "type": "tool_use"}]}

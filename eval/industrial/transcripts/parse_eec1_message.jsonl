@@ -1,0 +1,2 @@
+{"content": [{"text": "I'll decode this frame.", "type": "text"}, {"caller": {"type": "direct"}, "id": "toolu_01TdzTjr8rVQpramxC3ND7s3", "input": {"can_id": 2147545092, "data": "0000a5e02e000000"}, "name": "decode_frame", "type": "tool_use"}]}
+{"content": [{"caller": {"type": "direct"}, "id": "toolu_0129b8pfTGhHMPpTeKtFEtQL", "input": {"answer": "J1939_EEC1_ElectronicEngineControl1"}, "name": "submit_answer", "type": "tool_use"}]}

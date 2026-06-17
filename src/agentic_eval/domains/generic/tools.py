@@ -6,6 +6,7 @@ from __future__ import annotations
 import ast
 import contextlib
 import csv
+import json
 import re
 from collections.abc import Callable
 from pathlib import Path
@@ -66,7 +67,9 @@ TOOL_SCHEMAS: list[dict[str, Any]] = [
         "description": (
             "Aggregate over the orders table (orders.csv: order_id, region, category, "
             "quantity, unit_price, status). Call this for any question about orders. "
-            "Applies the filters, then runs the operation over the given column."
+            "Applies the filters, then runs the operation over the given column. "
+            "Use operation='distinct' to list a column's unique values (helpful for "
+            "discovering valid filter values before filtering)."
         ),
         "strict": True,
         "input_schema": {
@@ -74,7 +77,7 @@ TOOL_SCHEMAS: list[dict[str, Any]] = [
             "properties": {
                 "operation": {
                     "type": "string",
-                    "enum": ["count", "sum", "avg", "min", "max"],
+                    "enum": ["count", "sum", "avg", "min", "max", "distinct"],
                 },
                 "column": {
                     "type": "string",
@@ -204,6 +207,8 @@ def csv_query(
     selected = [r for r in rows if matches(r)]
     if operation == "count":
         return str(len(selected))
+    if operation == "distinct":
+        return json.dumps(sorted({r[column] for r in selected}))
     if not selected:
         raise ToolError("no rows match the filters")
     values = [float(r[column]) for r in selected]

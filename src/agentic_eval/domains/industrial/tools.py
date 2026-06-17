@@ -119,6 +119,8 @@ def fault_check(log: str, signal: str = "") -> str:
     Evaluates monitored signals: those with a published safety bound, plus the
     periodic heartbeat (for dropout). Returns the detected faults, one per signal.
     """
+    if signal and signal not in _SIGNAL_INDEX:
+        raise ToolError(f"unknown signal: {signal!r}")
     frames = _read_log(log)
     present = {int(f["can_id"]) for f in frames}
     faults: list[dict[str, str]] = []
@@ -216,16 +218,15 @@ TOOL_SCHEMAS: list[dict[str, Any]] = [
         "name": "fault_check",
         "description": (
             "Scan a bus log for faults (out_of_range, dropout, stuck, drift) across "
-            "monitored signals. Optionally restrict to one signal. Returns the faults found."
+            "all monitored signals. Returns the faults found, one per signal."
         ),
         "strict": True,
         "input_schema": {
             "type": "object",
             "properties": {
                 "log": {"type": "string", "description": "log name, e.g. faults"},
-                "signal": {"type": "string", "description": "optional: restrict to one signal"},
             },
-            "required": ["log", "signal"],
+            "required": ["log"],
             "additionalProperties": False,
         },
     },

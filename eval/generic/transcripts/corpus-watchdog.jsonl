@@ -1,0 +1,3 @@
+{"content": [{"text": "I'll search for the CR-12 watchdog timeout information.", "type": "text"}, {"caller": {"type": "direct"}, "id": "toolu_011G1WSa32EzK11VCQUJVt2u", "input": {"pattern": "CR-12 watchdog"}, "name": "file_search", "type": "tool_use"}]}
+{"content": [{"caller": {"type": "direct"}, "id": "toolu_01Eq4aZrmAbgkvGEZsSK5hpY", "input": {"pattern": "CR-12"}, "name": "file_search", "type": "tool_use"}, {"caller": {"type": "direct"}, "id": "toolu_01Ja5RdBC7wfRc19tpZ4Ta7o", "input": {"pattern": "watchdog"}, "name": "file_search", "type": "tool_use"}]}
+{"content": [{"caller": {"type": "direct"}, "id": "toolu_01JisbcATFMFF7TxwymgvKfp", "input": {"answer": "1500 ms"}, "name": "submit_answer", "type": "tool_use"}]}

@@ -1,0 +1,2 @@
+{"content": [{"caller": {"type": "direct"}, "id": "toolu_014pu6F6kvAoUYprZa3iiNkR", "input": {"expression": "14 * 89.50 * (1 - 0.12)"}, "name": "calculator", "type": "tool_use"}]}
+{"content": [{"caller": {"type": "direct"}, "id": "toolu_018ZZGCVUHn9fzoAxFCGSisT", "input": {"answer": "1102.64"}, "name": "submit_answer", "type": "tool_use"}]}

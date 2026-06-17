@@ -33,6 +33,11 @@ class ToolError(ValueError):
     """Raised on invalid tool input; returned to the model as is_error."""
 
 
+def list_policy_categories() -> str:
+    """List every category id the content policy defines."""
+    return json.dumps({"categories": list(_POLICY.category_ids)}, sort_keys=True)
+
+
 def policy_lookup(category: str = "") -> str:
     """Return the rule (action + severity + markers) for a category.
 
@@ -162,6 +167,21 @@ TOOL_SCHEMAS: list[dict[str, Any]] = [
         },
     },
     {
+        "name": "list_policy_categories",
+        "description": (
+            "List every category id the content policy defines. Call this to discover "
+            "the policy's categories (e.g. to count or enumerate them) before looking "
+            "an individual category up with policy_lookup."
+        ),
+        "strict": True,
+        "input_schema": {
+            "type": "object",
+            "properties": {},
+            "required": [],
+            "additionalProperties": False,
+        },
+    },
+    {
         "name": "classify_content",
         "description": (
             "Classify a content item by deterministic marker matching against the "
@@ -252,6 +272,8 @@ TOOL_SCHEMAS: list[dict[str, Any]] = [
 def execute_tool(name: str, tool_input: dict[str, Any]) -> tuple[str, bool]:
     """Run a tool; returns (content, is_error)."""
     try:
+        if name == "list_policy_categories":
+            return list_policy_categories(), False
         if name == "policy_lookup":
             return policy_lookup(str(tool_input.get("category", ""))), False
         if name == "classify_content":

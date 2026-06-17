@@ -1,0 +1,3 @@
+{"content": [{"text": "I'll find the highest unit price among controller orders.", "type": "text"}, {"caller": {"type": "direct"}, "id": "toolu_01Qo3ME53KH2zrDJ7mHebvzJ", "input": {"column": "category", "filters": [], "operation": "distinct"}, "name": "csv_query", "type": "tool_use"}]}
+{"content": [{"caller": {"type": "direct"}, "id": "toolu_01H5etrkazx2bdgrEkLhGMkw", "input": {"column": "unit_price", "filters": [{"column": "category", "op": "eq", "value": "controllers"}], "operation": "max"}, "name": "csv_query", "type": "tool_use"}]}
+{"content": [{"caller": {"type": "direct"}, "id": "toolu_01KavH9fJF8qkHAtRjpTHKVo", "input": {"answer": "225"}, "name": "submit_answer", "type": "tool_use"}]}

@@ -1,0 +1,2 @@
+{"content": [{"text": "I'll look up the inter-rater agreement for set_a.", "type": "text"}, {"caller": {"type": "direct"}, "id": "toolu_01AEQMRJCjrcxdx7subkJA5J", "input": {"set_name": "set_a"}, "name": "qc_sample", "type": "tool_use"}]}
+{"content": [{"caller": {"type": "direct"}, "id": "toolu_01W93qgpe4oCDM4YiAWH8Tpd", "input": {"answer": "80%"}, "name": "submit_answer", "type": "tool_use"}]}

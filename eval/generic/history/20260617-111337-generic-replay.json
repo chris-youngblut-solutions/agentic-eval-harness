@@ -1,0 +1,337 @@
+{
+  "run_id": "20260617-111337-generic-replay",
+  "backend": "replay",
+  "model": "claude-opus-4-8",
+  "cases": [
+    {
+      "case_id": "calc-basic-product",
+      "score": 1.0,
+      "passed": true,
+      "answer": "391",
+      "stop_reason": "answered",
+      "turns": 2,
+      "tools_called": [
+        "calculator"
+      ],
+      "metric": null,
+      "hard_gate": false
+    },
+    {
+      "case_id": "calc-discounted-total",
+      "score": 1.0,
+      "passed": true,
+      "answer": "1102.64",
+      "stop_reason": "answered",
+      "turns": 2,
+      "tools_called": [
+        "calculator"
+      ],
+      "metric": null,
+      "hard_gate": false
+    },
+    {
+      "case_id": "calc-percent-change",
+      "score": 1.0,
+      "passed": true,
+      "answer": "30.58%",
+      "stop_reason": "answered",
+      "turns": 2,
+      "tools_called": [
+        "calculator"
+      ],
+      "metric": null,
+      "hard_gate": false
+    },
+    {
+      "case_id": "calc-floor-division",
+      "score": 1.0,
+      "passed": true,
+      "answer": "23",
+      "stop_reason": "answered",
+      "turns": 2,
+      "tools_called": [
+        "calculator"
+      ],
+      "metric": null,
+      "hard_gate": false
+    },
+    {
+      "case_id": "calc-compound",
+      "score": 1.0,
+      "passed": true,
+      "answer": "533",
+      "stop_reason": "answered",
+      "turns": 2,
+      "tools_called": [
+        "calculator"
+      ],
+      "metric": null,
+      "hard_gate": false
+    },
+    {
+      "case_id": "calc-leap-february-hours",
+      "score": 1.0,
+      "passed": true,
+      "answer": "696",
+      "stop_reason": "answered",
+      "turns": 2,
+      "tools_called": [
+        "calculator"
+      ],
+      "metric": null,
+      "hard_gate": false
+    },
+    {
+      "case_id": "corpus-hx300-torque",
+      "score": 1.0,
+      "passed": true,
+      "answer": "24",
+      "stop_reason": "answered",
+      "turns": 3,
+      "tools_called": [
+        "file_search",
+        "read_file"
+      ],
+      "metric": null,
+      "hard_gate": false
+    },
+    {
+      "case_id": "corpus-hx500-impeller",
+      "score": 1.0,
+      "passed": true,
+      "answer": "IMP-6620",
+      "stop_reason": "answered",
+      "turns": 3,
+      "tools_called": [
+        "file_search",
+        "read_file"
+      ],
+      "metric": null,
+      "hard_gate": false
+    },
+    {
+      "case_id": "corpus-cr12-firmware",
+      "score": 1.0,
+      "passed": true,
+      "answer": "v4.2.1",
+      "stop_reason": "answered",
+      "turns": 3,
+      "tools_called": [
+        "file_search",
+        "read_file"
+      ],
+      "metric": null,
+      "hard_gate": false
+    },
+    {
+      "case_id": "corpus-cr12-channels",
+      "score": 1.0,
+      "passed": true,
+      "answer": "8",
+      "stop_reason": "answered",
+      "turns": 3,
+      "tools_called": [
+        "file_search",
+        "read_file"
+      ],
+      "metric": null,
+      "hard_gate": false
+    },
+    {
+      "case_id": "corpus-hx300-seal-kit",
+      "score": 1.0,
+      "passed": true,
+      "answer": "SK-300-V (Viton)",
+      "stop_reason": "answered",
+      "turns": 3,
+      "tools_called": [
+        "file_search",
+        "read_file"
+      ],
+      "metric": null,
+      "hard_gate": false
+    },
+    {
+      "case_id": "corpus-watchdog",
+      "score": 1.0,
+      "passed": true,
+      "answer": "1500 ms",
+      "stop_reason": "answered",
+      "turns": 3,
+      "tools_called": [
+        "file_search",
+        "file_search",
+        "file_search"
+      ],
+      "metric": null,
+      "hard_gate": false
+    },
+    {
+      "case_id": "csv-completed-count",
+      "score": 1.0,
+      "passed": true,
+      "answer": "19",
+      "stop_reason": "answered",
+      "turns": 2,
+      "tools_called": [
+        "csv_query"
+      ],
+      "metric": null,
+      "hard_gate": false
+    },
+    {
+      "case_id": "csv-west-completed",
+      "score": 1.0,
+      "passed": true,
+      "answer": "7",
+      "stop_reason": "answered",
+      "turns": 2,
+      "tools_called": [
+        "csv_query"
+      ],
+      "metric": null,
+      "hard_gate": false
+    },
+    {
+      "case_id": "csv-west-avg-quantity",
+      "score": 1.0,
+      "passed": true,
+      "answer": "6.71",
+      "stop_reason": "answered",
+      "turns": 3,
+      "tools_called": [
+        "csv_query",
+        "calculator"
+      ],
+      "metric": null,
+      "hard_gate": false
+    },
+    {
+      "case_id": "csv-controllers-max-price",
+      "score": 1.0,
+      "passed": true,
+      "answer": "225",
+      "stop_reason": "answered",
+      "turns": 4,
+      "tools_called": [
+        "csv_query",
+        "csv_query",
+        "csv_query",
+        "csv_query"
+      ],
+      "metric": null,
+      "hard_gate": false
+    },
+    {
+      "case_id": "csv-sensors-units",
+      "score": 0.5,
+      "passed": false,
+      "answer": null,
+      "stop_reason": "stopped_max_turns",
+      "turns": 8,
+      "tools_called": [
+        "csv_query",
+        "csv_query",
+        "csv_query",
+        "csv_query",
+        "csv_query",
+        "csv_query",
+        "csv_query",
+        "csv_query",
+        "csv_query",
+        "csv_query",
+        "csv_query",
+        "csv_query",
+        "csv_query",
+        "csv_query",
+        "csv_query",
+        "csv_query",
+        "csv_query",
+        "csv_query",
+        "csv_query",
+        "csv_query"
+      ],
+      "metric": null,
+      "hard_gate": false
+    },
+    {
+      "case_id": "csv-harness-units",
+      "score": 1.0,
+      "passed": true,
+      "answer": "57",
+      "stop_reason": "answered",
+      "turns": 6,
+      "tools_called": [
+        "csv_query",
+        "csv_query",
+        "csv_query",
+        "csv_query",
+        "csv_query",
+        "csv_query"
+      ],
+      "metric": null,
+      "hard_gate": false
+    },
+    {
+      "case_id": "multi-flow-combined",
+      "score": 1.0,
+      "passed": true,
+      "answer": "820 L/min",
+      "stop_reason": "answered",
+      "turns": 4,
+      "tools_called": [
+        "file_search",
+        "file_search",
+        "file_search",
+        "read_file",
+        "read_file",
+        "calculator"
+      ],
+      "metric": null,
+      "hard_gate": false
+    },
+    {
+      "case_id": "multi-interval-gap",
+      "score": 1.0,
+      "passed": true,
+      "answer": "250 hours",
+      "stop_reason": "answered",
+      "turns": 3,
+      "tools_called": [
+        "file_search",
+        "calculator"
+      ],
+      "metric": null,
+      "hard_gate": false
+    },
+    {
+      "case_id": "multi-completed-minus-cancelled",
+      "score": 1.0,
+      "passed": true,
+      "answer": "16",
+      "stop_reason": "answered",
+      "turns": 2,
+      "tools_called": [
+        "csv_query",
+        "csv_query"
+      ],
+      "metric": null,
+      "hard_gate": false
+    },
+    {
+      "case_id": "multi-east-west-completed",
+      "score": 1.0,
+      "passed": true,
+      "answer": "12",
+      "stop_reason": "answered",
+      "turns": 3,
+      "tools_called": [
+        "csv_query",
+        "csv_query",
+        "calculator"
+      ],
+      "metric": null,
+      "hard_gate": false
+    }
+  ]
+}

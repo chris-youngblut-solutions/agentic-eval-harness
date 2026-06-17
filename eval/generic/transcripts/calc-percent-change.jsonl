@@ -1,0 +1,2 @@
+{"content": [{"caller": {"type": "direct"}, "id": "toolu_01NcKcWQ8T4hLgA9gTaLGHxs", "input": {"expression": "(538 - 412) / 412 * 100"}, "name": "calculator", "type": "tool_use"}]}
+{"content": [{"caller": {"type": "direct"}, "id": "toolu_01QqqUjTrbmwugtZYgQgjzRt", "input": {"answer": "30.58%"}, "name": "submit_answer", "type": "tool_use"}]}
