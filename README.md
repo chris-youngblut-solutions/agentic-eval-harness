@@ -1,10 +1,8 @@
 # agentic-eval-harness
 
-> One agentic plan-act-observe loop over real tools, plus the eval harness that scores
-> it — across pluggable domain packs. Partial-credit rubric, per-metric rollups, hard
-> gates, and regression tracking across runs. Apache-2.0 OR MIT. Status: 0.1.0.
+A CLI and library: one agentic plan-act-observe loop over real tools, plus the eval harness that scores it — across pluggable domain packs — with a partial-credit rubric, per-metric rollups, hard gates, and regression tracking across runs.
 
-## What
+## What it does
 
 An agent loop on the Anthropic SDK (`claude-opus-4-8` by default) with offline,
 deterministic tools and explicit stop conditions: a `submit_answer` tool call (the
@@ -37,7 +35,7 @@ recorded model turns through the identical loop and tool code with no key and no
 network. Tools execute for real in both — they are deterministic, so a replayed run
 reproduces its scorecard, and the recorded outputs, exactly.
 
-## Run
+## Quickstart
 
 Requires [uv](https://docs.astral.sh/uv/); the live backend requires
 `ANTHROPIC_API_KEY` in the environment.
@@ -61,7 +59,7 @@ uv run agentic-eval report --domain industrial          # per-case diff of the t
 `eval` prints one line per case, a per-metric rollup, and a summary
 (`N/M passed, score S/M`), and writes `eval/<domain>/history/<run-id>.json`.
 
-## Eval design
+## How it works
 
 - **Domains** (`src/agentic_eval/domains/<name>/`): each pack exports a `Domain`
   (system prompt + tool schemas + tool executor); its golden set is
@@ -86,7 +84,9 @@ uv run agentic-eval report --domain industrial          # per-case diff of the t
   run replays byte-for-byte — and `eval --backend replay --record` regenerates the
   transcripts with no key.
 
-## Limits
+## Status
+
+Version 0.1.0.
 
 - Committed scorecards and transcripts are present for all three domains (live runs,
   `claude-opus-4-8`); `eval --backend replay` reproduces them with no key, and the
