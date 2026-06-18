@@ -1,5 +1,7 @@
 # Design
 
+The architecture and design decisions of the agentic-eval-harness: a domain-agnostic plan-act-observe agent loop plus the eval harness that scores it across pluggable domain packs.
+
 ## Architecture
 
 ```
@@ -25,12 +27,12 @@ eval/<domain>/transcripts/  recorded conversation: task + assistant turns + tool
 eval/<domain>/history/      one scorecard JSON per run
 ```
 
-## Decisions
+## Design decisions
 
 - **Own the loop; no agent framework.** The loop is under 70 lines over the Messages API
-  (manual tool-use loop per the API docs). A framework would hide exactly the part
-  this repo exists to demonstrate: stop conditions, error budgets, tool plumbing,
-  and the seam that makes replay possible.
+  (manual tool-use loop per the API docs). A framework would hide the parts this repo
+  demonstrates: stop conditions, error budgets, tool plumbing, and the seam that makes
+  replay possible.
 - **One engine, N domain packs.** Everything domain-specific (system prompt, tools,
   golden set, fixtures) lives behind a `Domain` selected with `--domain`; the engine
   never changes when a domain is added. `generic` is the reference baseline;
@@ -41,8 +43,7 @@ eval/<domain>/history/      one scorecard JSON per run
   no real policy or harmful content). Adding a domain is additive, not a fork.
 - **Metric tags + hard gates.** Cases carry a `metric` (rolled up per metric in the
   scorecard) and an optional `hard_gate`. A failed hard-gate case (e.g. a safety-bound
-  violation in the industrial pack) fails the whole run regardless of the pass count —
-  the eval analogue of a non-negotiable safety property.
+  violation in the industrial pack) fails the whole run regardless of the pass count.
 - **`set` checker for precision/recall.** Beyond numeric/exact/regex, a `set` checker
   scores the F1 of the answer's item set against an expected set — the mechanical basis
   for fault-detection precision/recall without an LLM judge.
@@ -77,7 +78,7 @@ eval/<domain>/history/      one scorecard JSON per run
 | pydantic | 2.x |
 | pyyaml | 6.x |
 
-## Honesty boundary
+## Status
 
 Built and tested: the engine (loop, runner, scoring), the domain seam, three domain
 packs (generic + industrial + trust_safety — tools, golden sets, fixtures), the rubric
