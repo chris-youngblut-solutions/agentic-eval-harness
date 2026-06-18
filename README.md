@@ -19,7 +19,7 @@ with `--domain`. Three ship in the box:
 - **`industrial`** — a CAN/ISOBUS edge decode + diagnostics agent: `decode_frame`,
   `query_signal`, `fault_check`, `safety_bound_check` (a deterministic safety gate),
   `sensor_fuse`. Decode ground-truth is a curated public-standard signal subset derived
-  from the MIT-licensed [opendbc-ag](https://github.com/in-loop/opendbc-ag); the bus
+  from the MIT-licensed [opendbc-ag](https://github.com/chris-youngblut-solutions/opendbc-ag); the bus
   logs are a synthetic corpus (no real machine, operator, or farm data). 17 cases.
 - **`trust_safety`** — a content-enforcement agent over a fully synthetic, generic
   policy: `policy_lookup`, `classify_content`, `rca_trace`, `appeal_adjudicate`,
@@ -41,7 +41,7 @@ Requires [uv](https://docs.astral.sh/uv/); the live backend requires
 `ANTHROPIC_API_KEY` in the environment.
 
 ```sh
-git clone https://github.com/in-loop/agentic-eval-harness && cd agentic-eval-harness
+git clone https://github.com/chris-youngblut-solutions/agentic-eval-harness && cd agentic-eval-harness
 uv sync --all-extras
 uv run pytest          # 64 tests: engine, tools, scoring, all domains, replay — no key needed
 ```
