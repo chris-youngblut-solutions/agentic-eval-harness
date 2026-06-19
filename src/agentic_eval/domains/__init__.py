@@ -19,4 +19,7 @@ Built-in domains:
   access-control adherence over a fully synthetic, generic compliance rule set
   (methodology-only: abstract MARKER tokens, no real customer/account/PII data,
   no real sanctions list).
+- `data_semantic` — NL->metric/SQL accuracy + metric-correctness over a fully
+  synthetic, generic semantic layer (a metric catalog over a tiny star schema;
+  methodology-only, no real data model or data).
 """

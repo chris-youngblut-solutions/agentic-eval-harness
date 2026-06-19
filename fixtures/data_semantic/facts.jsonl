@@ -1,0 +1,8 @@
+{"amount": 100.0, "customer": "cust-a", "region": "west", "status": "completed"}
+{"amount": 200.0, "customer": "cust-b", "region": "west", "status": "completed"}
+{"amount": 150.0, "customer": "cust-a", "region": "west", "status": "pending"}
+{"amount": 50.0, "customer": "cust-c", "region": "west", "status": "cancelled"}
+{"amount": 300.0, "customer": "cust-c", "region": "east", "status": "completed"}
+{"amount": 100.0, "customer": "cust-d", "region": "east", "status": "pending"}
+{"amount": 75.0, "customer": "cust-b", "region": "east", "status": "cancelled"}
+{"amount": 25.0, "customer": "cust-d", "region": "east", "status": "pending"}

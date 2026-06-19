@@ -16,12 +16,15 @@ deterministic tools, plus the eval harness that scores it — across pluggable
 domain packs selected with `--domain`. Mechanical checkers
 (numeric/exact/regex/set-F1), partial-credit rubric, per-metric rollups, hard
 gates, scorecard history + regression diff, and a record/replay backend seam so
-CI runs the full path without an API key. Three domains ship: `generic` (22 cases),
+CI runs the full path without an API key. Four domains ship: `generic` (22 cases),
 `industrial` (CAN/ISOBUS edge decode + diagnostics, 17 cases; public-standard
-decode ground-truth from opendbc-ag over a synthetic corpus), and `trust_safety`
+decode ground-truth from opendbc-ag over a synthetic corpus), `trust_safety`
 (content-enforcement, 18 cases; methodology-only — a fully synthetic, generic policy
-with abstract MARKER tokens and benign filler, no real policy or harmful content). It
-does NOT use an agent framework, LLM judges, or online tools — see docs/design.md for why.
+with abstract MARKER tokens and benign filler, no real policy or harmful content), and
+`data_semantic` (NL→metric/SQL accuracy + metric-correctness, 20 cases; methodology-only
+— a fully synthetic, generic semantic layer / metric catalog over a tiny star schema, no
+real data model or data). It does NOT use an agent framework, LLM judges, or online
+tools — see docs/design.md for why.
 
 ## Build / test / lint
 
@@ -59,8 +62,10 @@ Update when the layout changes.
 - `src/agentic_eval/domains/<name>/` — a domain pack: `tools.py` + `__init__.py`
   exporting `DOMAIN`. `industrial` also has `codec.py` (bit-field decode/encode) and
   `generate.py` (deterministic corpus generator); `trust_safety` has `policy.py`
-  (synthetic policy + fixture loaders) and `generate.py`. Adding a domain is
-  additive — no engine edit.
+  (synthetic policy + fixture loaders) and `generate.py`; `data_semantic` has
+  `semantic.py` (synthetic metric-model + fixture loaders), `compute.py` (the shared
+  metric/SQL compute that is the single answer-key source), and `generate.py`. Adding a
+  domain is additive — no engine edit.
 - `fixtures/<name>/` — that domain's committed fixtures (the tools' only world);
   case expected-values derive from these. Changing a fixture means recomputing the
   domain's `eval/<name>/cases.yaml` expectations. For `industrial`, regenerate logs
