@@ -1,0 +1,18 @@
+{"description": "Classify a short synthetic log line into one of three buckets.", "difficulty": 0.1, "gold_tier": "edge", "id": "t-01", "privacy": false, "required_capabilities": ["classify"]}
+{"description": "Extract a fabricated order id from a one-line synthetic message.", "difficulty": 0.15, "gold_tier": "edge", "id": "t-02", "privacy": false, "required_capabilities": ["extract"]}
+{"description": "Answer a trivial synthetic chat prompt with a single token.", "difficulty": 0.05, "gold_tier": "edge", "id": "t-03", "privacy": false, "required_capabilities": ["chat"]}
+{"description": "Classify a longer synthetic record; medium difficulty.", "difficulty": 0.45, "gold_tier": "local", "id": "t-04", "privacy": false, "required_capabilities": ["classify"]}
+{"description": "Summarize a synthetic paragraph (summarize not on edge) -> local.", "difficulty": 0.3, "gold_tier": "local", "id": "t-05", "privacy": false, "required_capabilities": ["summarize"]}
+{"description": "Rerank a small synthetic candidate list (rerank not on edge) -> local.", "difficulty": 0.5, "gold_tier": "local", "id": "t-06", "privacy": false, "required_capabilities": ["rerank"]}
+{"description": "Summarize a hard synthetic passage; difficulty over local's band.", "difficulty": 0.8, "gold_tier": "frontier", "id": "t-07", "privacy": false, "required_capabilities": ["summarize"]}
+{"description": "Classify a very hard synthetic item; difficulty over local's band.", "difficulty": 0.9, "gold_tier": "frontier", "id": "t-08", "privacy": false, "required_capabilities": ["classify"]}
+{"description": "Describe a synthetic image (vision is frontier-only) -> frontier.", "difficulty": 0.2, "gold_tier": "frontier", "id": "t-09", "privacy": false, "required_capabilities": ["vision"]}
+{"description": "Run a synthetic multi-tool plan (tool_use is frontier-only) -> frontier.", "difficulty": 0.4, "gold_tier": "frontier", "id": "t-10", "privacy": false, "required_capabilities": ["tool_use"]}
+{"description": "Process a synthetic long-context doc (long_context frontier-only) -> frontier.", "difficulty": 0.55, "gold_tier": "frontier", "id": "t-11", "privacy": false, "required_capabilities": ["long_context"]}
+{"description": "PRIVACY: classify a sensitive synthetic record on-box only.", "difficulty": 0.1, "gold_tier": "edge", "id": "t-12", "privacy": true, "required_capabilities": ["classify"]}
+{"description": "PRIVACY: summarize a sensitive synthetic note on-box only.", "difficulty": 0.3, "gold_tier": "local", "id": "t-13", "privacy": true, "required_capabilities": ["summarize"]}
+{"description": "PRIVACY: hard synthetic summarize task, but privacy pins it local.", "difficulty": 0.95, "gold_tier": "local", "id": "t-14", "privacy": true, "required_capabilities": ["summarize"]}
+{"description": "PRIVACY: hard synthetic rerank, privacy pins it local not frontier.", "difficulty": 0.88, "gold_tier": "local", "id": "t-15", "privacy": true, "required_capabilities": ["rerank"]}
+{"description": "Synthetic task needing chat+classify+extract, easy -> edge.", "difficulty": 0.2, "gold_tier": "edge", "id": "t-16", "privacy": false, "required_capabilities": ["chat", "classify", "extract"]}
+{"description": "Synthetic task needing classify+summarize, medium -> local.", "difficulty": 0.4, "gold_tier": "local", "id": "t-17", "privacy": false, "required_capabilities": ["classify", "summarize"]}
+{"description": "Synthetic task needing summarize+vision -> frontier (vision-miss).", "difficulty": 0.3, "gold_tier": "frontier", "id": "t-18", "privacy": false, "required_capabilities": ["summarize", "vision"]}
