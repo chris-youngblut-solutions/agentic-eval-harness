@@ -1,2 +1,4 @@
-{"content": [{"text": "I'll trace the root cause of misfire m-01.", "type": "text"}, {"caller": {"type": "direct"}, "id": "toolu_019RjL2kbBNPmMzE5YrL7zpC", "input": {"misfire_id": "m-01"}, "name": "rca_trace", "type": "tool_use"}]}
-{"content": [{"caller": {"type": "direct"}, "id": "toolu_01MTvb46x2R3qt8xAhRaepHE", "input": {"answer": "policy_gap"}, "name": "submit_answer", "type": "tool_use"}]}
+{"content": "Trace the root cause of misfire m-01 and report only its root-cause class.", "role": "user"}
+{"content": [{"text": "I'll trace the root cause of misfire m-01.", "type": "text"}, {"caller": {"type": "direct"}, "id": "toolu_019RjL2kbBNPmMzE5YrL7zpC", "input": {"misfire_id": "m-01"}, "name": "rca_trace", "type": "tool_use"}], "role": "assistant"}
+{"content": [{"content": "{\"misfire_id\": \"m-01\", \"rca_class\": \"policy_gap\"}", "is_error": false, "tool_use_id": "toolu_019RjL2kbBNPmMzE5YrL7zpC", "type": "tool_result"}], "role": "user"}
+{"content": [{"caller": {"type": "direct"}, "id": "toolu_01MTvb46x2R3qt8xAhRaepHE", "input": {"answer": "policy_gap"}, "name": "submit_answer", "type": "tool_use"}], "role": "assistant"}

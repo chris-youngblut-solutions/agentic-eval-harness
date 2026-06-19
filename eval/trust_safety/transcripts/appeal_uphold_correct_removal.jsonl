@@ -1,2 +1,4 @@
-{"content": [{"text": "I'll adjudicate appeal a-01.", "type": "text"}, {"caller": {"type": "direct"}, "id": "toolu_01Na4MsQW4MTXmGDyNxwUTnM", "input": {"appeal_id": "a-01"}, "name": "appeal_adjudicate", "type": "tool_use"}]}
-{"content": [{"caller": {"type": "direct"}, "id": "toolu_01CqAipfj5yNe8qVHYqb2KBH", "input": {"answer": "uphold"}, "name": "submit_answer", "type": "tool_use"}]}
+{"content": "Adjudicate appeal a-01 and report only the verdict (overturn or uphold).", "role": "user"}
+{"content": [{"text": "I'll adjudicate appeal a-01.", "type": "text"}, {"caller": {"type": "direct"}, "id": "toolu_01Na4MsQW4MTXmGDyNxwUTnM", "input": {"appeal_id": "a-01"}, "name": "appeal_adjudicate", "type": "tool_use"}], "role": "assistant"}
+{"content": [{"content": "{\"appeal_id\": \"a-01\", \"content_id\": \"c-04\", \"verdict\": \"uphold\"}", "is_error": false, "tool_use_id": "toolu_01Na4MsQW4MTXmGDyNxwUTnM", "type": "tool_result"}], "role": "user"}
+{"content": [{"caller": {"type": "direct"}, "id": "toolu_01CqAipfj5yNe8qVHYqb2KBH", "input": {"answer": "uphold"}, "name": "submit_answer", "type": "tool_use"}], "role": "assistant"}

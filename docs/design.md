@@ -1,15 +1,20 @@
 # Design
 
+The architecture and design decisions of the agentic-eval-harness: a domain-agnostic plan-act-observe agent loop plus the eval harness that scores it across pluggable domain packs.
+
 ## Architecture
 
 ```
 src/agentic_eval/                     ENGINE (domain-agnostic)
   runner.py        CLI (run | eval | report), all take --domain
-  agent.py         plan-act-observe loop; ModelBackend protocol; run_task(task, backend, domain)
-                     LiveBackend   -> Anthropic API (records JSONL with --record)
-                     ReplayBackend -> recorded turns, no key, no network
+  agent.py         plan-act-observe loop; ModelBackend protocol; run_task(..., record_path)
+                     run_task records the full conversation as JSONL when given record_path
+                     LiveBackend   -> Anthropic API
+                     ReplayBackend -> recorded assistant turns, no key, no network
   domain.py        Domain(name, system_prompt, tool_schemas, execute_tool); load_domain(name)
   cases.py         golden-set loading; checkers (numeric/exact/regex/set); metric/hard_gate
+  dimensions.py    reusable scorer library — retrieval (precision/recall/f1/mrr/AP/nDCG),
+                     tool-use (exact/recall/precision/order), grounding/citation; a pack composes these
   scoring.py       rubric, scorecard, per-metric rollup, hard gates, history, regression diff
   domains/
     generic/       tools.py (calculator/file_search/read_file/csv_query) + DOMAIN     22 cases
@@ -20,16 +25,16 @@ src/agentic_eval/                     ENGINE (domain-agnostic)
 
 fixtures/<domain>/        committed fixtures (the tools' only world)
 eval/<domain>/cases.yaml  prompt + checker + expected tools + metric + hard_gate
-eval/<domain>/transcripts/  recorded assistant turns (one JSONL per case)
+eval/<domain>/transcripts/  recorded conversation: task + assistant turns + tool_result turns (one JSONL per case)
 eval/<domain>/history/      one scorecard JSON per run
 ```
 
-## Decisions
+## Design decisions
 
 - **Own the loop; no agent framework.** The loop is under 70 lines over the Messages API
-  (manual tool-use loop per the API docs). A framework would hide exactly the part
-  this repo exists to demonstrate: stop conditions, error budgets, tool plumbing,
-  and the seam that makes replay possible.
+  (manual tool-use loop per the API docs). A framework would hide the parts this repo
+  demonstrates: stop conditions, error budgets, tool plumbing, and the seam that makes
+  replay possible.
 - **One engine, N domain packs.** Everything domain-specific (system prompt, tools,
   golden set, fixtures) lives behind a `Domain` selected with `--domain`; the engine
   never changes when a domain is added. `generic` is the reference baseline;
@@ -40,19 +45,31 @@ eval/<domain>/history/      one scorecard JSON per run
   no real policy or harmful content). Adding a domain is additive, not a fork.
 - **Metric tags + hard gates.** Cases carry a `metric` (rolled up per metric in the
   scorecard) and an optional `hard_gate`. A failed hard-gate case (e.g. a safety-bound
-  violation in the industrial pack) fails the whole run regardless of the pass count —
-  the eval analogue of a non-negotiable safety property.
+  violation in the industrial pack) fails the whole run regardless of the pass count.
 - **`set` checker for precision/recall.** Beyond numeric/exact/regex, a `set` checker
   scores the F1 of the answer's item set against an expected set — the mechanical basis
   for fault-detection precision/recall without an LLM judge.
+- **A reusable dimension library, not per-pack scorers.** `dimensions.py` exports named,
+  pure scorers — retrieval quality (`precision`/`recall`/`f1`/`mrr`/`average_precision`/
+  `ndcg`), tool-use correctness (`tool_exact_match`/`tool_recall`/`tool_precision`/
+  `tool_order_match`), and grounding/citation (`citation_grounding`/`citation_coverage`/
+  `is_grounded`) — that every domain pack *composes* instead of re-deriving. It is to
+  eval scoring what a SQL spine is to data access: the same primitives back the `set`
+  checker's F1 and any pack's retrieval/tool/grounding bar. The functions take plain
+  collections (ids, tool names, citations), so they stay deterministic and keyless and
+  never reach for the agent types.
 - **`submit_answer` as a tool, not free text.** The final answer arrives as a strict-
   schema tool call, so scoring never parses prose. An assistant turn with no tool
   call is an explicit failure mode (`stopped_no_answer`), not a success path.
 - **Backend seam for replay.** The only nondeterministic component is the model.
-  Recording its turns (wire-shape content blocks, JSONL) and replaying them through
-  the identical loop + tool code gives CI a deterministic full-path execution with
-  no key. Tools re-execute for real on replay; they are pure functions of committed
-  fixtures, so results match the recording.
+  `run_task` records the full conversation as role-tagged JSONL (the task, each
+  assistant turn, and the user turns carrying the tools' `tool_result` outputs);
+  replaying the assistant turns through the identical loop + tool code gives CI a
+  deterministic full-path execution with no key. Tools re-execute for real on replay;
+  they are pure functions of committed fixtures, so the outputs match the recording —
+  which is why `eval --backend replay --record` can regenerate a faithful transcript
+  keyless. Recording the outputs (not just the model turns) makes the transcript a
+  fully observable plan-act-observe trace, not only what the model proposed.
 - **Mechanical checkers only.** Numeric-with-tolerance, exact, regex. LLM-as-judge
   adds a second model's variance to the thing being measured; for closed-form tasks
   it is unnecessary.
@@ -72,14 +89,14 @@ eval/<domain>/history/      one scorecard JSON per run
 | pydantic | 2.x |
 | pyyaml | 6.x |
 
-## Honesty boundary
+## Status
 
 Built and tested: the engine (loop, runner, scoring), the domain seam, three domain
 packs (generic + industrial + trust_safety — tools, golden sets, fixtures), the rubric
 with per-metric rollups + hard gates, regression tracking, record/replay, CLI, CI
-(lint/type/tests); 57 keyless tests. Pending: the first live run and its committed
-scorecard + transcripts per domain (needs `ANTHROPIC_API_KEY`; one command:
-`uv run agentic-eval eval --domain <name> --record`). The industrial corpus is synthetic
+(lint/type/tests); 64 keyless tests. Committed live scorecards + transcripts for all
+three domains (`claude-opus-4-8`); the transcripts carry the tools' outputs and
+`eval --backend replay` reproduces the scorecards keyless. The industrial corpus is synthetic
 and its decode ground-truth is public-standard only (see `fixtures/industrial/PROVENANCE.md`);
 safety bounds are illustrative; latency (p50/p95) is a live-only metric, not in the
 keyless golden set. The trust_safety pack is methodology-only — the policy, content

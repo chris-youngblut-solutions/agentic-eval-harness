@@ -1,2 +1,4 @@
-{"content": [{"caller": {"type": "direct"}, "id": "toolu_01GDn55S648vmfJhKQH1ub8f", "input": {"expression": "17 * 23"}, "name": "calculator", "type": "tool_use"}]}
-{"content": [{"caller": {"type": "direct"}, "id": "toolu_01QJkxrQ9gvfB7xygJ2b45s9", "input": {"answer": "391"}, "name": "submit_answer", "type": "tool_use"}]}
+{"content": "What is 17 * 23?", "role": "user"}
+{"content": [{"caller": {"type": "direct"}, "id": "toolu_01GDn55S648vmfJhKQH1ub8f", "input": {"expression": "17 * 23"}, "name": "calculator", "type": "tool_use"}], "role": "assistant"}
+{"content": [{"content": "391", "is_error": false, "tool_use_id": "toolu_01GDn55S648vmfJhKQH1ub8f", "type": "tool_result"}], "role": "user"}
+{"content": [{"caller": {"type": "direct"}, "id": "toolu_01QJkxrQ9gvfB7xygJ2b45s9", "input": {"answer": "391"}, "name": "submit_answer", "type": "tool_use"}], "role": "assistant"}

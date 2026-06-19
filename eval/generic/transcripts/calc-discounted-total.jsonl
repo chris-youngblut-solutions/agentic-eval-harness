@@ -1,2 +1,4 @@
-{"content": [{"caller": {"type": "direct"}, "id": "toolu_014pu6F6kvAoUYprZa3iiNkR", "input": {"expression": "14 * 89.50 * (1 - 0.12)"}, "name": "calculator", "type": "tool_use"}]}
-{"content": [{"caller": {"type": "direct"}, "id": "toolu_018ZZGCVUHn9fzoAxFCGSisT", "input": {"answer": "1102.64"}, "name": "submit_answer", "type": "tool_use"}]}
+{"content": "An order is 14 units at $89.50 each with a 12% discount. What is the total in dollars?", "role": "user"}
+{"content": [{"caller": {"type": "direct"}, "id": "toolu_014pu6F6kvAoUYprZa3iiNkR", "input": {"expression": "14 * 89.50 * (1 - 0.12)"}, "name": "calculator", "type": "tool_use"}], "role": "assistant"}
+{"content": [{"content": "1102.64", "is_error": false, "tool_use_id": "toolu_014pu6F6kvAoUYprZa3iiNkR", "type": "tool_result"}], "role": "user"}
+{"content": [{"caller": {"type": "direct"}, "id": "toolu_018ZZGCVUHn9fzoAxFCGSisT", "input": {"answer": "1102.64"}, "name": "submit_answer", "type": "tool_use"}], "role": "assistant"}

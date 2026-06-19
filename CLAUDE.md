@@ -52,8 +52,10 @@ does, key invariants a newcomer can't infer from a `tree` listing.
 Update when the layout changes.
 
 - `src/agentic_eval/` — engine (domain-agnostic): loop (agent.py), CLI (runner.py),
-  domain seam (domain.py), golden-set loading + checkers (cases.py), rubric + rollups
-  + history (scoring.py).
+  domain seam (domain.py), golden-set loading + checkers (cases.py), the reusable
+  scorer library (dimensions.py — retrieval precision/recall/f1/MRR/AP/nDCG, tool-use
+  correctness, grounding/citation; packs compose it), rubric + rollups + history
+  (scoring.py).
 - `src/agentic_eval/domains/<name>/` — a domain pack: `tools.py` + `__init__.py`
   exporting `DOMAIN`. `industrial` also has `codec.py` (bit-field decode/encode) and
   `generate.py` (deterministic corpus generator); `trust_safety` has `policy.py`
@@ -64,7 +66,7 @@ Update when the layout changes.
   domain's `eval/<name>/cases.yaml` expectations. For `industrial`, regenerate logs
   with `uv run python -m agentic_eval.domains.industrial.generate`; for `trust_safety`,
   `uv run python -m agentic_eval.domains.trust_safety.generate`.
-- `eval/<name>/` — cases.yaml, transcripts/ (recorded model turns), history/ (scorecards).
+- `eval/<name>/` — cases.yaml, transcripts/ (recorded conversation: task + assistant turns + tool_result outputs), history/ (scorecards).
 - `tests/` — scripted-backend tests; no network, no key. Keep it that way.
 - `.github/workflows/` — CI; SHA-pinned actions.
 

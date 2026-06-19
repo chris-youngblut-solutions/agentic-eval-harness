@@ -3,7 +3,7 @@
 #
 # Verification by downstream:
 #   cosign verify-blob \
-#     --certificate-identity-regexp '^https://github.com/in-loop/agentic-eval-harness/' \
+#     --certificate-identity-regexp '^https://github.com/chris-youngblut-solutions/agentic-eval-harness/' \
 #     --certificate-oidc-issuer https://token.actions.githubusercontent.com \
 #     --bundle <artifact>.bundle \
 #     <artifact>

@@ -5,6 +5,13 @@ The loop is backend-agnostic: a ModelBackend returns assistant content blocks
 returns recorded blocks, which lets CI exercise the identical loop with no key
 and no network. Tools execute for real in both cases — they are deterministic.
 
+Recording belongs to run_task, not the backend: given a record_path it persists
+the full conversation (the user task, every assistant turn, and the user turns
+carrying the tools' tool_result outputs) as role-tagged JSONL. Replay reads back
+only the assistant turns and re-executes the tools, so the observed outputs are
+reproduced rather than trusted — which means `eval --backend replay --record`
+regenerates a faithful, fully-observable transcript with no key.
+
 Stop conditions, all explicit:
 1. the model calls submit_answer  -> done (the only success path)
 2. max_turns model calls consumed -> stopped_max_turns
@@ -61,18 +68,14 @@ class ModelBackend(Protocol):
 
 
 class LiveBackend:
-    """Calls the Claude API. Optionally records each assistant turn to a JSONL
-    file so the run can be replayed later without a key."""
+    """Calls the Claude API and returns the assistant turn. Recording is handled
+    by run_task, so any backend (including replay) can produce a transcript."""
 
-    def __init__(self, model: str, record_path: Path | None = None) -> None:
+    def __init__(self, model: str) -> None:
         import anthropic  # imported here so replay-only environments don't need a key
 
         self.client = anthropic.Anthropic()
         self.model = model
-        self.record_path = record_path
-        if record_path is not None:
-            record_path.parent.mkdir(parents=True, exist_ok=True)
-            record_path.write_text("")
 
     def next_assistant_content(
         self, system: str, tool_schemas: list[dict[str, Any]], messages: list[dict[str, Any]]
@@ -84,20 +87,23 @@ class LiveBackend:
             tools=tool_schemas,  # type: ignore[arg-type]
             messages=messages,  # type: ignore[arg-type]
         )
-        content = [block.to_dict() for block in response.content]
-        if self.record_path is not None:
-            with self.record_path.open("a") as f:
-                f.write(json.dumps({"content": content}, sort_keys=True) + "\n")
-        return content
+        return [block.to_dict() for block in response.content]
 
 
 class ReplayBackend:
-    """Returns assistant turns recorded by LiveBackend, in order."""
+    """Returns the assistant turns from a recorded transcript, in order. Reads
+    assistant turns only — the tool_result (user) turns, when present, are
+    recomputed live by the tools on replay. Legacy transcripts whose lines are
+    untagged ``{"content": ...}`` are read as assistant turns."""
 
     def __init__(self, record_path: Path) -> None:
-        self.turns: list[list[dict[str, Any]]] = [
-            json.loads(line)["content"] for line in record_path.read_text().splitlines() if line
-        ]
+        self.turns: list[list[dict[str, Any]]] = []
+        for line in record_path.read_text().splitlines():
+            if not line:
+                continue
+            message = json.loads(line)
+            if message.get("role", "assistant") == "assistant":
+                self.turns.append(message["content"])
         self.cursor = 0
 
     def next_assistant_content(
@@ -110,70 +116,97 @@ class ReplayBackend:
         return content
 
 
+def _write_transcript(path: Path, messages: list[dict[str, Any]]) -> None:
+    """Persist the conversation as role-tagged JSONL — one message per line: the
+    user task, each assistant turn, and the user turns carrying tool_result
+    outputs. An answered run ends on the assistant `submit_answer` turn (no
+    trailing tool_result). Replay reads the assistant turns; the tool_result
+    turns make the recorded run a faithful, fully-observable transcript."""
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with path.open("w") as f:
+        for message in messages:
+            f.write(json.dumps(message, sort_keys=True) + "\n")
+
+
 def run_task(
     task: str,
     backend: ModelBackend,
     domain: Domain,
     max_turns: int = DEFAULT_MAX_TURNS,
+    record_path: Path | None = None,
 ) -> AgentResult:
     tool_schemas = [*domain.tool_schemas, SUBMIT_ANSWER_SCHEMA]
     messages: list[dict[str, Any]] = [{"role": "user", "content": task}]
     tools_called: list[str] = []
     tool_errors = 0
+    result: AgentResult | None = None
 
-    for turn in range(1, max_turns + 1):
-        content = backend.next_assistant_content(domain.system_prompt, tool_schemas, messages)
-        messages.append({"role": "assistant", "content": content})
-        tool_uses = [b for b in content if b.get("type") == "tool_use"]
+    try:
+        for turn in range(1, max_turns + 1):
+            content = backend.next_assistant_content(domain.system_prompt, tool_schemas, messages)
+            messages.append({"role": "assistant", "content": content})
+            tool_uses = [b for b in content if b.get("type") == "tool_use"]
 
-        if not tool_uses:
-            return AgentResult(
-                answer=None,
-                stop_reason="stopped_no_answer",
-                turns=turn,
-                tools_called=tools_called,
-                transcript=messages,
-            )
-
-        results: list[dict[str, Any]] = []
-        for block in tool_uses:
-            name = str(block["name"])
-            tool_input = dict(block["input"])
-            if name == "submit_answer":
-                return AgentResult(
-                    answer=str(tool_input.get("answer", "")),
-                    stop_reason="answered",
+            if not tool_uses:
+                result = AgentResult(
+                    answer=None,
+                    stop_reason="stopped_no_answer",
                     turns=turn,
                     tools_called=tools_called,
                     transcript=messages,
                 )
-            tools_called.append(name)
-            output, is_error = domain.execute_tool(name, tool_input)
-            if is_error:
-                tool_errors += 1
-            results.append(
-                {
-                    "type": "tool_result",
-                    "tool_use_id": block["id"],
-                    "content": output,
-                    "is_error": is_error,
-                }
-            )
-        messages.append({"role": "user", "content": results})
+                return result
 
-        if tool_errors > TOOL_ERROR_BUDGET:
-            return AgentResult(
-                answer=None,
-                stop_reason="stopped_tool_errors",
-                turns=turn,
-                tools_called=tools_called,
-                transcript=messages,
-            )
+            results: list[dict[str, Any]] = []
+            for block in tool_uses:
+                name = str(block["name"])
+                tool_input = dict(block["input"])
+                if name == "submit_answer":
+                    result = AgentResult(
+                        answer=str(tool_input.get("answer", "")),
+                        stop_reason="answered",
+                        turns=turn,
+                        tools_called=tools_called,
+                        transcript=messages,
+                    )
+                    return result
+                tools_called.append(name)
+                output, is_error = domain.execute_tool(name, tool_input)
+                if is_error:
+                    tool_errors += 1
+                results.append(
+                    {
+                        "type": "tool_result",
+                        "tool_use_id": block["id"],
+                        "content": output,
+                        "is_error": is_error,
+                    }
+                )
+            messages.append({"role": "user", "content": results})
 
-    return AgentResult(
-        answer=None,
-        stop_reason="stopped_max_turns",
-        turns=max_turns,
-        tools_called=tools_called,
-        transcript=messages,
-    )
+            if tool_errors > TOOL_ERROR_BUDGET:
+                result = AgentResult(
+                    answer=None,
+                    stop_reason="stopped_tool_errors",
+                    turns=turn,
+                    tools_called=tools_called,
+                    transcript=messages,
+                )
+                return result
+
+        result = AgentResult(
+            answer=None,
+            stop_reason="stopped_max_turns",
+            turns=max_turns,
+            tools_called=tools_called,
+            transcript=messages,
+        )
+        return result
+    finally:
+        # Persist only on a normal exit. If the loop raised (e.g. a replay ran
+        # short, or a live API error), `result` is None and we leave any existing
+        # transcript untouched rather than overwrite it with a partial one — which
+        # matters because `eval --backend replay --record` records over the same
+        # file it is replaying.
+        if record_path is not None and result is not None:
+            _write_transcript(record_path, messages)
