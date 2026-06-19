@@ -1,0 +1,6 @@
+{"gold_should_escalate": false, "id": "e-01", "ticket_id": "t-01"}
+{"gold_should_escalate": false, "id": "e-02", "ticket_id": "t-03"}
+{"gold_should_escalate": false, "id": "e-03", "ticket_id": "t-05"}
+{"gold_should_escalate": true, "id": "e-04", "ticket_id": "t-07"}
+{"gold_should_escalate": true, "id": "e-05", "ticket_id": "t-09"}
+{"gold_should_escalate": true, "id": "e-06", "ticket_id": "t-11"}

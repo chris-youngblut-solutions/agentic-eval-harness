@@ -1,0 +1,40 @@
+{
+  "items": [
+    "q-01",
+    "q-02",
+    "q-03",
+    "q-04",
+    "q-05",
+    "q-06",
+    "q-07",
+    "q-08",
+    "q-09",
+    "q-10"
+  ],
+  "rater_sets": {
+    "set_a": {
+      "q-01": "resolve",
+      "q-02": "resolve",
+      "q-03": "deflect",
+      "q-04": "escalate",
+      "q-05": "resolve",
+      "q-06": "deflect",
+      "q-07": "escalate",
+      "q-08": "resolve",
+      "q-09": "resolve",
+      "q-10": "escalate"
+    },
+    "set_b": {
+      "q-01": "resolve",
+      "q-02": "resolve",
+      "q-03": "deflect",
+      "q-04": "escalate",
+      "q-05": "resolve",
+      "q-06": "deflect",
+      "q-07": "escalate",
+      "q-08": "resolve",
+      "q-09": "deflect",
+      "q-10": "resolve"
+    }
+  }
+}

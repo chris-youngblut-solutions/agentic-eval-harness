@@ -7,4 +7,8 @@ Built-in domains:
 - `trust_safety` — content-policy enforcement + diagnostics over a fully synthetic,
   generic policy (methodology-only: abstract MARKER tokens, no real policy or
   harmful content).
+- `customer_support` — agent-assist triage/routing (resolution / deflection /
+  escalation correctness) over a fully synthetic, generic support action policy
+  (methodology-only: abstract MARKER tokens, no real policy, ticket, or customer
+  data); hard-gates auto-resolving a must-escalate ticket (unsafe auto-action).
 """
