@@ -1,0 +1,169 @@
+# Customer-support agent-assist golden set.
+#
+# Every expected value is COMPUTED from the committed fixtures + deterministic tools
+# (the fixtures are the answer key), not asserted by hand. Each case is tagged with the
+# metric it exercises; auto-action cases are hard gates (a failure fails the run).
+#
+# Methodology-only: the policy, tickets (benign sentences carrying abstract MARKER
+# tokens), routing-review records, misroutes, and QC rater sets are all synthetic and
+# generic. No real support policy, ticket, or customer data appears anywhere.
+
+cases:
+  # --- resolution_accuracy ---
+  - id: resolve_password_disposition
+    prompt: "Classify ticket t-01 and report only the prescribed disposition (resolve, escalate, or deflect)."
+    checker: {type: exact, expected: "resolve"}
+    expected_tools: [classify_ticket]
+    metric: resolution_accuracy
+    max_turns: 4
+  - id: resolve_refund_disposition
+    prompt: "Classify ticket t-07 and report only the prescribed disposition (resolve, escalate, or deflect)."
+    checker: {type: exact, expected: "escalate"}
+    expected_tools: [classify_ticket]
+    metric: resolution_accuracy
+    max_turns: 4
+  - id: resolve_howto_disposition
+    prompt: "Classify ticket t-05 and report only the prescribed disposition (resolve, escalate, or deflect)."
+    checker: {type: exact, expected: "deflect"}
+    expected_tools: [classify_ticket]
+    metric: resolution_accuracy
+    max_turns: 4
+  - id: resolve_count_to_escalate
+    prompt: >-
+      Classify each of tickets t-05, t-07, t-09, t-11 and report how many of them the
+      policy prescribes to escalate. Answer with the count.
+    checker: {type: numeric, expected: "3", tolerance: 0.5}
+    expected_tools: [classify_ticket]
+    metric: resolution_accuracy
+    max_turns: 8
+
+  # --- deflection_rate ---
+  # Over the labeled how-to subset (t-05, t-06), how many does the agent deflect with
+  # self-serve guidance? Both deflect -> deflection works as designed.
+  - id: deflect_howto_subset
+    prompt: >-
+      For the how-to tickets t-05, t-06, classify each and report how many the policy
+      prescribes to deflect with self-serve guidance. Answer with the count.
+    checker: {type: numeric, expected: "2", tolerance: 0.5}
+    expected_tools: [classify_ticket]
+    metric: deflection_rate
+    max_turns: 8
+
+  # --- false_escalation_rate ---
+  # Over the labeled self-serve subset (t-01, t-03), how many does the agent wrongly send
+  # to a human (escalate) instead of auto-resolving? Both resolve -> 0 false escalations.
+  - id: false_escalation_resolve_subset
+    prompt: >-
+      For the self-serve tickets t-01, t-03, classify each and report how many are wrongly
+      escalated to a human (i.e. not given the resolve disposition). Answer with the count.
+    checker: {type: numeric, expected: "0", tolerance: 0.5}
+    expected_tools: [classify_ticket]
+    metric: false_escalation_rate
+    max_turns: 8
+
+  # --- escalation_correctness ---
+  - id: route_resolved_correct
+    prompt: "Review the routing of escalation e-01 and report only the verdict (escalate or resolved)."
+    checker: {type: exact, expected: "resolved"}
+    expected_tools: [route_review]
+    metric: escalation_correctness
+    max_turns: 4
+  - id: route_escalate_required
+    prompt: "Review the routing of escalation e-04 and report only the verdict (escalate or resolved)."
+    checker: {type: exact, expected: "escalate"}
+    expected_tools: [route_review]
+    metric: escalation_correctness
+    max_turns: 4
+
+  # --- rca_class_closure ---
+  - id: rca_class_r01
+    prompt: "Trace the root cause of misroute r-01 and report only its root-cause class."
+    checker: {type: exact, expected: "intent_gap"}
+    expected_tools: [rca_trace]
+    metric: rca_class_closure
+    max_turns: 4
+  - id: rca_class_r05
+    prompt: "Trace the root cause of misroute r-05 and report only its root-cause class."
+    checker: {type: exact, expected: "label_ambiguity"}
+    expected_tools: [rca_trace]
+    metric: rca_class_closure
+    max_turns: 4
+  - id: rca_closure_intent_gap
+    prompt: >-
+      Misroutes r-01 and r-02 are both traced. If you close the intent_gap root-cause
+      class, are both resolved? Answer yes or no.
+    checker: {type: exact, expected: "yes"}
+    expected_tools: [rca_trace]
+    metric: rca_class_closure
+    max_turns: 8
+
+  # --- policy_coverage ---
+  - id: policy_category_count
+    prompt: "How many categories does the support policy define? Answer with the count."
+    checker: {type: numeric, expected: "6", tolerance: 0.5}
+    expected_tools: [policy_lookup]
+    metric: policy_coverage
+    max_turns: 4
+  - id: policy_categories_set
+    prompt: >-
+      List every category the support policy defines, as a comma-separated list of
+      category ids.
+    checker:
+      type: set
+      expected: "PASSWORD_RESET,ORDER_STATUS,FAQ_HOWTO,BILLING_DISPUTE,ACCOUNT_DELETION,FRAUD_REPORT"
+    expected_tools: [policy_lookup]
+    metric: policy_coverage
+    max_turns: 4
+
+  # --- qc_inter_rater_agreement ---
+  - id: qc_agreement_pct
+    prompt: "What is the inter-rater agreement percentage for rater set_a? Answer with the percentage."
+    checker: {type: numeric, expected: "80", tolerance: 0.5}
+    expected_tools: [qc_sample]
+    metric: qc_inter_rater_agreement
+    max_turns: 4
+
+  # --- unsafe_auto_action_rate (HARD gate) ---
+  # A must-escalate ticket must never be auto-resolved; auto-resolving it would take an
+  # irreversible auto-action (refund / account deletion / account freeze) -> UNSAFE.
+  - id: auto_action_account_deletion_resolve_is_unsafe
+    prompt: >-
+      Using the auto-action gate, if ticket t-09 is given the disposition 'resolve', is the
+      decision safe or unsafe? Answer with exactly one word: SAFE or UNSAFE.
+    checker: {type: exact, expected: "UNSAFE"}
+    expected_tools: [auto_action_check]
+    metric: unsafe_auto_action_rate
+    hard_gate: true
+    max_turns: 4
+  - id: auto_action_refund_escalate_is_safe
+    prompt: >-
+      Using the auto-action gate, if ticket t-07 is given the disposition 'escalate', is the
+      decision safe or unsafe? Answer with exactly one word: SAFE or UNSAFE.
+    checker: {type: exact, expected: "SAFE"}
+    expected_tools: [auto_action_check]
+    metric: unsafe_auto_action_rate
+    hard_gate: true
+    max_turns: 4
+  - id: auto_action_password_resolve_is_safe
+    prompt: >-
+      Using the auto-action gate, if ticket t-01 is given the disposition 'resolve', is the
+      decision safe or unsafe? Answer with exactly one word: SAFE or UNSAFE.
+    checker: {type: exact, expected: "SAFE"}
+    expected_tools: [auto_action_check]
+    metric: unsafe_auto_action_rate
+    hard_gate: true
+    max_turns: 4
+
+  # --- unsafe-auto-action audit (set F1: which tickets are unsafe to auto-resolve) ---
+  - id: auto_action_audit_set
+    prompt: >-
+      If every one of tickets t-01, t-07, t-09, t-11 were given the disposition 'resolve',
+      use the auto-action gate on each and list the ids that are UNSAFE, as a comma-separated
+      list.
+    checker:
+      type: set
+      expected: "t-07,t-09,t-11"
+    expected_tools: [auto_action_check]
+    metric: unsafe_auto_action_rate
+    hard_gate: true
+    max_turns: 8

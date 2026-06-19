@@ -11,4 +11,8 @@ Built-in domains:
   fully synthetic, generic tier table; encodes a documented two-lane (local | frontier)
   dispatch contract, extended with a third on-device edge tier, with a must-not-misroute
   privacy hard gate.
+- `customer_support` — agent-assist triage/routing (resolution / deflection /
+  escalation correctness) over a fully synthetic, generic support action policy
+  (methodology-only: abstract MARKER tokens, no real policy, ticket, or customer
+  data); hard-gates auto-resolving a must-escalate ticket (unsafe auto-action).
 """

@@ -1,0 +1,12 @@
+{"gold_category": "PASSWORD_RESET", "gold_disposition": "resolve", "id": "t-01", "text": "Fabricated sample ticket for eval; benign filler text. Token: MARKER_PASSWORD_RESET end."}
+{"gold_category": "PASSWORD_RESET", "gold_disposition": "resolve", "id": "t-02", "text": "Fabricated sample ticket for eval; benign filler text. Token: MARKER_PASSWORD_RESET end."}
+{"gold_category": "ORDER_STATUS", "gold_disposition": "resolve", "id": "t-03", "text": "Fabricated sample ticket for eval; benign filler text. Token: MARKER_ORDER_STATUS end."}
+{"gold_category": "ORDER_STATUS", "gold_disposition": "resolve", "id": "t-04", "text": "Fabricated sample ticket for eval; benign filler text. Token: MARKER_ORDER_STATUS end."}
+{"gold_category": "FAQ_HOWTO", "gold_disposition": "deflect", "id": "t-05", "text": "Fabricated sample ticket for eval; benign filler text. Token: MARKER_HOWTO end."}
+{"gold_category": "FAQ_HOWTO", "gold_disposition": "deflect", "id": "t-06", "text": "Fabricated sample ticket for eval; benign filler text. Token: MARKER_HOWTO end."}
+{"gold_category": "BILLING_DISPUTE", "gold_disposition": "escalate", "id": "t-07", "text": "Fabricated sample ticket for eval; benign filler text. Token: MARKER_REFUND end."}
+{"gold_category": "BILLING_DISPUTE", "gold_disposition": "escalate", "id": "t-08", "text": "Fabricated sample ticket for eval; benign filler text. Token: MARKER_REFUND end."}
+{"gold_category": "ACCOUNT_DELETION", "gold_disposition": "escalate", "id": "t-09", "text": "Fabricated sample ticket for eval; benign filler text. Token: MARKER_DELETE_ACCOUNT end."}
+{"gold_category": "ACCOUNT_DELETION", "gold_disposition": "escalate", "id": "t-10", "text": "Fabricated sample ticket for eval; benign filler text. Token: MARKER_DELETE_ACCOUNT end."}
+{"gold_category": "FRAUD_REPORT", "gold_disposition": "escalate", "id": "t-11", "text": "Fabricated sample ticket for eval; benign filler text. Token: MARKER_FRAUD end."}
+{"gold_category": "FRAUD_REPORT", "gold_disposition": "escalate", "id": "t-12", "text": "Fabricated sample ticket for eval; benign filler text. Token: MARKER_FRAUD end."}

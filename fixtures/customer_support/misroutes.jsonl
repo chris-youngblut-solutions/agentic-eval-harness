@@ -1,0 +1,6 @@
+{"gold_rca_class": "intent_gap", "id": "r-01"}
+{"gold_rca_class": "intent_gap", "id": "r-02"}
+{"gold_rca_class": "classifier_threshold", "id": "r-03"}
+{"gold_rca_class": "classifier_threshold", "id": "r-04"}
+{"gold_rca_class": "label_ambiguity", "id": "r-05"}
+{"gold_rca_class": "label_ambiguity", "id": "r-06"}
