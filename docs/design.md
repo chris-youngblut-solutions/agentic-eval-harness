@@ -13,6 +13,8 @@ src/agentic_eval/                     ENGINE (domain-agnostic)
                      ReplayBackend -> recorded assistant turns, no key, no network
   domain.py        Domain(name, system_prompt, tool_schemas, execute_tool); load_domain(name)
   cases.py         golden-set loading; checkers (numeric/exact/regex/set); metric/hard_gate
+  dimensions.py    reusable scorer library — retrieval (precision/recall/f1/mrr/AP/nDCG),
+                     tool-use (exact/recall/precision/order), grounding/citation; a pack composes these
   scoring.py       rubric, scorecard, per-metric rollup, hard gates, history, regression diff
   domains/
     generic/       tools.py (calculator/file_search/read_file/csv_query) + DOMAIN     22 cases
@@ -47,6 +49,15 @@ eval/<domain>/history/      one scorecard JSON per run
 - **`set` checker for precision/recall.** Beyond numeric/exact/regex, a `set` checker
   scores the F1 of the answer's item set against an expected set — the mechanical basis
   for fault-detection precision/recall without an LLM judge.
+- **A reusable dimension library, not per-pack scorers.** `dimensions.py` exports named,
+  pure scorers — retrieval quality (`precision`/`recall`/`f1`/`mrr`/`average_precision`/
+  `ndcg`), tool-use correctness (`tool_exact_match`/`tool_recall`/`tool_precision`/
+  `tool_order_match`), and grounding/citation (`citation_grounding`/`citation_coverage`/
+  `is_grounded`) — that every domain pack *composes* instead of re-deriving. It is to
+  eval scoring what a SQL spine is to data access: the same primitives back the `set`
+  checker's F1 and any pack's retrieval/tool/grounding bar. The functions take plain
+  collections (ids, tool names, citations), so they stay deterministic and keyless and
+  never reach for the agent types.
 - **`submit_answer` as a tool, not free text.** The final answer arrives as a strict-
   schema tool call, so scoring never parses prose. An assistant turn with no tool
   call is an explicit failure mode (`stopped_no_answer`), not a success path.
