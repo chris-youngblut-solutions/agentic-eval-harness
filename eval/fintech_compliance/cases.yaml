@@ -1,0 +1,177 @@
+# Fintech-compliance KYC/AML + audit-trail + access-control golden set.
+#
+# Every expected value is COMPUTED from the committed fixtures + deterministic tools
+# (the fixtures are the answer key), not asserted by hand. Each case is tagged with the
+# metric it exercises; violation cases are hard gates (a failure fails the run).
+#
+# Methodology-only: the rule set, case records (benign sentences carrying abstract MARKER
+# tokens), access requests, ACL, and audit events are all synthetic and generic. No real
+# customer, account, transaction, or PII data, no real sanctions list, and no real
+# financial system appears anywhere.
+
+cases:
+  # --- kyc_aml_accuracy ---
+  - id: kyc_unverified_disposition
+    prompt: "Screen case record r-04 and report only the prescribed disposition (approve, reject, or escalate)."
+    checker: {type: exact, expected: "reject"}
+    expected_tools: [screen_record]
+    metric: kyc_aml_accuracy
+    max_turns: 4
+  - id: aml_pattern_disposition
+    prompt: "Screen case record r-06 and report only the prescribed disposition (approve, reject, or escalate)."
+    checker: {type: exact, expected: "reject"}
+    expected_tools: [screen_record]
+    metric: kyc_aml_accuracy
+    max_turns: 4
+  - id: sanctions_disposition
+    prompt: "Screen case record r-10 and report only the prescribed disposition (approve, reject, or escalate)."
+    checker: {type: exact, expected: "escalate"}
+    expected_tools: [screen_record]
+    metric: kyc_aml_accuracy
+    max_turns: 4
+  - id: clear_disposition
+    prompt: "Screen case record r-01 and report only the prescribed disposition (approve, reject, or escalate)."
+    checker: {type: exact, expected: "approve"}
+    expected_tools: [screen_record]
+    metric: kyc_aml_accuracy
+    max_turns: 4
+  - id: kyc_count_to_reject_or_escalate
+    prompt: >-
+      Screen each of records r-04, r-06, r-08, r-10 and report how many of them the rule
+      set prescribes NOT to approve (i.e. reject or escalate). Answer with the count.
+    checker: {type: numeric, expected: "4", tolerance: 0.5}
+    expected_tools: [screen_record]
+    metric: kyc_aml_accuracy
+    max_turns: 8
+
+  # --- false_approval_rate ---
+  # Over the labeled must-not-approve subset (r-06, r-10, r-12), how many does the
+  # screener wrongly approve? The screener rejects/escalates all three -> 0 false approvals.
+  - id: false_approval_enforced_subset
+    prompt: >-
+      For the must-not-approve records r-06, r-10, r-12, screen each and report how many are
+      wrongly approved (i.e. given the approve disposition). Answer with the count.
+    checker: {type: numeric, expected: "0", tolerance: 0.5}
+    expected_tools: [screen_record]
+    metric: false_approval_rate
+    max_turns: 8
+
+  # --- false_rejection_rate ---
+  # Over the labeled clear subset (r-01, r-02, r-03), how many does the screener wrongly
+  # reject? The screener approves all three -> 0 false rejections.
+  - id: false_rejection_clear_subset
+    prompt: >-
+      For the labeled-clear records r-01, r-02, r-03, screen each and report how many are
+      wrongly not approved (i.e. rejected or escalated). Answer with the count.
+    checker: {type: numeric, expected: "0", tolerance: 0.5}
+    expected_tools: [screen_record]
+    metric: false_rejection_rate
+    max_turns: 8
+
+  # --- access_control_adherence ---
+  - id: access_grant_authorized
+    prompt: "Authorize access request ac-01 and report only the verdict (grant or deny)."
+    checker: {type: exact, expected: "grant"}
+    expected_tools: [access_check]
+    metric: access_control_adherence
+    max_turns: 4
+  - id: access_deny_unauthorized
+    prompt: "Authorize access request ac-04 and report only the verdict (grant or deny)."
+    checker: {type: exact, expected: "deny"}
+    expected_tools: [access_check]
+    metric: access_control_adherence
+    max_turns: 4
+  - id: access_deny_set
+    prompt: >-
+      For access requests ac-01, ac-02, ac-04, ac-05, authorize each and list the ids that
+      are DENIED, as a comma-separated list.
+    checker:
+      type: set
+      expected: "ac-04,ac-05"
+    expected_tools: [access_check]
+    metric: access_control_adherence
+    max_turns: 8
+
+  # --- audit_trail_completeness ---
+  - id: audit_complete_event
+    prompt: "Check audit-trail event au-01 and report only its status (complete or incomplete)."
+    checker: {type: exact, expected: "complete"}
+    expected_tools: [audit_check]
+    metric: audit_trail_completeness
+    max_turns: 4
+  - id: audit_incomplete_event
+    prompt: "Check audit-trail event au-04 and report only its status (complete or incomplete)."
+    checker: {type: exact, expected: "incomplete"}
+    expected_tools: [audit_check]
+    metric: audit_trail_completeness
+    max_turns: 4
+  - id: audit_incomplete_set
+    prompt: >-
+      For audit events au-01, au-02, au-04, au-05, check each and list the ids that are
+      INCOMPLETE, as a comma-separated list.
+    checker:
+      type: set
+      expected: "au-04,au-05"
+    expected_tools: [audit_check]
+    metric: audit_trail_completeness
+    max_turns: 8
+
+  # --- rule_coverage ---
+  - id: rule_count
+    prompt: "How many rules does the compliance rule set define? Answer with the count."
+    checker: {type: numeric, expected: "6", tolerance: 0.5}
+    expected_tools: [rule_lookup]
+    metric: rule_coverage
+    max_turns: 4
+  - id: rule_set_ids
+    prompt: >-
+      List every rule the compliance rule set defines, as a comma-separated list of rule ids.
+    checker:
+      type: set
+      expected: "CLEAR,KYC_UNVERIFIED,AML_PATTERN,PEP,SANCTIONS,HIGH_RISK_GEO"
+    expected_tools: [rule_lookup]
+    metric: rule_coverage
+    max_turns: 4
+
+  # --- compliance_violation_rate (HARD gate) ---
+  # A must-escalate sanctions record must never be approved; a wrong "approve" is a VIOLATION.
+  - id: violation_sanctions_approve_is_violation
+    prompt: >-
+      Using the violation gate, if case record r-10 is given the disposition 'approve', is the
+      decision clean or a violation? Answer with exactly one word: CLEAN or VIOLATION.
+    checker: {type: exact, expected: "VIOLATION"}
+    expected_tools: [violation_check]
+    metric: compliance_violation_rate
+    hard_gate: true
+    max_turns: 4
+  - id: violation_aml_reject_is_clean
+    prompt: >-
+      Using the violation gate, if case record r-06 is given the disposition 'reject', is the
+      decision clean or a violation? Answer with exactly one word: CLEAN or VIOLATION.
+    checker: {type: exact, expected: "CLEAN"}
+    expected_tools: [violation_check]
+    metric: compliance_violation_rate
+    hard_gate: true
+    max_turns: 4
+  - id: violation_clear_approve_is_clean
+    prompt: >-
+      Using the violation gate, if case record r-01 is given the disposition 'approve', is the
+      decision clean or a violation? Answer with exactly one word: CLEAN or VIOLATION.
+    checker: {type: exact, expected: "CLEAN"}
+    expected_tools: [violation_check]
+    metric: compliance_violation_rate
+    hard_gate: true
+    max_turns: 4
+
+  # --- violation_audit (set F1: which records violate under a blanket-approve proposal) ---
+  - id: violation_audit_set
+    prompt: >-
+      If every one of records r-01, r-06, r-10, r-12 were given the disposition 'approve', use
+      the violation gate on each and list the ids that are a VIOLATION, as a comma-separated list.
+    checker:
+      type: set
+      expected: "r-06,r-10,r-12"
+    expected_tools: [violation_check]
+    metric: compliance_violation_rate
+    hard_gate: true
+    max_turns: 8

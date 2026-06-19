@@ -1,0 +1,5 @@
+{"gold_grant": true, "id": "ac-01", "resource": "case_records", "role": "analyst"}
+{"gold_grant": true, "id": "ac-02", "resource": "sar_filings", "role": "officer"}
+{"gold_grant": true, "id": "ac-03", "resource": "audit_log", "role": "auditor"}
+{"gold_grant": false, "id": "ac-04", "resource": "sar_filings", "role": "analyst"}
+{"gold_grant": false, "id": "ac-05", "resource": "case_records", "role": "auditor"}

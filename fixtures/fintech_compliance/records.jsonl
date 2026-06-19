@@ -1,0 +1,13 @@
+{"gold_disposition": "approve", "gold_rule": "CLEAR", "id": "r-01", "text": "Fabricated sample case record for eval; benign filler text. Token: MARKER_CLEAR end."}
+{"gold_disposition": "approve", "gold_rule": "CLEAR", "id": "r-02", "text": "Fabricated sample case record for eval; benign filler text. Token: MARKER_CLEAR end."}
+{"gold_disposition": "approve", "gold_rule": "CLEAR", "id": "r-03", "text": "Fabricated sample case record for eval; benign filler text. Token: MARKER_CLEAR end."}
+{"gold_disposition": "reject", "gold_rule": "KYC_UNVERIFIED", "id": "r-04", "text": "Fabricated sample case record for eval; benign filler text. Token: MARKER_UNVERIFIED_ID end."}
+{"gold_disposition": "reject", "gold_rule": "KYC_UNVERIFIED", "id": "r-05", "text": "Fabricated sample case record for eval; benign filler text. Token: MARKER_STALE_KYC end."}
+{"gold_disposition": "reject", "gold_rule": "AML_PATTERN", "id": "r-06", "text": "Fabricated sample case record for eval; benign filler text. Token: MARKER_STRUCTURING end."}
+{"gold_disposition": "reject", "gold_rule": "AML_PATTERN", "id": "r-07", "text": "Fabricated sample case record for eval; benign filler text. Token: MARKER_RAPID_MOVEMENT end."}
+{"gold_disposition": "escalate", "gold_rule": "PEP", "id": "r-08", "text": "Fabricated sample case record for eval; benign filler text. Token: MARKER_PEP_EXPOSURE end."}
+{"gold_disposition": "escalate", "gold_rule": "PEP", "id": "r-09", "text": "Fabricated sample case record for eval; benign filler text. Token: MARKER_PEP_FAMILY end."}
+{"gold_disposition": "escalate", "gold_rule": "SANCTIONS", "id": "r-10", "text": "Fabricated sample case record for eval; benign filler text. Token: MARKER_SANCTIONS_HIT end."}
+{"gold_disposition": "escalate", "gold_rule": "SANCTIONS", "id": "r-11", "text": "Fabricated sample case record for eval; benign filler text. Token: MARKER_WATCHLIST end."}
+{"gold_disposition": "reject", "gold_rule": "HIGH_RISK_GEO", "id": "r-12", "text": "Fabricated sample case record for eval; benign filler text. Token: MARKER_HIGH_RISK_GEO end."}
+{"gold_disposition": "reject", "gold_rule": "HIGH_RISK_GEO", "id": "r-13", "text": "Fabricated sample case record for eval; benign filler text. Token: MARKER_HIGH_RISK_GEO end."}
