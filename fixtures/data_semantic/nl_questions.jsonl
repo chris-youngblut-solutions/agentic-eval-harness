@@ -1,0 +1,8 @@
+{"gold_metric": "revenue", "id": "q-01", "text": "What is the total revenue across all orders?"}
+{"gold_metric": "order_count", "id": "q-02", "text": "How many orders were placed in total?"}
+{"gold_metric": "active_customers", "id": "q-03", "text": "How many distinct customers do we have?"}
+{"gold_metric": "avg_order_value", "id": "q-04", "text": "What is the average order value overall?"}
+{"gold_metric": "completed_revenue", "id": "q-05", "text": "What is the completed revenue?"}
+{"gold_metric": "west_orders", "id": "q-06", "text": "How many west orders are there?"}
+{"gold_metric": "revenue", "id": "q-07", "text": "Give me the total sales figure."}
+{"gold_metric": "order_count", "id": "q-08", "text": "What is the number of orders we processed?"}

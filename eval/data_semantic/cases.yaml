@@ -1,0 +1,176 @@
+# Data-semantic NL->metric/SQL + metric-correctness golden set.
+#
+# Every expected value is COMPUTED from the committed fixtures + deterministic tools
+# (model.json is the answer key; facts.jsonl is the metrics' world), not asserted by
+# hand. Each case is tagged with the metric it exercises; consistency cases are hard
+# gates (a failure fails the run).
+#
+# Methodology-only: the semantic model (metrics over a tiny star schema), the fact rows,
+# the NL questions, and the mismatch cases are all synthetic and generic. No real company
+# data model, metric catalog, BI semantic layer, or data appears anywhere.
+
+cases:
+  # --- nl_metric_mapping ---
+  - id: nl_map_revenue
+    prompt: 'Map this question to the correct metric id: "What is the total revenue across all orders?" Report only the metric id.'
+    checker: {type: exact, expected: "revenue"}
+    expected_tools: [nl_to_metric]
+    metric: nl_metric_mapping
+    max_turns: 4
+  - id: nl_map_completed_revenue
+    prompt: 'Map this question to the correct metric id: "What is the completed revenue?" Report only the metric id.'
+    checker: {type: exact, expected: "completed_revenue"}
+    expected_tools: [nl_to_metric]
+    metric: nl_metric_mapping
+    max_turns: 4
+  - id: nl_map_active_customers
+    prompt: 'Map this question to the correct metric id: "How many distinct customers do we have?" Report only the metric id.'
+    checker: {type: exact, expected: "active_customers"}
+    expected_tools: [nl_to_metric]
+    metric: nl_metric_mapping
+    max_turns: 4
+
+  # --- metric_correctness ---
+  - id: metric_revenue_value
+    prompt: "Compute the total revenue metric and report only its value."
+    checker: {type: numeric, expected: "1000", tolerance: 0.5}
+    expected_tools: [metric_rollup]
+    metric: metric_correctness
+    max_turns: 4
+  - id: metric_active_customers_value
+    prompt: "Compute the active customers metric and report only its value."
+    checker: {type: numeric, expected: "4", tolerance: 0.5}
+    expected_tools: [metric_rollup]
+    metric: metric_correctness
+    max_turns: 4
+  - id: metric_avg_order_value
+    prompt: "Compute the average order value metric and report only its value."
+    checker: {type: numeric, expected: "125", tolerance: 0.5}
+    expected_tools: [metric_rollup]
+    metric: metric_correctness
+    max_turns: 4
+
+  # --- metric_rollup_accuracy (filtered rollups) ---
+  - id: rollup_completed_revenue
+    prompt: "Compute the completed_revenue metric and report only its value."
+    checker: {type: numeric, expected: "600", tolerance: 0.5}
+    expected_tools: [metric_rollup]
+    metric: metric_rollup_accuracy
+    max_turns: 4
+  - id: rollup_revenue_west
+    prompt: "Compute the revenue metric filtered to region = west and report only its value."
+    checker: {type: numeric, expected: "500", tolerance: 0.5}
+    expected_tools: [metric_rollup]
+    metric: metric_rollup_accuracy
+    max_turns: 4
+  - id: rollup_west_orders
+    prompt: "Compute the west_orders metric and report only its value."
+    checker: {type: numeric, expected: "4", tolerance: 0.5}
+    expected_tools: [metric_rollup]
+    metric: metric_rollup_accuracy
+    max_turns: 4
+
+  # --- nl_sql_accuracy (exact canonical SQL) ---
+  - id: sql_revenue
+    prompt: >-
+      Return the canonical SQL for the revenue metric. Report only the SQL string,
+      exactly as the semantic layer renders it.
+    checker: {type: exact, expected: "SELECT SUM(amount) FROM facts"}
+    expected_tools: [sql_for_metric]
+    metric: nl_sql_accuracy
+    max_turns: 4
+  - id: sql_completed_revenue
+    prompt: >-
+      Return the canonical SQL for the completed_revenue metric. Report only the SQL
+      string, exactly as the semantic layer renders it.
+    checker: {type: exact, expected: "SELECT SUM(amount) FROM facts WHERE status = 'completed'"}
+    expected_tools: [sql_for_metric]
+    metric: nl_sql_accuracy
+    max_turns: 4
+  - id: sql_active_customers
+    prompt: >-
+      Return the canonical SQL for the active_customers metric. Report only the SQL
+      string, exactly as the semantic layer renders it.
+    checker: {type: exact, expected: "SELECT COUNT(DISTINCT customer) FROM facts"}
+    expected_tools: [sql_for_metric]
+    metric: nl_sql_accuracy
+    max_turns: 4
+
+  # --- model_coverage ---
+  - id: model_metric_count
+    prompt: "How many metrics does the semantic layer define? Answer with the count."
+    checker: {type: numeric, expected: "6", tolerance: 0.5}
+    expected_tools: [metric_lookup]
+    metric: model_coverage
+    max_turns: 4
+  - id: model_metrics_set
+    prompt: >-
+      List every metric the semantic layer defines, as a comma-separated list of metric
+      ids.
+    checker:
+      type: set
+      expected: "revenue,order_count,active_customers,avg_order_value,completed_revenue,west_orders"
+    expected_tools: [metric_lookup]
+    metric: model_coverage
+    max_turns: 4
+
+  # --- mismatch_diagnosis ---
+  - id: mismatch_class_x01
+    prompt: "Trace the metric mismatch x-01 and report only its diagnosis class."
+    checker: {type: exact, expected: "wrong_grain"}
+    expected_tools: [mismatch_trace]
+    metric: mismatch_diagnosis
+    max_turns: 4
+  - id: mismatch_class_x05
+    prompt: "Trace the metric mismatch x-05 and report only its diagnosis class."
+    checker: {type: exact, expected: "filter_drift"}
+    expected_tools: [mismatch_trace]
+    metric: mismatch_diagnosis
+    max_turns: 4
+
+  # --- metric_consistency (HARD gate) ---
+  # A numeric answer must equal the semantic layer's own computed value; a wrong-metric
+  # / double-count answer would MISMATCH and must never be waved through.
+  - id: consistency_revenue_correct_is_consistent
+    prompt: >-
+      Using the consistency gate, if the revenue metric is answered as 1000, is that
+      CONSISTENT or a MISMATCH? Answer with exactly one word: CONSISTENT or MISMATCH.
+    checker: {type: exact, expected: "CONSISTENT"}
+    expected_tools: [consistency_check]
+    metric: metric_consistency
+    hard_gate: true
+    max_turns: 4
+  - id: consistency_revenue_wrong_is_mismatch
+    prompt: >-
+      Using the consistency gate, if the revenue metric is answered as 8 (the order
+      count, not revenue), is that CONSISTENT or a MISMATCH? Answer with exactly one
+      word: CONSISTENT or MISMATCH.
+    checker: {type: exact, expected: "MISMATCH"}
+    expected_tools: [consistency_check]
+    metric: metric_consistency
+    hard_gate: true
+    max_turns: 4
+  - id: consistency_completed_revenue_wrong_is_mismatch
+    prompt: >-
+      Using the consistency gate, if the completed_revenue metric is answered as 1000
+      (the total revenue, ignoring the completed filter), is that CONSISTENT or a
+      MISMATCH? Answer with exactly one word: CONSISTENT or MISMATCH.
+    checker: {type: exact, expected: "MISMATCH"}
+    expected_tools: [consistency_check]
+    metric: metric_consistency
+    hard_gate: true
+    max_turns: 4
+
+  # --- mismatch_audit (set F1: which proposed answers MISMATCH the metric) ---
+  - id: consistency_audit_set
+    prompt: >-
+      For the revenue metric, three answers are proposed: 1000, 8, and 500. Using the
+      consistency gate on each, list the proposed values that MISMATCH, as a
+      comma-separated list.
+    checker:
+      type: set
+      expected: "8,500"
+    expected_tools: [consistency_check]
+    metric: metric_consistency
+    hard_gate: true
+    max_turns: 8

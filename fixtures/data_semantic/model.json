@@ -1,0 +1,54 @@
+{
+  "_provenance": "Fully SYNTHETIC and GENERIC semantic-layer (metrics) model authored for this evaluation. It is NOT any real company's data model, metric catalog, dbt project, or BI semantic layer, and reproduces no real schema, metric definition, or business logic. The star schema (one fact table over region/status/customer dimensions) and its metrics are illustrative constructs that exist only to exercise the NL->metric/SQL accuracy and metric-correctness eval metrics. No real data, customers, revenue, or operational figures are represented.",
+  "_schema": "Each metric has id, name, measure (fact column, or '*' for count), aggregation (sum | count | count_distinct | avg), synonyms (phrase tokens that deterministically map an NL question to this metric), and an optional fixed_filter {dimension, value} baked into the metric. The fact table columns are region, status, customer, amount.",
+  "metrics": [
+    {
+      "id": "revenue",
+      "name": "Total revenue",
+      "measure": "amount",
+      "aggregation": "sum",
+      "synonyms": ["total revenue", "how much revenue", "sum of amount", "total sales"],
+      "fixed_filter": null
+    },
+    {
+      "id": "order_count",
+      "name": "Order count",
+      "measure": "*",
+      "aggregation": "count",
+      "synonyms": ["how many orders", "number of orders", "order count", "count of orders"],
+      "fixed_filter": null
+    },
+    {
+      "id": "active_customers",
+      "name": "Active customers",
+      "measure": "customer",
+      "aggregation": "count_distinct",
+      "synonyms": ["how many customers", "distinct customers", "unique customers", "active customers"],
+      "fixed_filter": null
+    },
+    {
+      "id": "avg_order_value",
+      "name": "Average order value",
+      "measure": "amount",
+      "aggregation": "avg",
+      "synonyms": ["average order value", "avg order value", "mean order amount", "average amount"],
+      "fixed_filter": null
+    },
+    {
+      "id": "completed_revenue",
+      "name": "Completed revenue",
+      "measure": "amount",
+      "aggregation": "sum",
+      "synonyms": ["completed revenue", "revenue from completed orders", "fulfilled revenue"],
+      "fixed_filter": {"dimension": "status", "value": "completed"}
+    },
+    {
+      "id": "west_orders",
+      "name": "West-region orders",
+      "measure": "*",
+      "aggregation": "count",
+      "synonyms": ["west orders", "orders in the west", "west region order count"],
+      "fixed_filter": {"dimension": "region", "value": "west"}
+    }
+  ]
+}

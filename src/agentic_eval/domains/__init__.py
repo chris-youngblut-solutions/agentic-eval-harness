@@ -7,4 +7,7 @@ Built-in domains:
 - `trust_safety` — content-policy enforcement + diagnostics over a fully synthetic,
   generic policy (methodology-only: abstract MARKER tokens, no real policy or
   harmful content).
+- `data_semantic` — NL->metric/SQL accuracy + metric-correctness over a fully
+  synthetic, generic semantic layer (a metric catalog over a tiny star schema;
+  methodology-only, no real data model or data).
 """
