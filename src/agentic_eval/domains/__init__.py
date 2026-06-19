@@ -15,4 +15,8 @@ Built-in domains:
   escalation correctness) over a fully synthetic, generic support action policy
   (methodology-only: abstract MARKER tokens, no real policy, ticket, or customer
   data); hard-gates auto-resolving a must-escalate ticket (unsafe auto-action).
+- `fintech_compliance` — KYC/AML screening, audit-trail completeness, and
+  access-control adherence over a fully synthetic, generic compliance rule set
+  (methodology-only: abstract MARKER tokens, no real customer/account/PII data,
+  no real sanctions list).
 """

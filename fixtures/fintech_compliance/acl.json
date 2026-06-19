@@ -1,0 +1,16 @@
+{
+  "roles": {
+    "analyst": [
+      "case_records",
+      "screening_tool"
+    ],
+    "auditor": [
+      "audit_log"
+    ],
+    "officer": [
+      "case_records",
+      "sar_filings",
+      "screening_tool"
+    ]
+  }
+}

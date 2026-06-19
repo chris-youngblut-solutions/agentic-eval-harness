@@ -1,0 +1,48 @@
+{
+  "_provenance": "Fully SYNTHETIC and GENERIC financial-compliance rule taxonomy authored for this evaluation. It is NOT any real institution's compliance policy, KYC/AML program, sanctions screening configuration, or risk model, and reproduces no real policy text. Rules key on abstract MARKER tokens (e.g. MARKER_SANCTIONS_HIT), never on real customer, account, or transaction data; case records in the fixtures are benign fabricated sentences carrying those marker tokens. No real customers, accounts, transactions, PII, sanctions lists, SAR/CTR filings, or screening internals are represented. Prescribed dispositions, severities, and the access-control matrix are illustrative constructs for exercising eval metrics, not operational rules for any real system.",
+  "_schema": "Each rule has id, name, markers (abstract tokens that key the rule), disposition (approve | reject | escalate), and severity (low | medium | high). Disposition 'escalate' routes high-severity, leakage-sensitive records to a human compliance officer rather than auto-rejecting.",
+  "rules": [
+    {
+      "id": "CLEAR",
+      "name": "Clear / approvable",
+      "markers": ["MARKER_CLEAR"],
+      "disposition": "approve",
+      "severity": "low"
+    },
+    {
+      "id": "KYC_UNVERIFIED",
+      "name": "KYC identity unverified or stale",
+      "markers": ["MARKER_UNVERIFIED_ID", "MARKER_STALE_KYC"],
+      "disposition": "reject",
+      "severity": "medium"
+    },
+    {
+      "id": "AML_PATTERN",
+      "name": "AML structuring / rapid-movement pattern",
+      "markers": ["MARKER_STRUCTURING", "MARKER_RAPID_MOVEMENT"],
+      "disposition": "reject",
+      "severity": "high"
+    },
+    {
+      "id": "PEP",
+      "name": "Politically exposed person",
+      "markers": ["MARKER_PEP_EXPOSURE", "MARKER_PEP_FAMILY"],
+      "disposition": "escalate",
+      "severity": "high"
+    },
+    {
+      "id": "SANCTIONS",
+      "name": "Sanctions / watchlist hit",
+      "markers": ["MARKER_SANCTIONS_HIT", "MARKER_WATCHLIST"],
+      "disposition": "escalate",
+      "severity": "high"
+    },
+    {
+      "id": "HIGH_RISK_GEO",
+      "name": "High-risk jurisdiction exposure",
+      "markers": ["MARKER_HIGH_RISK_GEO"],
+      "disposition": "reject",
+      "severity": "medium"
+    }
+  ]
+}
