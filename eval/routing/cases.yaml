@@ -1,0 +1,151 @@
+# Frontier/local dispatch routing golden set.
+#
+# Every expected value is COMPUTED from the committed fixtures + deterministic policy model
+# (the tier table is the answer key), not asserted by hand. Each case is tagged with the
+# metric it exercises; the privacy-misroute cases are hard gates (a failure fails the run).
+#
+# Methodology-only: the tier roster, capability sets, difficulty band, cost weights, and
+# task corpus are all synthetic and generic. No real routing table, model roster, cost
+# sheet, capability matrix, or task content appears anywhere. The third 'edge' tier is this
+# eval's modeled extension of a documented two-lane (local | frontier) dispatch contract.
+
+cases:
+  # --- tier_accuracy: map a task to its prescribed tier ---
+  - id: route_edge_easy_classify
+    prompt: "Route task t-01 and report only the prescribed tier (edge, local, or frontier)."
+    checker: {type: exact, expected: "edge"}
+    expected_tools: [route_task]
+    metric: tier_accuracy
+    max_turns: 4
+  - id: route_local_medium_summarize
+    prompt: "Route task t-05 and report only the prescribed tier (edge, local, or frontier)."
+    checker: {type: exact, expected: "local"}
+    expected_tools: [route_task]
+    metric: tier_accuracy
+    max_turns: 4
+  - id: route_frontier_hard_summarize
+    prompt: "Route task t-07 and report only the prescribed tier (edge, local, or frontier)."
+    checker: {type: exact, expected: "frontier"}
+    expected_tools: [route_task]
+    metric: tier_accuracy
+    max_turns: 4
+  - id: route_count_to_edge
+    prompt: >-
+      Route each of tasks t-01, t-02, t-03, t-16 and report how many of them the policy
+      sends to the edge tier. Answer with the count.
+    checker: {type: numeric, expected: "4", tolerance: 0.5}
+    expected_tools: [route_task]
+    metric: tier_accuracy
+    max_turns: 8
+
+  # --- escalation_correctness: capability-miss and difficulty escalate upward ---
+  # t-09 needs vision (frontier-only) -> a capability-miss escalates to frontier.
+  - id: escalate_capability_miss_vision
+    prompt: "Route task t-09 and report only the prescribed tier (edge, local, or frontier)."
+    checker: {type: exact, expected: "frontier"}
+    expected_tools: [route_task]
+    metric: escalation_correctness
+    max_turns: 4
+  # t-08 is locally-capable but its difficulty (0.90) exceeds local's band -> frontier.
+  - id: escalate_difficulty_over_local_band
+    prompt: "Route task t-08 and report only the prescribed tier (edge, local, or frontier)."
+    checker: {type: exact, expected: "frontier"}
+    expected_tools: [route_task]
+    metric: escalation_correctness
+    max_turns: 4
+  # t-05 needs summarize (not on edge) -> escalate from edge to local even though easy.
+  - id: escalate_capability_miss_edge_to_local
+    prompt: "Route task t-05 and report only the prescribed tier (edge, local, or frontier)."
+    checker: {type: exact, expected: "local"}
+    expected_tools: [route_task]
+    metric: escalation_correctness
+    max_turns: 4
+
+  # --- cost_efficiency: do not over-route a task the cheaper tier can serve ---
+  # The cheapest tier that satisfies caps AND admits difficulty must be chosen.
+  - id: cost_no_overroute_edge
+    prompt: >-
+      Route task t-16 (chat+classify+extract, easy). Report only the prescribed tier.
+      The cheapest capable tier must be used.
+    checker: {type: exact, expected: "edge"}
+    expected_tools: [route_task]
+    metric: cost_efficiency
+    max_turns: 4
+  - id: cost_no_overroute_local
+    prompt: >-
+      Route task t-17 (classify+summarize, medium). Report only the prescribed tier.
+      The cheapest capable tier must be used.
+    checker: {type: exact, expected: "local"}
+    expected_tools: [route_task]
+    metric: cost_efficiency
+    max_turns: 4
+
+  # --- tier_coverage: enumerate the routing tier ladder ---
+  - id: tier_count
+    prompt: "How many tiers does the routing policy define? Answer with the count."
+    checker: {type: numeric, expected: "3", tolerance: 0.5}
+    expected_tools: [tier_lookup]
+    metric: tier_coverage
+    max_turns: 4
+  - id: tier_ladder_set
+    prompt: >-
+      List every tier the routing policy defines, as a comma-separated list of tier ids.
+    checker:
+      type: set
+      expected: "edge,local,frontier"
+    expected_tools: [tier_lookup]
+    metric: tier_coverage
+    max_turns: 4
+
+  # --- privacy_misroute_rate (HARD gate): a privacy task must NEVER route to a net tier ---
+  # A privacy-flagged task proposed to frontier is a MISROUTE (off-box leak).
+  - id: privacy_frontier_is_misroute
+    prompt: >-
+      Using the privacy gate, if privacy-flagged task t-14 were routed to the 'frontier'
+      tier, is that clean or a misroute? Answer with exactly one word: CLEAN or MISROUTE.
+    checker: {type: exact, expected: "MISROUTE"}
+    expected_tools: [privacy_gate]
+    metric: privacy_misroute_rate
+    hard_gate: true
+    max_turns: 4
+  # The hard private task t-14 (difficulty 0.95) must route LOCAL, never frontier.
+  - id: privacy_hard_task_pins_local
+    prompt: "Route privacy-flagged task t-14 and report only the prescribed tier."
+    checker: {type: exact, expected: "local"}
+    expected_tools: [route_task]
+    metric: privacy_misroute_rate
+    hard_gate: true
+    max_turns: 4
+  # A privacy task correctly routed local is CLEAN through the gate.
+  - id: privacy_local_is_clean
+    prompt: >-
+      Using the privacy gate, if privacy-flagged task t-13 were routed to the 'local'
+      tier, is that clean or a misroute? Answer with exactly one word: CLEAN or MISROUTE.
+    checker: {type: exact, expected: "CLEAN"}
+    expected_tools: [privacy_gate]
+    metric: privacy_misroute_rate
+    hard_gate: true
+    max_turns: 4
+  # Privacy + edge-capable easy task pins to edge (cheapest non-net), never frontier.
+  - id: privacy_edge_capable_pins_edge
+    prompt: "Route privacy-flagged task t-12 and report only the prescribed tier."
+    checker: {type: exact, expected: "edge"}
+    expected_tools: [route_task]
+    metric: privacy_misroute_rate
+    hard_gate: true
+    max_turns: 4
+
+  # --- privacy_audit (set F1: which of these privacy tasks would LEAK if sent frontier) ---
+  # Every privacy-flagged task sent to frontier misroutes; non-private ones are clean.
+  - id: privacy_audit_set
+    prompt: >-
+      For each of tasks t-09, t-12, t-13, t-14, t-15, use the privacy gate to test routing
+      it to the 'frontier' tier, and list the task ids that MISROUTE, as a comma-separated
+      list.
+    checker:
+      type: set
+      expected: "t-12,t-13,t-14,t-15"
+    expected_tools: [privacy_gate]
+    metric: privacy_misroute_rate
+    hard_gate: true
+    max_turns: 8
