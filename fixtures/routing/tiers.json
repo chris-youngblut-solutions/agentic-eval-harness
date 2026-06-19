@@ -1,7 +1,7 @@
 {
-  "_provenance": "Fully SYNTHETIC and GENERIC hybrid-dispatch routing policy authored for this evaluation. It encodes the documented hard-rules contract of the hybrid-dispatch router (frameworks/openweights-finetuning/internals/hybrid-dispatch) extended with a third 'edge' tier. It is NOT any real production routing table, model roster, cost sheet, or capability matrix. Difficulty thresholds, per-tier capability sets, and cost weights are illustrative constructs for exercising eval metrics, not operational thresholds for any real router.",
+  "_provenance": "Fully SYNTHETIC and GENERIC frontier/local dispatch routing policy authored for this evaluation. It encodes a documented two-lane (local | frontier) dispatch contract, extended with a third 'edge' tier. It is NOT any real production routing table, model roster, cost sheet, or capability matrix. Difficulty thresholds, per-tier capability sets, and cost weights are illustrative constructs for exercising eval metrics, not operational thresholds for any real router.",
   "_schema": "tiers: ordered cheapest->priciest (edge, local, frontier). Each tier has id, capabilities (the set it can satisfy), max_difficulty (the inclusive upper difficulty it will accept under the difficulty rule; frontier accepts everything), cost (relative weight for the tiebreak). 'net' marks whether the tier leaves the box: edge/local = none, frontier = frontier. A privacy-flagged task must NEVER route to a net!=none tier.",
-  "_contract_ref": "Mirrors hybrid_dispatch.router.Router.decide rule order: (1) privacy -> never a net tier; (2) capability-miss -> escalate to the cheapest tier that satisfies; (3) difficulty within a tier's max_difficulty -> that tier; (4) cost tiebreak -> cheapest capable tier. Extended from the router's two lanes (local|frontier) to three by adding 'edge' below 'local'; the upstream router ships local|frontier only (see DEP note in cases.yaml / PROVENANCE.md).",
+  "_contract_ref": "Mirrors a frontier/local dispatch router's decide rule order: (1) privacy -> never a net tier; (2) capability-miss -> escalate to the cheapest tier that satisfies; (3) difficulty within a tier's max_difficulty -> that tier; (4) cost tiebreak -> cheapest capable tier. Extended from a two-lane (local|frontier) contract to three by adding 'edge' below 'local' (see DEP note in PROVENANCE.md).",
   "difficulty_band": {
     "edge_max_difficulty": 0.25,
     "local_max_difficulty": 0.6
@@ -17,7 +17,7 @@
     },
     {
       "id": "local",
-      "name": "Local gfx1150 llama-server",
+      "name": "Local on-box llama-server",
       "capabilities": ["chat", "classify", "extract", "summarize", "rerank"],
       "max_difficulty": 0.6,
       "cost": 0.1,

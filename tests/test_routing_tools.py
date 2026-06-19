@@ -2,9 +2,9 @@
 deterministic. Everything exercised here is synthetic and generic (abstract tier
 table, benign synthetic task descriptions); no real routing table or task content.
 
-The policy model reimplements the documented hard-rules contract of the
-hybrid-dispatch router (local|frontier), extended with a third on-device 'edge'
-tier — see fixtures/routing/PROVENANCE.md."""
+The policy model reimplements a documented two-lane (local|frontier) dispatch
+contract, extended with a third on-device 'edge' tier — see
+fixtures/routing/PROVENANCE.md."""
 
 from __future__ import annotations
 
@@ -51,7 +51,7 @@ def test_tier_lookup_errors_on_unknown_tier() -> None:
     assert is_error and "unknown tier" in content
 
 
-# --- the policy model: the answer key, mirroring Router.decide rule order ---
+# --- the policy model: the answer key, mirroring the dispatch contract's rule order ---
 
 
 def test_easy_edge_capable_task_routes_edge() -> None:

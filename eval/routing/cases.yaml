@@ -1,4 +1,4 @@
-# Hybrid-dispatch routing golden set.
+# Frontier/local dispatch routing golden set.
 #
 # Every expected value is COMPUTED from the committed fixtures + deterministic policy model
 # (the tier table is the answer key), not asserted by hand. Each case is tagged with the
@@ -7,7 +7,7 @@
 # Methodology-only: the tier roster, capability sets, difficulty band, cost weights, and
 # task corpus are all synthetic and generic. No real routing table, model roster, cost
 # sheet, capability matrix, or task content appears anywhere. The third 'edge' tier is this
-# eval's modeled extension of the upstream router's documented local|frontier rule order.
+# eval's modeled extension of a documented two-lane (local | frontier) dispatch contract.
 
 cases:
   # --- tier_accuracy: map a task to its prescribed tier ---

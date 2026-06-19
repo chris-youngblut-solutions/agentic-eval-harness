@@ -1,18 +1,16 @@
 """Deterministic routing-policy model for the routing domain.
 
-This is the domain's *answer key*: a pure, offline reimplementation of the
-hybrid-dispatch router's documented hard-rules contract
-(``frameworks/openweights-finetuning/internals/hybrid-dispatch``,
-``hybrid_dispatch.router.Router.decide``), extended from two lanes
-(``local`` | ``frontier``) to three tiers (``edge`` | ``local`` | ``frontier``)
-by adding an on-device ``edge`` tier below ``local``.
+This is the domain's *answer key*: a pure, offline reimplementation of a
+documented two-lane (``local`` | ``frontier``) dispatch contract, extended to
+three tiers (``edge`` | ``local`` | ``frontier``) by adding an on-device
+``edge`` tier below ``local``.
 
 Everything is FABRICATED and GENERIC: the tier roster, capability sets,
 difficulty band, and cost weights (``fixtures/routing/tiers.json``) are
 illustrative constructs authored to exercise the eval metrics. No real routing
 table, model roster, cost sheet, or capability matrix is reproduced.
 
-Rule order (mirrors ``Router.decide``, first match wins):
+Rule order (mirrors the dispatch contract's decide order, first match wins):
 
 1. **privacy** → the cheapest *capable* tier whose ``net == "none"``; the
    frontier (net) arm is *never* selected for a privacy-flagged task. This is
@@ -25,7 +23,7 @@ Rule order (mirrors ``Router.decide``, first match wins):
 
 Privacy is evaluated **before** capability and difficulty on purpose: a
 privacy-flagged task stays off the net even when it is hard or needs a
-capability only the frontier tier has — exactly as the upstream router pins a
+capability only the frontier tier has — exactly as the reference contract pins a
 privacy request local even on a capability-miss.
 """
 
@@ -144,11 +142,11 @@ def decide_tier(
     required_capabilities: frozenset[str],
     privacy: bool,
 ) -> str:
-    """Compute the gold tier for a task, mirroring ``Router.decide`` rule order.
+    """Compute the gold tier for a task, mirroring the dispatch contract's rule order.
 
     Pure and deterministic — the answer key for every routing case. Raises
-    :class:`ValueError` for an out-of-range difficulty (matching
-    ``ChatRequest.__post_init__``) or a capability no tier can satisfy.
+    :class:`ValueError` for an out-of-range difficulty (the contract requires
+    difficulty in [0, 1]) or a capability no tier can satisfy.
     """
     if not 0.0 <= difficulty <= 1.0:
         raise ValueError(f"difficulty must be in [0, 1]; got {difficulty}")

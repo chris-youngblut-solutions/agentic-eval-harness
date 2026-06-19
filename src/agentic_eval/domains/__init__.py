@@ -7,7 +7,8 @@ Built-in domains:
 - `trust_safety` — content-policy enforcement + diagnostics over a fully synthetic,
   generic policy (methodology-only: abstract MARKER tokens, no real policy or
   harmful content).
-- `routing`      — hybrid-dispatch tier selection (edge|local|frontier) over a fully
-  synthetic, generic tier table; encodes the documented hard-rules contract of the
-  in-workspace hybrid-dispatch router with a must-not-misroute privacy hard gate.
+- `routing`      — frontier/local dispatch tier selection (edge|local|frontier) over a
+  fully synthetic, generic tier table; encodes a documented two-lane (local | frontier)
+  dispatch contract, extended with a third on-device edge tier, with a must-not-misroute
+  privacy hard gate.
 """

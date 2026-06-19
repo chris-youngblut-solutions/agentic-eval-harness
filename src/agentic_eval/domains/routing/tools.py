@@ -1,4 +1,4 @@
-"""The routing domain's tools: synthetic hybrid-dispatch tier selection + audit.
+"""The routing domain's tools: synthetic frontier/local dispatch tier selection + audit.
 
 All tools are offline and deterministic — same input, same output, no network —
 which is what makes the eval reproducible and keyless. The routing ground truth
