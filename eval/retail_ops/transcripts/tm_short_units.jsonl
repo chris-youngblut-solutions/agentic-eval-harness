@@ -1,0 +1,4 @@
+{"content": "For PO-8802, how many cases short is the receipt versus the PO? Answer the number of cases.", "role": "user"}
+{"content": [{"text": "Working tm_short_units.", "type": "text"}, {"id": "tm_short_units-0", "input": {"po_id": "PO-8802"}, "name": "three_way_match", "type": "tool_use"}], "role": "assistant"}
+{"content": [{"content": "{\"price_inv\": 8.0, \"price_po\": 8.0, \"price_within_tol\": true, \"qty_grn_ea\": 1104.0, \"qty_inv_ea\": 1200.0, \"qty_po_ea\": 1200.0, \"qty_within_tol\": false, \"variance_units_cs\": 8.0, \"verdict\": \"short_ship\"}", "is_error": false, "tool_use_id": "tm_short_units-0", "type": "tool_result"}], "role": "user"}
+{"content": [{"id": "tm_short_units-submit", "input": {"answer": "8"}, "name": "submit_answer", "type": "tool_use"}], "role": "assistant"}

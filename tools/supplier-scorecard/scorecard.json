@@ -1,0 +1,344 @@
+{
+  "corpus": {
+    "n_pos": 10,
+    "n_suppliers": 3,
+    "pack_uom": "eaches",
+    "qty_tolerance_pct": 2.0
+  },
+  "generated_from": "fixtures/retail_ops (synthetic corpus)",
+  "grade_bands": {
+    "A": 80.0,
+    "B": 65.0,
+    "C": 50.0,
+    "D": 35.0,
+    "F": 0.0
+  },
+  "kpis": {
+    "composite": [
+      "otif_pct",
+      "fill_pct",
+      "asn_accuracy_pct",
+      "exception_rate_pct"
+    ],
+    "contextual": [
+      "deduction_validity_pct",
+      "chase_responsiveness_pct"
+    ]
+  },
+  "overall": {
+    "best": "SUP-021",
+    "grade_distribution": {
+      "B": 1,
+      "C": 1,
+      "D": 1
+    },
+    "ranking": [
+      "SUP-021",
+      "SUP-023",
+      "SUP-022"
+    ],
+    "worst": "SUP-022"
+  },
+  "schema": "supplier-scorecard/0.1",
+  "suppliers": [
+    {
+      "composite": 67.18,
+      "coverage": {
+        "asn_accuracy": {
+          "accurate": 3,
+          "total": 4
+        },
+        "chases": {
+          "mapped": 2,
+          "responsive": 1
+        },
+        "deductions": {
+          "invalid": 1,
+          "total": 2,
+          "valid": 1
+        },
+        "exceptions": {
+          "flagged": 3,
+          "total": 4
+        },
+        "otif": {
+          "passed": 3,
+          "total": 4
+        }
+      },
+      "grade": "B",
+      "led": "ok",
+      "metrics": {
+        "asn_accuracy_pct": 75.0,
+        "chase_responsiveness_pct": 50.0,
+        "clean_pct": 25.0,
+        "deduction_validity_pct": 50.0,
+        "exception_rate_pct": 75.0,
+        "fill_pct": 98.4,
+        "otif_pct": 75.0
+      },
+      "n_pos": 4,
+      "po_ids": [
+        "PO-8801",
+        "PO-8802",
+        "PO-8804",
+        "PO-8808"
+      ],
+      "pos": [
+        {
+          "asn_accurate": true,
+          "asn_ea": 1200.0,
+          "exception_type": null,
+          "fill_pct": 100.0,
+          "good_ea": 1200.0,
+          "grn_ea": 1200.0,
+          "on_time": true,
+          "ordered_ea": 1200.0,
+          "otif": "pass",
+          "po_id": "PO-8801",
+          "received_ea": 1200.0,
+          "sku": "SKU-4471",
+          "three_way": "matched"
+        },
+        {
+          "asn_accurate": false,
+          "asn_ea": 1200.0,
+          "exception_type": "short_ship",
+          "fill_pct": 92.0,
+          "good_ea": 1104.0,
+          "grn_ea": 1104.0,
+          "on_time": true,
+          "ordered_ea": 1200.0,
+          "otif": "fail",
+          "po_id": "PO-8802",
+          "received_ea": 1104.0,
+          "sku": "SKU-5502",
+          "three_way": "short_ship"
+        },
+        {
+          "asn_accurate": true,
+          "asn_ea": 2400.0,
+          "exception_type": "price_variance",
+          "fill_pct": 100.0,
+          "good_ea": 2400.0,
+          "grn_ea": 2400.0,
+          "on_time": true,
+          "ordered_ea": 2400.0,
+          "otif": "pass",
+          "po_id": "PO-8804",
+          "received_ea": 2400.0,
+          "sku": "SKU-4471",
+          "three_way": "matched"
+        },
+        {
+          "asn_accurate": true,
+          "asn_ea": 1200.0,
+          "exception_type": "duplicate_invoice",
+          "fill_pct": 100.0,
+          "good_ea": 1200.0,
+          "grn_ea": 1200.0,
+          "on_time": true,
+          "ordered_ea": 1200.0,
+          "otif": "pass",
+          "po_id": "PO-8808",
+          "received_ea": 1200.0,
+          "sku": "SKU-4471",
+          "three_way": "duplicate_invoice"
+        }
+      ],
+      "rank": 1,
+      "supplier": "SUP-021"
+    },
+    {
+      "composite": 52.12,
+      "coverage": {
+        "asn_accuracy": {
+          "accurate": 2,
+          "total": 3
+        },
+        "chases": {
+          "mapped": 1,
+          "responsive": 0
+        },
+        "deductions": {
+          "invalid": 1,
+          "total": 2,
+          "valid": 1
+        },
+        "exceptions": {
+          "flagged": 2,
+          "total": 3
+        },
+        "otif": {
+          "passed": 1,
+          "total": 3
+        }
+      },
+      "grade": "C",
+      "led": "warn",
+      "metrics": {
+        "asn_accuracy_pct": 66.67,
+        "chase_responsiveness_pct": 0.0,
+        "clean_pct": 33.33,
+        "deduction_validity_pct": 50.0,
+        "exception_rate_pct": 66.67,
+        "fill_pct": 93.94,
+        "otif_pct": 33.33
+      },
+      "n_pos": 3,
+      "po_ids": [
+        "PO-8805",
+        "PO-8806",
+        "PO-8810"
+      ],
+      "pos": [
+        {
+          "asn_accurate": true,
+          "asn_ea": 1800.0,
+          "exception_type": "price_variance",
+          "fill_pct": 100.0,
+          "good_ea": 1800.0,
+          "grn_ea": 1800.0,
+          "on_time": false,
+          "ordered_ea": 1800.0,
+          "otif": "fail",
+          "po_id": "PO-8805",
+          "received_ea": 1800.0,
+          "sku": "SKU-5502",
+          "three_way": "price_variance"
+        },
+        {
+          "asn_accurate": true,
+          "asn_ea": 1200.0,
+          "exception_type": "no_exception",
+          "fill_pct": 100.0,
+          "good_ea": 1200.0,
+          "grn_ea": 1200.0,
+          "on_time": true,
+          "ordered_ea": 1200.0,
+          "otif": "pass",
+          "po_id": "PO-8806",
+          "received_ea": 1200.0,
+          "sku": "SKU-7788",
+          "three_way": "matched"
+        },
+        {
+          "asn_accurate": false,
+          "asn_ea": 960.0,
+          "exception_type": "short_ship_discontinued",
+          "fill_pct": 75.0,
+          "good_ea": 720.0,
+          "grn_ea": 720.0,
+          "on_time": true,
+          "ordered_ea": 960.0,
+          "otif": "fail",
+          "po_id": "PO-8810",
+          "received_ea": 720.0,
+          "sku": "SKU-7788",
+          "three_way": "short_ship"
+        }
+      ],
+      "rank": 2,
+      "supplier": "SUP-023"
+    },
+    {
+      "composite": 49.84,
+      "coverage": {
+        "asn_accuracy": {
+          "accurate": 1,
+          "total": 3
+        },
+        "chases": {
+          "mapped": 0,
+          "responsive": 0
+        },
+        "deductions": {
+          "invalid": 0,
+          "total": 0,
+          "valid": 0
+        },
+        "exceptions": {
+          "flagged": 3,
+          "total": 3
+        },
+        "otif": {
+          "passed": 2,
+          "total": 3
+        }
+      },
+      "grade": "D",
+      "led": "danger",
+      "metrics": {
+        "asn_accuracy_pct": 33.33,
+        "chase_responsiveness_pct": null,
+        "clean_pct": 0.0,
+        "deduction_validity_pct": null,
+        "exception_rate_pct": 100.0,
+        "fill_pct": 99.2,
+        "otif_pct": 66.67
+      },
+      "n_pos": 3,
+      "po_ids": [
+        "PO-8803",
+        "PO-8807",
+        "PO-8809"
+      ],
+      "pos": [
+        {
+          "asn_accurate": false,
+          "asn_ea": 1200.0,
+          "exception_type": "over_ship",
+          "fill_pct": 108.0,
+          "good_ea": 1296.0,
+          "grn_ea": 1296.0,
+          "on_time": true,
+          "ordered_ea": 1200.0,
+          "otif": "pass",
+          "po_id": "PO-8803",
+          "received_ea": 1296.0,
+          "sku": "SKU-6613",
+          "three_way": "over_ship"
+        },
+        {
+          "asn_accurate": false,
+          "asn_ea": null,
+          "exception_type": "blind_receipt",
+          "fill_pct": 100.0,
+          "good_ea": 1200.0,
+          "grn_ea": 1200.0,
+          "on_time": true,
+          "ordered_ea": 1200.0,
+          "otif": "pass",
+          "po_id": "PO-8807",
+          "received_ea": 1200.0,
+          "sku": "SKU-6613",
+          "three_way": "matched"
+        },
+        {
+          "asn_accurate": true,
+          "asn_ea": 600.0,
+          "exception_type": "damaged_goods",
+          "fill_pct": 80.0,
+          "good_ea": 480.0,
+          "grn_ea": 600.0,
+          "on_time": true,
+          "ordered_ea": 600.0,
+          "otif": "fail",
+          "po_id": "PO-8809",
+          "received_ea": 600.0,
+          "sku": "SKU-5502",
+          "three_way": "matched"
+        }
+      ],
+      "rank": 3,
+      "supplier": "SUP-022"
+    }
+  ],
+  "synthetic": true,
+  "weights": {
+    "asn_accuracy": 0.2,
+    "clean": 0.25,
+    "fill": 0.2,
+    "otif": 0.35
+  }
+}

@@ -1,0 +1,80 @@
+# Scoping checklist — {{CUSTOMER}} (`{{SLUG}}`)
+
+Phase-0 intake. Fill every `____` before Phase 1. Nothing here is dated by the tool —
+`____-__-__` are fill-ins.
+
+## 1. Owners & buyers (approval owners)
+| Role | Name | Contact | Holds `{{APPROVAL_TOKEN_VAR}}`? |
+|---|---|---|---|
+| Economic buyer | ____________ | ____________ | no |
+| Ops owner | ____________ | ____________ | ____ |
+| FDE (you) | ____________ | ____________ | no (agent-side) |
+| Approver(s) on call | ____________ | ____________ | **yes** |
+
+The approval token is the human proof-of-presence. Only named approvers hold it; the agent
+never does. Absent a token, every gated action fails closed.
+
+## 2. Systems touched (sets the four dialects)
+| Class | Server | Env var | Customer's system | Chosen value | Validated? |
+|---|---|---|---|---|---|
+| ERP (3-way match) | `retail-erp-mcp` | `RETAIL_ERP_SYSTEM` | ____________ | `{{ERP_SYSTEM}}` | ☐ |
+| Supplier network | `retail-supplier-mcp` | `RETAIL_SUPPLIER_SYSTEM` | ____________ | `{{SUPPLIER_SYSTEM}}` | ☐ |
+| Email / chase | `retail-email-mcp` | `RETAIL_EMAIL_SYSTEM` | ____________ | `{{EMAIL_SYSTEM}}` | ☐ |
+| Spreadsheet / recon | `retail-sheets-mcp` | `RETAIL_SHEETS_SYSTEM` | ____________ | `{{SHEETS_SYSTEM}}` | ☐ |
+
+Allowed: ERP `sap_s4hana|netsuite|dynamics365`; supplier `sps_commerce|coupa|ariba`;
+email `msgraph|gmail`; sheets `google_sheets|msgraph_excel`.
+
+## 3. Tolerances to author in the exception board (`<<TOKEN>>` → real value)
+| Tolerance | Board field | Placeholder token | Customer value |
+|---|---|---|---|
+| Qty tolerance % | `qty_tolerance_pct` | `<<QTY_TOL_PCT>>` | ____ |
+| Price tolerance / case | `price_tolerance_per_case` | `<<PRICE_TOL>>` | ____ |
+| Write-off threshold | `write_off_threshold` | `<<WRITEOFF_USD>>` | ____ |
+| OTIF window | `otif_window` | `<<OTIF_WINDOW>>` (+`early_ok`) | ____ |
+| Fill-rate basis | `fill_rate_basis` | `<<FILL_BASIS>>` (line\|unit\|case\|value) | ____ |
+| Credit-note direction | `credit_note_direction` | `<<CN_DIR>>` | ____ |
+| Chase ladder cadence | `chase_ladder[]` | (per step) | ____ |
+| UOM (SKU→pack) | `uom{}` | (per SKU) | ____ |
+
+## 4. Gated actions (the frozen 11 — DO NOT edit the list)
+`pay_invoice · issue_debit_note · issue_credit_note · post_deduction · accept_chargeback ·
+po_amendment · po_cancellation · accept_over_ship · authorize_return · commit_supplier_payment ·
+override_scorecard`
+
+- The board locks this set; the export must equal `rules.GATED_ACTIONS` (drift-guarded by `test_corpus`).
+- `write_off` and `close_exception` are gated by literal in `compute.approval_gate` and must **not** appear in the list.
+- For each gated action, name the approver and the ceiling:
+
+| Gated action | Approver | Per-action ceiling | Notes |
+|---|---|---|---|
+| pay_invoice | ____ | ____ | |
+| issue_debit_note | ____ | ____ | |
+| issue_credit_note | ____ | ____ | |
+| post_deduction | ____ | ____ | |
+| accept_chargeback | ____ | ____ | |
+| po_amendment | ____ | ____ | |
+| po_cancellation | ____ | ____ | |
+| accept_over_ship | ____ | ____ | |
+| authorize_return | ____ | ____ | |
+| commit_supplier_payment | ____ | ____ | |
+| override_scorecard | ____ | ____ | |
+
+## 5. Hand-to-human fallbacks (each of the four classes needs one)
+| Class | Fallback route | Owner |
+|---|---|---|
+| ____________ | ____________ | ____ |
+| ____________ | ____________ | ____ |
+| ____________ | ____________ | ____ |
+| ____________ | ____________ | ____ |
+
+## 6. Audit fields (mandatory record shape)
+Default `audit_required_fields`: `timestamp, actor, action, evidence, rule_applied,
+before_state, after_state, reason_code`. Confirm or extend: ____________
+
+## 7. Data access & consent
+- [ ] Read access granted to all four system classes
+- [ ] Consent secured for the data in scope (family-held / off-device where applicable)
+- [ ] `{{APPROVAL_TOKEN_VAR}}` injection path decided (host env / secrets manager — never VCS)
+
+**Phase-0 gate:** every row above filled; dialects validated; scope signed.

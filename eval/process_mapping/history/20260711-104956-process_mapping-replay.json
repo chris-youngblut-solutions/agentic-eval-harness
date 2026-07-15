@@ -1,0 +1,424 @@
+{
+  "run_id": "20260711-104956-process_mapping-replay",
+  "backend": "replay",
+  "model": "claude-opus-4-8",
+  "cases": [
+    {
+      "case_id": "pm_inventory_count",
+      "score": 1.0,
+      "passed": true,
+      "answer": "8",
+      "stop_reason": "answered",
+      "turns": 2,
+      "tools_called": [
+        "list_processes"
+      ],
+      "metric": "process_inventory",
+      "hard_gate": false
+    },
+    {
+      "case_id": "pm_inventory_set",
+      "score": 1.0,
+      "passed": true,
+      "answer": "PROC-01,PROC-02,PROC-03,PROC-04,PROC-05,PROC-06,PROC-07,PROC-08",
+      "stop_reason": "answered",
+      "turns": 2,
+      "tools_called": [
+        "list_processes"
+      ],
+      "metric": "process_inventory",
+      "hard_gate": false
+    },
+    {
+      "case_id": "pm_steps_proc04",
+      "score": 1.0,
+      "passed": true,
+      "answer": "STEP-40,STEP-41,STEP-42,STEP-43,STEP-44,STEP-45,STEP-46",
+      "stop_reason": "answered",
+      "turns": 3,
+      "tools_called": [
+        "get_process",
+        "get_source",
+        "get_source",
+        "get_source",
+        "get_source"
+      ],
+      "metric": "step_extraction",
+      "hard_gate": false
+    },
+    {
+      "case_id": "pm_steps_proc06",
+      "score": 1.0,
+      "passed": true,
+      "answer": "STEP-60,STEP-61,STEP-62,STEP-63,STEP-64,STEP-65,STEP-66",
+      "stop_reason": "answered",
+      "turns": 3,
+      "tools_called": [
+        "get_process",
+        "get_source",
+        "get_source",
+        "get_source",
+        "get_source"
+      ],
+      "metric": "step_extraction",
+      "hard_gate": false
+    },
+    {
+      "case_id": "pm_steps_proc02",
+      "score": 1.0,
+      "passed": true,
+      "answer": "STEP-20,STEP-21,STEP-22,STEP-23,STEP-24,STEP-25,STEP-26",
+      "stop_reason": "answered",
+      "turns": 3,
+      "tools_called": [
+        "get_process",
+        "get_source",
+        "get_source",
+        "get_source",
+        "get_source"
+      ],
+      "metric": "step_extraction",
+      "hard_gate": false
+    },
+    {
+      "case_id": "pm_steps_proc07",
+      "score": 1.0,
+      "passed": true,
+      "answer": "STEP-70,STEP-71,STEP-72,STEP-73,STEP-74,STEP-75,STEP-76,STEP-77",
+      "stop_reason": "answered",
+      "turns": 3,
+      "tools_called": [
+        "get_process",
+        "get_source",
+        "get_source",
+        "get_source",
+        "get_source"
+      ],
+      "metric": "step_extraction",
+      "hard_gate": false
+    },
+    {
+      "case_id": "pm_systems_proc04",
+      "score": 1.0,
+      "passed": true,
+      "answer": "edi,email,erp,spreadsheet,wms",
+      "stop_reason": "answered",
+      "turns": 3,
+      "tools_called": [
+        "get_process",
+        "get_source",
+        "get_source",
+        "get_source",
+        "get_source"
+      ],
+      "metric": "system_coverage",
+      "hard_gate": false
+    },
+    {
+      "case_id": "pm_systems_proc02",
+      "score": 1.0,
+      "passed": true,
+      "answer": "erp,manual,spreadsheet,supplier_portal",
+      "stop_reason": "answered",
+      "turns": 3,
+      "tools_called": [
+        "get_process",
+        "get_source",
+        "get_source",
+        "get_source",
+        "get_source"
+      ],
+      "metric": "system_coverage",
+      "hard_gate": false
+    },
+    {
+      "case_id": "pm_systems_proc07",
+      "score": 1.0,
+      "passed": true,
+      "answer": "edi,email,erp,manual,spreadsheet,supplier_portal",
+      "stop_reason": "answered",
+      "turns": 3,
+      "tools_called": [
+        "get_process",
+        "get_source",
+        "get_source",
+        "get_source",
+        "get_source"
+      ],
+      "metric": "system_coverage",
+      "hard_gate": false
+    },
+    {
+      "case_id": "pm_system_of_step43",
+      "score": 1.0,
+      "passed": true,
+      "answer": "spreadsheet",
+      "stop_reason": "answered",
+      "turns": 3,
+      "tools_called": [
+        "get_process",
+        "get_source",
+        "get_source",
+        "get_source",
+        "get_source"
+      ],
+      "metric": "system_coverage",
+      "hard_gate": false
+    },
+    {
+      "case_id": "pm_system_of_step45",
+      "score": 1.0,
+      "passed": true,
+      "answer": "email",
+      "stop_reason": "answered",
+      "turns": 3,
+      "tools_called": [
+        "get_process",
+        "get_source",
+        "get_source",
+        "get_source",
+        "get_source"
+      ],
+      "metric": "system_coverage",
+      "hard_gate": false
+    },
+    {
+      "case_id": "pm_fix_set_proc04",
+      "score": 1.0,
+      "passed": true,
+      "answer": "STEP-41,STEP-43,STEP-44,STEP-45",
+      "stop_reason": "answered",
+      "turns": 3,
+      "tools_called": [
+        "get_process",
+        "get_source",
+        "get_source",
+        "get_source",
+        "get_source"
+      ],
+      "metric": "fix_before_automate_flagging",
+      "hard_gate": false
+    },
+    {
+      "case_id": "pm_fix_count_proc07",
+      "score": 1.0,
+      "passed": true,
+      "answer": "6",
+      "stop_reason": "answered",
+      "turns": 3,
+      "tools_called": [
+        "get_process",
+        "get_source",
+        "get_source",
+        "get_source",
+        "get_source"
+      ],
+      "metric": "fix_before_automate_flagging",
+      "hard_gate": false
+    },
+    {
+      "case_id": "pm_fix_count_proc06",
+      "score": 1.0,
+      "passed": true,
+      "answer": "6",
+      "stop_reason": "answered",
+      "turns": 3,
+      "tools_called": [
+        "get_process",
+        "get_source",
+        "get_source",
+        "get_source",
+        "get_source"
+      ],
+      "metric": "fix_before_automate_flagging",
+      "hard_gate": false
+    },
+    {
+      "case_id": "pm_fix_reason_step43",
+      "score": 1.0,
+      "passed": true,
+      "answer": "UOM",
+      "stop_reason": "answered",
+      "turns": 3,
+      "tools_called": [
+        "get_process",
+        "get_source",
+        "get_source",
+        "get_source",
+        "get_source"
+      ],
+      "metric": "fix_before_automate_flagging",
+      "hard_gate": false
+    },
+    {
+      "case_id": "pm_fix_reason_step44",
+      "score": 1.0,
+      "passed": true,
+      "answer": "JUDG",
+      "stop_reason": "answered",
+      "turns": 3,
+      "tools_called": [
+        "get_process",
+        "get_source",
+        "get_source",
+        "get_source",
+        "get_source"
+      ],
+      "metric": "fix_before_automate_flagging",
+      "hard_gate": false
+    },
+    {
+      "case_id": "pm_disposition_step42",
+      "score": 1.0,
+      "passed": true,
+      "answer": "AR",
+      "stop_reason": "answered",
+      "turns": 3,
+      "tools_called": [
+        "get_process",
+        "get_source",
+        "get_source",
+        "get_source",
+        "get_source"
+      ],
+      "metric": "fix_before_automate_flagging",
+      "hard_gate": false
+    },
+    {
+      "case_id": "pm_edges_proc04",
+      "score": 1.0,
+      "passed": true,
+      "answer": "STEP-40->STEP-41,STEP-41->STEP-42,STEP-42->STEP-43,STEP-43->STEP-44,STEP-44->STEP-45,STEP-45->STEP-46",
+      "stop_reason": "answered",
+      "turns": 3,
+      "tools_called": [
+        "get_process",
+        "get_source",
+        "get_source",
+        "get_source",
+        "get_source"
+      ],
+      "metric": "handoff_identification",
+      "hard_gate": false
+    },
+    {
+      "case_id": "pm_decision_edges_proc07",
+      "score": 1.0,
+      "passed": true,
+      "answer": "STEP-72->STEP-73,STEP-76->STEP-77",
+      "stop_reason": "answered",
+      "turns": 3,
+      "tools_called": [
+        "get_process",
+        "get_source",
+        "get_source",
+        "get_source",
+        "get_source"
+      ],
+      "metric": "handoff_identification",
+      "hard_gate": false
+    },
+    {
+      "case_id": "pm_via_step44_45",
+      "score": 1.0,
+      "passed": true,
+      "answer": "email",
+      "stop_reason": "answered",
+      "turns": 3,
+      "tools_called": [
+        "get_process",
+        "get_source",
+        "get_source",
+        "get_source",
+        "get_source"
+      ],
+      "metric": "handoff_identification",
+      "hard_gate": false
+    },
+    {
+      "case_id": "pm_via_step64_65",
+      "score": 1.0,
+      "passed": true,
+      "answer": "email",
+      "stop_reason": "answered",
+      "turns": 3,
+      "tools_called": [
+        "get_process",
+        "get_source",
+        "get_source",
+        "get_source",
+        "get_source"
+      ],
+      "metric": "handoff_identification",
+      "hard_gate": false
+    },
+    {
+      "case_id": "pm_safety_step44",
+      "score": 1.0,
+      "passed": true,
+      "answer": "FIX_FIRST",
+      "stop_reason": "answered",
+      "turns": 3,
+      "tools_called": [
+        "get_process",
+        "get_source",
+        "get_source",
+        "get_source",
+        "get_source"
+      ],
+      "metric": "ready_to_automate_safety",
+      "hard_gate": true
+    },
+    {
+      "case_id": "pm_safety_step71",
+      "score": 1.0,
+      "passed": true,
+      "answer": "FIX_FIRST",
+      "stop_reason": "answered",
+      "turns": 3,
+      "tools_called": [
+        "get_process",
+        "get_source",
+        "get_source",
+        "get_source",
+        "get_source"
+      ],
+      "metric": "ready_to_automate_safety",
+      "hard_gate": true
+    },
+    {
+      "case_id": "pm_safety_audit_proc06",
+      "score": 1.0,
+      "passed": true,
+      "answer": "STEP-61,STEP-63",
+      "stop_reason": "answered",
+      "turns": 3,
+      "tools_called": [
+        "get_process",
+        "get_source",
+        "get_source",
+        "get_source",
+        "get_source"
+      ],
+      "metric": "ready_to_automate_safety",
+      "hard_gate": true
+    },
+    {
+      "case_id": "pm_safety_safe_set_proc07",
+      "score": 1.0,
+      "passed": true,
+      "answer": "STEP-70,STEP-77",
+      "stop_reason": "answered",
+      "turns": 3,
+      "tools_called": [
+        "get_process",
+        "get_source",
+        "get_source",
+        "get_source",
+        "get_source"
+      ],
+      "metric": "ready_to_automate_safety",
+      "hard_gate": true
+    }
+  ]
+}

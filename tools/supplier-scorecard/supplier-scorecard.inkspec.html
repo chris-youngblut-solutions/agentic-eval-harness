@@ -1,0 +1,836 @@
+<!doctype html>
+<html lang="en" data-mode="day">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Supplier Scorecard — retail_ops</title>
+<style>
+/* ======================================================================== *
+ * COLLINS token contract (required-contract slice: surround + ink +
+ * fill/ink split + fonts + identity materials + focus bridge). Day is base
+ * :root; night is the [data-mode="night"] override. Authored against tokens
+ * only, so day<->night is free. Fills are MARKS ONLY (LED dots / bars / chips);
+ * every text colour comes from the --ink* ramp. One copper primary action;
+ * oxide is the identity badge only; --sys-accent owns focus + row selection.
+ * ======================================================================== */
+:root, [data-mode="day"]{
+  --paper:#DEDCD5; --paper-2:#D2CFC7; --paper-3:#C4C1B8; --inset:#E8E6DF;
+  --card:linear-gradient(180deg,#E8E6DF 0%,#DEDCD5 60%,#D2CFC7 100%);
+  --ink:#24221C; --ink-2:#4C4940; --ink-3:#5B5951; --ink-disabled:#8E8B81;
+  --rule:rgba(40,38,31,.12); --rule-2:rgba(40,38,31,.20); --rule-3:rgba(40,38,31,.30);
+  --fill-ok:#7C9578; --fill-warn:#BBA167; --fill-danger:#B5583F; --fill-info:#6B8394; --fill-accent:#8E4E45;
+  --ink-ok:#465F43; --ink-warn:#6F551B; --ink-danger:#8E3D2C; --ink-info:#3F5A6B; --ink-accent:#743E37;
+  --ok-soft:rgba(124,149,120,.16); --warn-soft:rgba(187,161,103,.18);
+  --danger-soft:rgba(181,88,63,.14); --info-soft:rgba(107,131,148,.15);
+  --accent-soft:rgba(142,78,69,.14); --accent-wash:rgba(142,78,69,.06);
+  --on-danger:#FFFFFF;
+}
+[data-mode="night"]{
+  --paper:#201F1C; --paper-2:#2A2926; --paper-3:#343330; --inset:#1A1917;
+  --card:linear-gradient(180deg,#2A2926 0%,#201F1C 60%,#1A1917 100%);
+  --ink:#E9E6DD; --ink-2:#B4B1A8; --ink-3:#938F85; --ink-disabled:#6E6A61;
+  --rule:rgba(255,255,255,.08); --rule-2:rgba(255,255,255,.15); --rule-3:rgba(255,255,255,.24);
+  --fill-ok:#8BAA84; --fill-warn:#CBB074; --fill-danger:#C56A50; --fill-info:#7E97A8; --fill-accent:#A85D52;
+  --ink-ok:#9CC090; --ink-warn:#DBC07E; --ink-danger:#E79079; --ink-info:#A9C2D2; --ink-accent:#D89E92;
+  --ok-soft:rgba(139,170,132,.18); --warn-soft:rgba(203,176,116,.18);
+  --danger-soft:rgba(197,106,80,.18); --info-soft:rgba(126,151,168,.18);
+  --accent-soft:rgba(168,93,82,.20); --accent-wash:rgba(168,93,82,.08);
+  --on-danger:#0B0A06;
+}
+:root{
+  --copper:#AE8A74; --copper-hi:#D6B7A4; --copper-lo:#8B6752; --copper-deep:#6F5240;
+  --oxide:#8E4E45; --oxide-deep:#743E37; --oxide-soft:rgba(142,78,69,.14);
+  --on-fill-dark:#0B0A06; --on-fill-light:#FFFFFF;
+  --on-ok:var(--on-fill-dark); --on-warn:var(--on-fill-dark); --on-info:var(--on-fill-dark);
+  --on-accent:var(--on-fill-light); --on-copper:var(--on-fill-dark); --on-oxide:var(--on-fill-light);
+  --font-serif:'Iowan Old Style','Palatino Linotype',Palatino,Georgia,serif;
+  --font-sans:'Adwaita Sans','Cantarell',system-ui,-apple-system,'Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif;
+  --font-mono:ui-monospace,'SF Mono','Cascadia Code',Menlo,Consolas,monospace;
+  --sys-accent:var(--copper);
+  --s2:8px; --s3:12px; --s4:16px; --s5:24px; --r1:4px; --r2:8px;
+}
+@supports (color: AccentColor){ :root{ --sys-accent:AccentColor; } }
+
+/* ---- base ---- */
+*{ box-sizing:border-box; }
+html,body{ margin:0; }
+body{
+  background:var(--paper); color:var(--ink); font-family:var(--font-sans);
+  font-size:15px; line-height:1.45; -webkit-font-smoothing:antialiased;
+  padding:var(--s5) clamp(var(--s3),4vw,48px);
+}
+h1,h2,h3{ font-family:var(--font-serif); font-weight:600; margin:0; color:var(--ink); }
+h1{ font-size:1.5rem; letter-spacing:.2px; }
+h2{ font-size:1.05rem; }
+h3{ font-size:.95rem; }
+a{ color:var(--ink-accent); }
+.wrap{ max-width:1160px; margin:0 auto; }
+.mono{ font-family:var(--font-mono); }
+.muted{ color:var(--ink-3); }
+.tiny{ font-size:.78rem; }
+
+/* ---- header ---- */
+header{ display:flex; flex-wrap:wrap; align-items:flex-end; gap:var(--s4); margin-bottom:var(--s5); }
+.badge{
+  display:inline-flex; align-items:center; gap:8px; padding:6px 12px; border-radius:var(--r1);
+  background:var(--oxide); color:var(--on-oxide); font-family:var(--font-mono);
+  font-size:.72rem; letter-spacing:.14em; text-transform:uppercase;
+}
+.title-block{ flex:1 1 320px; }
+.subtitle{ color:var(--ink-2); font-size:.92rem; margin-top:4px; }
+.controls{ display:flex; gap:var(--s2); align-items:center; }
+.chip{
+  font-family:var(--font-mono); font-size:.7rem; letter-spacing:.1em; text-transform:uppercase;
+  padding:5px 9px; border-radius:var(--r1); border:1px solid var(--rule-2);
+  color:var(--ink-2); background:var(--inset);
+}
+button{
+  font-family:var(--font-sans); font-size:.82rem; cursor:pointer;
+  padding:7px 13px; border-radius:var(--r1); border:1px solid var(--rule-2);
+  background:var(--inset); color:var(--ink);
+}
+button:focus-visible{ outline:2px solid var(--sys-accent); outline-offset:2px; }
+button.primary{ background:var(--copper); color:var(--on-copper); border-color:var(--copper-lo); font-weight:600; }
+button.toggle[aria-pressed="true"]{ border-color:var(--sys-accent); box-shadow:inset 0 0 0 1px var(--sys-accent); }
+
+/* ---- cards / sections ---- */
+section{ margin-bottom:var(--s5); }
+.card{
+  background:var(--card); border:1px solid var(--rule); border-radius:var(--r2);
+  padding:var(--s4) var(--s4) var(--s5);
+}
+.sec-head{ display:flex; flex-wrap:wrap; align-items:baseline; gap:var(--s3); margin-bottom:var(--s4); }
+.sec-head .note{ color:var(--ink-3); font-size:.82rem; }
+.sec-head .spacer{ flex:1; }
+
+/* ---- overview stat tiles ---- */
+.tiles{ display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:var(--s3); }
+.tile{ background:var(--inset); border:1px solid var(--rule); border-radius:var(--r1); padding:var(--s3) var(--s4); }
+.tile .k{ font-family:var(--font-mono); font-size:.68rem; letter-spacing:.1em; text-transform:uppercase; color:var(--ink-3); }
+.tile .v{ font-family:var(--font-serif); font-size:1.5rem; color:var(--ink); margin-top:2px; }
+.tile .s{ font-size:.78rem; color:var(--ink-2); }
+
+/* ---- table ---- */
+.table-scroll{ overflow-x:auto; }
+table{ border-collapse:collapse; width:100%; font-size:.86rem; }
+th,td{ text-align:right; padding:9px 10px; border-bottom:1px solid var(--rule); white-space:nowrap; }
+th{ color:var(--ink-3); font-weight:600; font-size:.72rem; letter-spacing:.06em; text-transform:uppercase; }
+th.l,td.l{ text-align:left; }
+tbody tr{ cursor:pointer; }
+tbody tr:hover{ background:var(--accent-wash); }
+tbody tr[aria-selected="true"]{ background:var(--inset); box-shadow:inset 3px 0 0 0 var(--sys-accent); }
+tbody tr:focus-visible{ outline:2px solid var(--sys-accent); outline-offset:-2px; }
+.supplier-id{ font-family:var(--font-mono); font-weight:600; color:var(--ink); }
+.na{ color:var(--ink-3); }
+
+/* ---- grade LED (fill as mark; never the only channel — grade letter carries it) ---- */
+.grade-cell{ display:inline-flex; align-items:center; gap:8px; }
+.led{ width:12px; height:12px; border-radius:50%; flex:none; box-shadow:0 0 0 3px var(--paper-3); }
+.led--ok{ background:var(--fill-ok); }
+.led--warn{ background:var(--fill-warn); }
+.led--danger{ background:var(--fill-danger); }
+.led--info{ background:var(--fill-info); }
+.grade-letter{ font-family:var(--font-serif); font-size:1rem; font-weight:600; color:var(--ink); }
+
+/* ---- bar charts (single hue + status; length = magnitude) ---- */
+.bar-row{ display:grid; grid-template-columns:74px 1fr 128px; align-items:center; gap:var(--s3); margin:7px 0; }
+.bar-row .name{ font-family:var(--font-mono); font-size:.8rem; color:var(--ink-2); }
+.track{ position:relative; height:15px; background:var(--paper-3); border-radius:var(--r1); }
+.bar{ position:absolute; left:0; top:0; height:100%; border-radius:0 var(--r1) var(--r1) 0; min-width:2px; }
+.bar--ok{ background:var(--fill-ok); }
+.bar--warn{ background:var(--fill-warn); }
+.bar--danger{ background:var(--fill-danger); }
+.bar--info{ background:var(--fill-info); }
+.target{ position:absolute; top:-4px; bottom:-4px; width:0; border-left:2px dashed var(--rule-3); }
+.val{ display:flex; align-items:center; gap:7px; justify-content:flex-end; }
+.val .num{ font-family:var(--font-mono); font-size:.82rem; color:var(--ink-2); }
+.st{ display:inline-flex; align-items:center; gap:4px; font-size:.72rem; }
+.st--ok{ color:var(--ink-ok); }
+.st--warn{ color:var(--ink-warn); }
+.st--danger{ color:var(--ink-danger); }
+.st--info{ color:var(--ink-info); }
+.st .glyph{ font-family:var(--font-mono); font-size:.72rem; }
+
+/* ---- legend ---- */
+.legend{ display:flex; flex-wrap:wrap; gap:var(--s4); margin-top:var(--s3); font-size:.76rem; color:var(--ink-2); }
+.legend .item{ display:inline-flex; align-items:center; gap:6px; }
+.swatch{ width:12px; height:12px; border-radius:3px; }
+.swatch--ok{ background:var(--fill-ok); } .swatch--warn{ background:var(--fill-warn); }
+.swatch--danger{ background:var(--fill-danger); } .swatch--info{ background:var(--fill-info); }
+.legend .rule-key{ width:14px; border-top:2px dashed var(--rule-3); height:0; }
+
+/* ---- small multiples ---- */
+.sm-grid{ display:grid; grid-template-columns:repeat(auto-fit,minmax(300px,1fr)); gap:var(--s5) var(--s4); }
+.panel h3{ margin-bottom:2px; }
+.panel .ptar{ font-size:.72rem; color:var(--ink-3); margin-bottom:var(--s3); }
+.panel .bar-row{ grid-template-columns:74px 1fr 118px; }
+
+/* ---- drill ---- */
+#drill .drill-meta{ display:flex; flex-wrap:wrap; gap:var(--s4); margin-bottom:var(--s4); }
+.kv{ font-size:.82rem; } .kv b{ font-family:var(--font-mono); color:var(--ink); }
+.verdict{ font-family:var(--font-mono); font-size:.76rem; padding:2px 7px; border-radius:var(--r1); border:1px solid var(--rule-2); color:var(--ink-2); background:var(--inset); }
+.pill{ display:inline-flex; align-items:center; gap:5px; }
+.footnote{ color:var(--ink-3); font-size:.78rem; margin-top:var(--s4); border-top:1px solid var(--rule); padding-top:var(--s3); }
+.footnote code{ font-family:var(--font-mono); color:var(--ink-2); }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <div class="title-block">
+      <span class="badge">Supplier Scorecard</span>
+      <h1 style="margin-top:10px">Record vs reality — supplier roll-up</h1>
+      <div class="subtitle">OTIF, fill, ASN accuracy, deduction validity, exception rate and chase responsiveness rolled from the <span class="mono">retail_ops</span> per-PO reconciliation corpus to the supplier level.</div>
+    </div>
+    <div class="controls">
+      <span class="chip" title="Every id, quantity and policy value is a fabricated MARKER token.">Synthetic</span>
+      <button id="mode-btn" class="toggle" type="button" aria-pressed="false" title="Toggle day / night">Night</button>
+      <button id="export-btn" class="primary" type="button" title="Download the embedded scorecard.json">Export JSON</button>
+    </div>
+  </header>
+
+  <section id="overview"><div class="tiles" id="tiles"></div></section>
+
+  <section id="ranking">
+    <div class="card">
+      <div class="sec-head">
+        <h2>Supplier ranking</h2>
+        <span class="note">graded on a weighted blend of the four full-coverage KPIs; click a row to drill in</span>
+      </div>
+      <div class="table-scroll">
+        <table id="rank-table">
+          <thead><tr>
+            <th class="l">#</th><th class="l">Grade</th><th class="l">Supplier</th>
+            <th>Composite</th><th>OTIF</th><th>Fill</th><th>ASN acc</th><th>Exc rate</th>
+            <th>Ded valid</th><th>Chase</th><th>POs</th>
+          </tr></thead>
+          <tbody id="rank-body"></tbody>
+        </table>
+      </div>
+      <div class="footnote">
+        Grade LED reflects the composite band (A/B on track, C watch, D/F critical).
+        <b>Ded valid</b> and <b>Chase</b> are <em>contextual</em> columns — sparse in this corpus
+        (a supplier can have zero deductions; only some chase threads map to an in-corpus PO) and
+        deliberately excluded from the composite.
+      </div>
+    </div>
+  </section>
+
+  <section id="chart1">
+    <div class="card">
+      <div class="sec-head">
+        <h2>OTIF by supplier</h2>
+        <span class="note">length = OTIF %, sorted best-first; colour = status vs the 95% SLA (dashed line); never colour-alone — value + status word carried</span>
+      </div>
+      <div id="otif-bars"></div>
+      <div class="legend" id="otif-legend"></div>
+    </div>
+  </section>
+
+  <section id="chart2">
+    <div class="card">
+      <div class="sec-head">
+        <h2>KPI profile — small multiples</h2>
+        <span class="note">one panel per KPI, suppliers in a shared rank order so you read a supplier's profile across a row</span>
+        <span class="spacer"></span>
+        <button id="matrix-btn" class="toggle" type="button" aria-pressed="false">Table view</button>
+      </div>
+      <div id="sm-grid" class="sm-grid"></div>
+      <div id="sm-table" class="table-scroll" hidden></div>
+      <div class="legend" id="sm-legend"></div>
+    </div>
+  </section>
+
+  <section id="drill">
+    <div class="card">
+      <div class="sec-head">
+        <h2 id="drill-title">Supplier drill</h2>
+        <span class="note">per-PO atoms behind the roll-up — every quantity normalized to eaches</span>
+      </div>
+      <div class="drill-meta" id="drill-meta"></div>
+      <div class="table-scroll">
+        <table id="drill-table">
+          <thead><tr>
+            <th class="l">PO</th><th class="l">SKU</th><th>Ordered ea</th><th>Recv ea</th><th>Good ea</th>
+            <th class="l">On-time</th><th>Fill</th><th class="l">OTIF</th><th class="l">ASN</th>
+            <th class="l">3-way verdict</th><th class="l">Exception</th>
+          </tr></thead>
+          <tbody id="drill-body"></tbody>
+        </table>
+      </div>
+      <div class="footnote" id="drill-context"></div>
+    </div>
+  </section>
+
+  <p class="footnote tiny" id="prov"></p>
+</div>
+
+<!-- Data payload: build_view.py re-inlines scorecard.json between this tag's open/close. -->
+<script type="application/json" id="scorecard-data">
+{
+  "corpus": {
+    "n_pos": 10,
+    "n_suppliers": 3,
+    "pack_uom": "eaches",
+    "qty_tolerance_pct": 2.0
+  },
+  "generated_from": "fixtures/retail_ops (synthetic corpus)",
+  "grade_bands": {
+    "A": 80.0,
+    "B": 65.0,
+    "C": 50.0,
+    "D": 35.0,
+    "F": 0.0
+  },
+  "kpis": {
+    "composite": [
+      "otif_pct",
+      "fill_pct",
+      "asn_accuracy_pct",
+      "exception_rate_pct"
+    ],
+    "contextual": [
+      "deduction_validity_pct",
+      "chase_responsiveness_pct"
+    ]
+  },
+  "overall": {
+    "best": "SUP-021",
+    "grade_distribution": {
+      "B": 1,
+      "C": 1,
+      "D": 1
+    },
+    "ranking": [
+      "SUP-021",
+      "SUP-023",
+      "SUP-022"
+    ],
+    "worst": "SUP-022"
+  },
+  "schema": "supplier-scorecard/0.1",
+  "suppliers": [
+    {
+      "composite": 67.18,
+      "coverage": {
+        "asn_accuracy": {
+          "accurate": 3,
+          "total": 4
+        },
+        "chases": {
+          "mapped": 2,
+          "responsive": 1
+        },
+        "deductions": {
+          "invalid": 1,
+          "total": 2,
+          "valid": 1
+        },
+        "exceptions": {
+          "flagged": 3,
+          "total": 4
+        },
+        "otif": {
+          "passed": 3,
+          "total": 4
+        }
+      },
+      "grade": "B",
+      "led": "ok",
+      "metrics": {
+        "asn_accuracy_pct": 75.0,
+        "chase_responsiveness_pct": 50.0,
+        "clean_pct": 25.0,
+        "deduction_validity_pct": 50.0,
+        "exception_rate_pct": 75.0,
+        "fill_pct": 98.4,
+        "otif_pct": 75.0
+      },
+      "n_pos": 4,
+      "po_ids": [
+        "PO-8801",
+        "PO-8802",
+        "PO-8804",
+        "PO-8808"
+      ],
+      "pos": [
+        {
+          "asn_accurate": true,
+          "asn_ea": 1200.0,
+          "exception_type": null,
+          "fill_pct": 100.0,
+          "good_ea": 1200.0,
+          "grn_ea": 1200.0,
+          "on_time": true,
+          "ordered_ea": 1200.0,
+          "otif": "pass",
+          "po_id": "PO-8801",
+          "received_ea": 1200.0,
+          "sku": "SKU-4471",
+          "three_way": "matched"
+        },
+        {
+          "asn_accurate": false,
+          "asn_ea": 1200.0,
+          "exception_type": "short_ship",
+          "fill_pct": 92.0,
+          "good_ea": 1104.0,
+          "grn_ea": 1104.0,
+          "on_time": true,
+          "ordered_ea": 1200.0,
+          "otif": "fail",
+          "po_id": "PO-8802",
+          "received_ea": 1104.0,
+          "sku": "SKU-5502",
+          "three_way": "short_ship"
+        },
+        {
+          "asn_accurate": true,
+          "asn_ea": 2400.0,
+          "exception_type": "price_variance",
+          "fill_pct": 100.0,
+          "good_ea": 2400.0,
+          "grn_ea": 2400.0,
+          "on_time": true,
+          "ordered_ea": 2400.0,
+          "otif": "pass",
+          "po_id": "PO-8804",
+          "received_ea": 2400.0,
+          "sku": "SKU-4471",
+          "three_way": "matched"
+        },
+        {
+          "asn_accurate": true,
+          "asn_ea": 1200.0,
+          "exception_type": "duplicate_invoice",
+          "fill_pct": 100.0,
+          "good_ea": 1200.0,
+          "grn_ea": 1200.0,
+          "on_time": true,
+          "ordered_ea": 1200.0,
+          "otif": "pass",
+          "po_id": "PO-8808",
+          "received_ea": 1200.0,
+          "sku": "SKU-4471",
+          "three_way": "duplicate_invoice"
+        }
+      ],
+      "rank": 1,
+      "supplier": "SUP-021"
+    },
+    {
+      "composite": 52.12,
+      "coverage": {
+        "asn_accuracy": {
+          "accurate": 2,
+          "total": 3
+        },
+        "chases": {
+          "mapped": 1,
+          "responsive": 0
+        },
+        "deductions": {
+          "invalid": 1,
+          "total": 2,
+          "valid": 1
+        },
+        "exceptions": {
+          "flagged": 2,
+          "total": 3
+        },
+        "otif": {
+          "passed": 1,
+          "total": 3
+        }
+      },
+      "grade": "C",
+      "led": "warn",
+      "metrics": {
+        "asn_accuracy_pct": 66.67,
+        "chase_responsiveness_pct": 0.0,
+        "clean_pct": 33.33,
+        "deduction_validity_pct": 50.0,
+        "exception_rate_pct": 66.67,
+        "fill_pct": 93.94,
+        "otif_pct": 33.33
+      },
+      "n_pos": 3,
+      "po_ids": [
+        "PO-8805",
+        "PO-8806",
+        "PO-8810"
+      ],
+      "pos": [
+        {
+          "asn_accurate": true,
+          "asn_ea": 1800.0,
+          "exception_type": "price_variance",
+          "fill_pct": 100.0,
+          "good_ea": 1800.0,
+          "grn_ea": 1800.0,
+          "on_time": false,
+          "ordered_ea": 1800.0,
+          "otif": "fail",
+          "po_id": "PO-8805",
+          "received_ea": 1800.0,
+          "sku": "SKU-5502",
+          "three_way": "price_variance"
+        },
+        {
+          "asn_accurate": true,
+          "asn_ea": 1200.0,
+          "exception_type": "no_exception",
+          "fill_pct": 100.0,
+          "good_ea": 1200.0,
+          "grn_ea": 1200.0,
+          "on_time": true,
+          "ordered_ea": 1200.0,
+          "otif": "pass",
+          "po_id": "PO-8806",
+          "received_ea": 1200.0,
+          "sku": "SKU-7788",
+          "three_way": "matched"
+        },
+        {
+          "asn_accurate": false,
+          "asn_ea": 960.0,
+          "exception_type": "short_ship_discontinued",
+          "fill_pct": 75.0,
+          "good_ea": 720.0,
+          "grn_ea": 720.0,
+          "on_time": true,
+          "ordered_ea": 960.0,
+          "otif": "fail",
+          "po_id": "PO-8810",
+          "received_ea": 720.0,
+          "sku": "SKU-7788",
+          "three_way": "short_ship"
+        }
+      ],
+      "rank": 2,
+      "supplier": "SUP-023"
+    },
+    {
+      "composite": 49.84,
+      "coverage": {
+        "asn_accuracy": {
+          "accurate": 1,
+          "total": 3
+        },
+        "chases": {
+          "mapped": 0,
+          "responsive": 0
+        },
+        "deductions": {
+          "invalid": 0,
+          "total": 0,
+          "valid": 0
+        },
+        "exceptions": {
+          "flagged": 3,
+          "total": 3
+        },
+        "otif": {
+          "passed": 2,
+          "total": 3
+        }
+      },
+      "grade": "D",
+      "led": "danger",
+      "metrics": {
+        "asn_accuracy_pct": 33.33,
+        "chase_responsiveness_pct": null,
+        "clean_pct": 0.0,
+        "deduction_validity_pct": null,
+        "exception_rate_pct": 100.0,
+        "fill_pct": 99.2,
+        "otif_pct": 66.67
+      },
+      "n_pos": 3,
+      "po_ids": [
+        "PO-8803",
+        "PO-8807",
+        "PO-8809"
+      ],
+      "pos": [
+        {
+          "asn_accurate": false,
+          "asn_ea": 1200.0,
+          "exception_type": "over_ship",
+          "fill_pct": 108.0,
+          "good_ea": 1296.0,
+          "grn_ea": 1296.0,
+          "on_time": true,
+          "ordered_ea": 1200.0,
+          "otif": "pass",
+          "po_id": "PO-8803",
+          "received_ea": 1296.0,
+          "sku": "SKU-6613",
+          "three_way": "over_ship"
+        },
+        {
+          "asn_accurate": false,
+          "asn_ea": null,
+          "exception_type": "blind_receipt",
+          "fill_pct": 100.0,
+          "good_ea": 1200.0,
+          "grn_ea": 1200.0,
+          "on_time": true,
+          "ordered_ea": 1200.0,
+          "otif": "pass",
+          "po_id": "PO-8807",
+          "received_ea": 1200.0,
+          "sku": "SKU-6613",
+          "three_way": "matched"
+        },
+        {
+          "asn_accurate": true,
+          "asn_ea": 600.0,
+          "exception_type": "damaged_goods",
+          "fill_pct": 80.0,
+          "good_ea": 480.0,
+          "grn_ea": 600.0,
+          "on_time": true,
+          "ordered_ea": 600.0,
+          "otif": "fail",
+          "po_id": "PO-8809",
+          "received_ea": 600.0,
+          "sku": "SKU-5502",
+          "three_way": "matched"
+        }
+      ],
+      "rank": 3,
+      "supplier": "SUP-022"
+    }
+  ],
+  "synthetic": true,
+  "weights": {
+    "asn_accuracy": 0.2,
+    "clean": 0.25,
+    "fill": 0.2,
+    "otif": 0.35
+  }
+}
+</script>
+
+<script>
+"use strict";
+(function () {
+  const DATA = JSON.parse(document.getElementById("scorecard-data").textContent || "{}");
+  if (!DATA.suppliers) { document.getElementById("tiles").textContent = "No scorecard data inlined — run build_view.py."; return; }
+
+  // KPI status bands (view concern; the numeric labels + target lines carry absolute truth).
+  const BANDS = {
+    otif_pct:           { label: "OTIF",           dir: "up",   target: 95, ok: 70, warn: 50 },
+    fill_pct:           { label: "Fill rate",      dir: "up",   target: 98, ok: 98, warn: 95 },
+    asn_accuracy_pct:   { label: "ASN accuracy",   dir: "up",   target: 90, ok: 70, warn: 50 },
+    exception_rate_pct: { label: "Exception rate", dir: "down", target: 20, ok: 50, warn: 75 },
+  };
+  const GLYPH = { ok: "✓", warn: "▲", danger: "✕", info: "○" };
+  const WORD  = { ok: "on track", warn: "watch", danger: "critical", info: "context" };
+
+  function statusOf(kpi, v) {
+    if (v == null) return "info";
+    const b = BANDS[kpi];
+    if (!b) return "info";
+    if (b.dir === "up")   return v >= b.ok ? "ok" : v >= b.warn ? "warn" : "danger";
+    return v <= b.ok ? "ok" : v <= b.warn ? "warn" : "danger";
+  }
+  const pct = (v) => (v == null ? "—" : v.toFixed(1) + "%");
+  const byRank = DATA.suppliers.slice().sort((a, b) => a.rank - b.rank);
+
+  // ---- status mark (redundant channels: fill via bar + word + glyph in semantic ink) ----
+  function statusHTML(st) {
+    return `<span class="st st--${st}"><span class="glyph">${GLYPH[st]}</span>${WORD[st]}</span>`;
+  }
+
+  // ---- one horizontal bar row ----
+  function barRow(name, value, kpi, opts) {
+    opts = opts || {};
+    const st = opts.status || statusOf(kpi, value);
+    const axisMax = 100;
+    const w = value == null ? 0 : Math.max(0, Math.min(value, axisMax)) / axisMax * 100;
+    const b = BANDS[kpi];
+    // Target line drawn AFTER the bar so the dashed SLA reference reads on top of the
+    // fill; the target VALUE is annotated once per panel/section, not on every row.
+    let targetHTML = "";
+    if (opts.showTarget && b && b.target != null) {
+      targetHTML = `<span class="target" style="left:${b.target}%"></span>`;
+    }
+    const valHTML = value == null
+      ? `<span class="num na">n/a</span>${statusHTML("info")}`
+      : `<span class="num">${value.toFixed(1)}%</span>${opts.hideStatus ? "" : statusHTML(st)}`;
+    return `<div class="bar-row">
+        <span class="name">${name}</span>
+        <span class="track"><span class="bar bar--${value==null?'info':st}" style="width:${w}%"></span>${targetHTML}</span>
+        <span class="val">${valHTML}</span>
+      </div>`;
+  }
+
+  // ---- overview tiles ----
+  function renderTiles() {
+    const c = DATA.corpus, o = DATA.overall;
+    const dist = Object.entries(o.grade_distribution).map(([g, n]) => `${g}×${n}`).join("  ");
+    const tiles = [
+      { k: "Suppliers", v: c.n_suppliers, s: `${c.n_pos} POs joined` },
+      { k: "Best", v: o.best, s: `rank 1 · grade ${byRank[0].grade}` },
+      { k: "Worst", v: o.worst, s: `rank ${byRank.length} · grade ${byRank[byRank.length-1].grade}` },
+      { k: "Grades", v: dist, s: "distribution" },
+      { k: "Qty tol", v: c.qty_tolerance_pct + "%", s: `base unit: ${c.pack_uom}` },
+    ];
+    document.getElementById("tiles").innerHTML = tiles.map(t =>
+      `<div class="tile"><div class="k">${t.k}</div><div class="v">${t.v}</div><div class="s">${t.s}</div></div>`
+    ).join("");
+  }
+
+  // ---- ranking table ----
+  function cell(kpi, v) {
+    if (v == null) return `<td><span class="na">—</span></td>`;
+    const st = statusOf(kpi, v);
+    return `<td><span class="pill"><span class="st st--${st}"><span class="glyph">${GLYPH[st]}</span></span> ${v.toFixed(1)}%</span></td>`;
+  }
+  function ctxCell(v, cov) {
+    if (v == null) return `<td><span class="na">n/a</span> <span class="tiny muted">${cov}</span></td>`;
+    return `<td>${v.toFixed(0)}% <span class="tiny muted">${cov}</span></td>`;
+  }
+  function renderTable() {
+    const body = document.getElementById("rank-body");
+    body.innerHTML = byRank.map(s => {
+      const m = s.metrics, cv = s.coverage;
+      const dedCov = `${cv.deductions.valid}/${cv.deductions.total}`;
+      const chaseCov = `${cv.chases.responsive}/${cv.chases.mapped}`;
+      return `<tr tabindex="0" data-supplier="${s.supplier}" aria-selected="false">
+        <td class="l mono">${s.rank}</td>
+        <td class="l"><span class="grade-cell"><span class="led led--${s.led}"></span><span class="grade-letter">${s.grade}</span></span></td>
+        <td class="l"><span class="supplier-id">${s.supplier}</span></td>
+        <td class="mono">${s.composite.toFixed(2)}</td>
+        ${cell("otif_pct", m.otif_pct)}
+        ${cell("fill_pct", m.fill_pct)}
+        ${cell("asn_accuracy_pct", m.asn_accuracy_pct)}
+        ${cell("exception_rate_pct", m.exception_rate_pct)}
+        ${ctxCell(m.deduction_validity_pct, dedCov)}
+        ${ctxCell(m.chase_responsiveness_pct, chaseCov)}
+        <td class="mono">${s.n_pos}</td>
+      </tr>`;
+    }).join("");
+    body.querySelectorAll("tr").forEach(tr => {
+      tr.addEventListener("click", () => selectSupplier(tr.dataset.supplier));
+      tr.addEventListener("keydown", e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); selectSupplier(tr.dataset.supplier); } });
+    });
+  }
+
+  // ---- Chart 1: ranked OTIF bar (sorted by value, SLA target line) ----
+  function renderOtif() {
+    const rows = DATA.suppliers.slice().sort((a, b) => b.metrics.otif_pct - a.metrics.otif_pct);
+    document.getElementById("otif-bars").innerHTML = rows.map(s =>
+      barRow(s.supplier, s.metrics.otif_pct, "otif_pct", { showTarget: true })
+    ).join("");
+    legend("otif-legend", true);
+  }
+
+  // ---- Chart 2: small multiples, shared rank order ----
+  const KPI_ORDER = ["otif_pct", "fill_pct", "asn_accuracy_pct", "exception_rate_pct"];
+  function renderSmallMultiples() {
+    document.getElementById("sm-grid").innerHTML = KPI_ORDER.map(kpi => {
+      const b = BANDS[kpi];
+      const bars = byRank.map(s => barRow(s.supplier, s.metrics[kpi], kpi, { showTarget: true })).join("");
+      const dir = b.dir === "down" ? "lower is better" : "higher is better";
+      return `<div class="panel"><h3>${b.label}</h3><div class="ptar">target ${b.target}% · ${dir}</div>${bars}</div>`;
+    }).join("");
+    // matrix (table view) alternative
+    const head = `<tr><th class="l">Supplier</th>${KPI_ORDER.map(k => `<th>${BANDS[k].label}</th>`).join("")}</tr>`;
+    const rows = byRank.map(s => `<tr><td class="l"><span class="supplier-id">${s.supplier}</span></td>${
+      KPI_ORDER.map(kpi => {
+        const v = s.metrics[kpi]; const st = statusOf(kpi, v);
+        return `<td><span class="pill"><span class="st st--${st}"><span class="glyph">${GLYPH[st]}</span></span> ${pct(v)}</span></td>`;
+      }).join("")
+    }</tr>`).join("");
+    document.getElementById("sm-table").innerHTML = `<table>${head}${rows}</table>`;
+    legend("sm-legend", true);
+  }
+
+  function legend(id, withTarget) {
+    const items = [
+      `<span class="item"><span class="swatch swatch--ok"></span>on track</span>`,
+      `<span class="item"><span class="swatch swatch--warn"></span>watch</span>`,
+      `<span class="item"><span class="swatch swatch--danger"></span>critical</span>`,
+    ];
+    if (withTarget) items.push(`<span class="item"><span class="rule-key"></span>SLA target</span>`);
+    document.getElementById(id).innerHTML = items.join("");
+  }
+
+  // ---- drill ----
+  function selectSupplier(sid) {
+    const s = DATA.suppliers.find(x => x.supplier === sid);
+    if (!s) return;
+    document.querySelectorAll("#rank-body tr").forEach(tr =>
+      tr.setAttribute("aria-selected", String(tr.dataset.supplier === sid)));
+    document.getElementById("drill-title").textContent = `Supplier drill — ${s.supplier} (grade ${s.grade}, rank ${s.rank})`;
+    const m = s.metrics;
+    document.getElementById("drill-meta").innerHTML = [
+      ["Composite", s.composite.toFixed(2)], ["OTIF", pct(m.otif_pct)], ["Fill", pct(m.fill_pct)],
+      ["ASN accuracy", pct(m.asn_accuracy_pct)], ["Exception rate", pct(m.exception_rate_pct)],
+      ["Deduction validity", m.deduction_validity_pct == null ? "n/a" : pct(m.deduction_validity_pct)],
+      ["Chase responsiveness", m.chase_responsiveness_pct == null ? "n/a" : pct(m.chase_responsiveness_pct)],
+    ].map(([k, v]) => `<span class="kv">${k}: <b>${v}</b></span>`).join("");
+
+    document.getElementById("drill-body").innerHTML = s.pos.map(p => {
+      const otifSt = p.otif === "pass" ? "ok" : "danger";
+      const asnSt = p.asn_accurate ? "ok" : "danger";
+      const otSt = p.on_time ? "ok" : "danger";
+      return `<tr>
+        <td class="l mono">${p.po_id}</td><td class="l mono">${p.sku}</td>
+        <td class="mono">${p.ordered_ea}</td><td class="mono">${p.received_ea}</td><td class="mono">${p.good_ea}</td>
+        <td class="l"><span class="st st--${otSt}"><span class="glyph">${GLYPH[otSt]}</span>${p.on_time ? "on-time" : "late"}</span></td>
+        <td class="mono">${p.fill_pct.toFixed(1)}%</td>
+        <td class="l"><span class="st st--${otifSt}"><span class="glyph">${GLYPH[otifSt]}</span>${p.otif}</span></td>
+        <td class="l"><span class="st st--${asnSt}"><span class="glyph">${GLYPH[asnSt]}</span>${p.asn_accurate ? "match" : "off"}</span></td>
+        <td class="l"><span class="verdict">${p.three_way}</span></td>
+        <td class="l muted">${p.exception_type ? p.exception_type : "—"}</td>
+      </tr>`;
+    }).join("");
+
+    const cv = s.coverage;
+    document.getElementById("drill-context").innerHTML =
+      `Coverage — deductions: <code>${cv.deductions.valid} valid / ${cv.deductions.invalid} invalid / ${cv.deductions.total} filed</code>; ` +
+      `chase threads mapped to this supplier: <code>${cv.chases.responsive} responsive / ${cv.chases.mapped} mapped</code>. ` +
+      `ASN accurate on <code>${cv.asn_accuracy.accurate}/${cv.asn_accuracy.total}</code> POs; OTIF passed <code>${cv.otif.passed}/${cv.otif.total}</code>.`;
+  }
+
+  // ---- controls ----
+  document.getElementById("mode-btn").addEventListener("click", function () {
+    const night = document.documentElement.getAttribute("data-mode") !== "night";
+    document.documentElement.setAttribute("data-mode", night ? "night" : "day");
+    this.setAttribute("aria-pressed", String(night));
+    this.textContent = night ? "Day" : "Night";
+  });
+  document.getElementById("matrix-btn").addEventListener("click", function () {
+    const showTable = this.getAttribute("aria-pressed") !== "true";
+    this.setAttribute("aria-pressed", String(showTable));
+    document.getElementById("sm-grid").hidden = showTable;
+    document.getElementById("sm-table").hidden = !showTable;
+  });
+  document.getElementById("export-btn").addEventListener("click", function () {
+    const blob = new Blob([document.getElementById("scorecard-data").textContent.trim() + "\n"], { type: "application/json" });
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob); a.download = "scorecard.json";
+    document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(a.href);
+  });
+
+  // OS-preference init (one night source of truth: the [data-mode="night"] block).
+  if (window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches) {
+    document.documentElement.setAttribute("data-mode", "night");
+    const b = document.getElementById("mode-btn"); b.setAttribute("aria-pressed", "true"); b.textContent = "Day";
+  }
+
+  renderTiles(); renderTable(); renderOtif(); renderSmallMultiples();
+  selectSupplier(byRank[0].supplier);
+  document.getElementById("prov").innerHTML =
+    `Schema <code>${DATA.schema}</code> · weights ` +
+    Object.entries(DATA.weights).map(([k, v]) => `${k} ${v}`).join(", ") +
+    ` · fully synthetic corpus (MARKER tokens) — no real supplier data.`;
+})();
+</script>
+</body>
+</html>

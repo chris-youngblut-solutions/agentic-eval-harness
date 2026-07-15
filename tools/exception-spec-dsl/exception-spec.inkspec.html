@@ -1,0 +1,939 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Exception-spec DSL — retail_ops · Collins</title>
+<style>
+  /* ==== COLLINS token contract (inlined · day/night, fails to light) ==== */
+  :root,[data-mode="day"]{
+    --paper:#DEDCD5; --paper-2:#D2CFC7; --paper-3:#C4C1B8; --inset:#E8E6DF;
+    --ink:#24221C; --ink-2:#4C4940; --ink-3:#5B5951; --ink-disabled:#8E8B81;
+    --rule:rgba(40,38,31,.12); --rule-2:rgba(40,38,31,.20); --rule-3:rgba(40,38,31,.30);
+    --fill-ok:#7C9578; --fill-warn:#BBA167; --fill-danger:#B5583F; --fill-info:#6B8394; --fill-accent:#8E4E45;
+    --ink-ok:#465F43; --ink-warn:#6F551B; --ink-danger:#8E3D2C; --ink-info:#3F5A6B; --ink-accent:#743E37;
+    --ok-soft:rgba(124,149,120,.16); --warn-soft:rgba(187,161,103,.18);
+    --danger-soft:rgba(181,88,63,.14); --info-soft:rgba(107,131,148,.15);
+    --accent-soft:rgba(142,78,69,.14); --accent-wash:rgba(142,78,69,.06);
+  }
+  @media (prefers-color-scheme: dark){:root:not([data-mode]){
+    --paper:#201F1C; --paper-2:#2A2926; --paper-3:#343330; --inset:#1A1917;
+    --ink:#E9E6DD; --ink-2:#B4B1A8; --ink-3:#938F85; --ink-disabled:#6E6A61;
+    --rule:rgba(255,255,255,.08); --rule-2:rgba(255,255,255,.15); --rule-3:rgba(255,255,255,.24);
+    --fill-ok:#8BAA84; --fill-warn:#CBB074; --fill-danger:#C56A50; --fill-info:#7E97A8; --fill-accent:#A85D52;
+    --ink-ok:#9CC090; --ink-warn:#DBC07E; --ink-danger:#E79079; --ink-info:#A9C2D2; --ink-accent:#D89E92;
+    --ok-soft:rgba(139,170,132,.18); --warn-soft:rgba(203,176,116,.18);
+    --danger-soft:rgba(197,106,80,.18); --info-soft:rgba(126,151,168,.18);
+    --accent-soft:rgba(168,93,82,.20); --accent-wash:rgba(168,93,82,.08);
+  }}
+  [data-mode="night"]{
+    --paper:#201F1C; --paper-2:#2A2926; --paper-3:#343330; --inset:#1A1917;
+    --ink:#E9E6DD; --ink-2:#B4B1A8; --ink-3:#938F85; --ink-disabled:#6E6A61;
+    --rule:rgba(255,255,255,.08); --rule-2:rgba(255,255,255,.15); --rule-3:rgba(255,255,255,.24);
+    --fill-ok:#8BAA84; --fill-warn:#CBB074; --fill-danger:#C56A50; --fill-info:#7E97A8; --fill-accent:#A85D52;
+    --ink-ok:#9CC090; --ink-warn:#DBC07E; --ink-danger:#E79079; --ink-info:#A9C2D2; --ink-accent:#D89E92;
+    --ok-soft:rgba(139,170,132,.18); --warn-soft:rgba(203,176,116,.18);
+    --danger-soft:rgba(197,106,80,.18); --info-soft:rgba(126,151,168,.18);
+    --accent-soft:rgba(168,93,82,.20); --accent-wash:rgba(168,93,82,.08);
+  }
+  :root{
+    --copper:#AE8A74; --copper-lo:#8B6752; --oxide:#8E4E45;
+    --on-copper:#0B0A06; --on-oxide:#FFFFFF;
+    --font-serif:'Iowan Old Style','Palatino Linotype',Palatino,Georgia,serif;
+    --font-sans:'Adwaita Sans','Cantarell',system-ui,-apple-system,'Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif;
+    --font-mono:ui-monospace,'SF Mono','Cascadia Code',Menlo,Consolas,monospace;
+    --serif:var(--font-serif); --sans:var(--font-sans); --mono:var(--font-mono);
+    --s1:4px; --s2:8px; --s3:12px; --s4:16px; --s5:24px; --s6:32px; --s7:48px; --s8:64px;
+    --r1:4px; --r2:8px; --r3:12px; --r4:16px;
+    --safe-bottom:env(safe-area-inset-bottom,0px);
+    --sys-accent:var(--copper);
+  }
+  @supports (color: AccentColor){:root{--sys-accent:AccentColor}}
+
+  /* ==== board ==== */
+  *{box-sizing:border-box}
+  html,body{max-width:100%}
+  body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);line-height:1.5;
+       padding:0 0 6.5rem;overflow-x:hidden}
+  .wrap{max-width:64rem;margin:0 auto;padding:1.5rem 1.15rem 0}
+  .eyebrow{font-family:var(--mono);font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-accent);margin:0 0 .35rem}
+  h1{font-family:var(--serif);font-size:1.9rem;font-weight:600;letter-spacing:-.01em;margin:0 0 .45rem}
+  .lead{color:var(--ink-2);max-width:52rem;margin:0 0 .9rem;font-size:.98rem}
+  .seams{font-size:.83rem;color:var(--ink-3);border-left:3px solid var(--copper);padding:.45rem 0 .45rem .8rem;
+         margin:.6rem 0 1.4rem;background:var(--accent-wash)}
+  .seams code{font-family:var(--mono);font-size:.8em;color:var(--ink-accent)}
+
+  /* ==== sticky tab bar ==== */
+  .tabs{position:sticky;top:0;z-index:6;background:var(--paper-2);border-bottom:1px solid var(--rule-3);
+        display:flex;gap:.4rem;align-items:center;padding:.5rem 1.15rem;flex-wrap:wrap}
+  .tabs .grp{display:flex;gap:.3rem}
+  .tab{font-family:var(--mono);font-size:.74rem;letter-spacing:.06em;text-transform:uppercase;
+       border:1px solid var(--rule-2);background:transparent;color:var(--ink-3);border-radius:var(--r1);
+       padding:.42rem .8rem;cursor:pointer}
+  .tab[aria-selected="true"]{color:var(--ink);border-color:var(--rule-3);background:var(--inset);box-shadow:inset 0 -2px 0 var(--copper)}
+  .tabs .spacer{flex:1 1 auto}
+  .tabs .vstat{font-family:var(--mono);font-size:.72rem;color:var(--ink-3);white-space:nowrap}
+  .tabs .vstat b{color:var(--ink-danger)}
+  .tabs .vstat b.ok{color:var(--ink-ok)}
+  .tabs .modebtn,.tabs .saved{font-family:var(--mono);font-size:.72rem}
+  .tabs .modebtn{border:1px solid var(--rule-2);background:transparent;color:var(--ink-3);border-radius:var(--r1);padding:.4rem .6rem;cursor:pointer}
+  .tabs .saved{color:var(--ink-ok)}
+
+  main{padding:1.15rem 1.15rem 0;max-width:64rem;margin:0 auto}
+  .pane{display:none}
+  .pane.on{display:block}
+
+  /* ==== editor sections ==== */
+  section.sec{margin:0 0 1.5rem}
+  .sec-h{font-family:var(--serif);font-size:1.24rem;font-weight:600;margin:1.6rem 0 .2rem;padding-bottom:.3rem;
+         border-bottom:1px solid var(--rule-2);display:flex;align-items:baseline;gap:.55rem;flex-wrap:wrap}
+  .sec-h .n{font-family:var(--mono);font-size:.68rem;color:var(--ink-3);font-weight:400}
+  .sec-h .maps{font-family:var(--mono);font-size:.64rem;color:var(--ink-accent);margin-left:auto;letter-spacing:.04em}
+  .sec-d{font-size:.82rem;color:var(--ink-3);margin:.4rem 0 .9rem;max-width:54rem}
+
+  .card{background:var(--inset);border:1px solid var(--rule);border-radius:var(--r3);padding:.85rem .95rem;margin:0 0 .75rem;
+        box-shadow:0 1px 2px rgba(20,16,10,.08)}
+  .card.locked{border-style:dashed}
+  .rowhead{display:flex;gap:.5rem;align-items:baseline;flex-wrap:wrap;margin-bottom:.5rem}
+  .rowhead .tag{font-family:var(--mono);font-size:.66rem;color:var(--ink-disabled)}
+  .rowhead .ttl{font-family:var(--mono);font-size:.78rem;color:var(--ink-2);font-weight:600}
+  .rowhead .push{margin-left:auto}
+
+  .grid{display:grid;gap:.55rem .75rem;grid-template-columns:repeat(auto-fit,minmax(11rem,1fr))}
+  .f{display:flex;flex-direction:column;gap:.22rem;min-width:0}
+  .f.wide{grid-column:1 / -1}
+  .f > label{font-family:var(--mono);font-size:.64rem;letter-spacing:.05em;text-transform:uppercase;color:var(--ink-3)}
+  .f > label .hint{color:var(--ink-disabled);text-transform:none;letter-spacing:0}
+  input[type=text],input[type=number],select,textarea{
+    background:var(--paper);border:1px solid var(--rule-2);border-radius:var(--r1);
+    padding:.42rem .55rem;font-family:var(--sans);font-size:.86rem;color:var(--ink);width:100%;min-width:0}
+  input.mono,textarea.mono{font-family:var(--mono);font-size:.8rem}
+  textarea{min-height:3.2rem;resize:vertical;line-height:1.4}
+  input::placeholder,textarea::placeholder{color:var(--ink-disabled)}
+  input:focus,select:focus,textarea:focus{outline:2px solid var(--sys-accent);outline-offset:1px;border-color:var(--copper)}
+  select{cursor:pointer;appearance:none;background-image:linear-gradient(45deg,transparent 50%,var(--ink-3) 50%),linear-gradient(135deg,var(--ink-3) 50%,transparent 50%);
+         background-position:calc(100% - 15px) 55%,calc(100% - 10px) 55%;background-size:5px 5px,5px 5px;background-repeat:no-repeat;padding-right:1.7rem}
+  input[type=checkbox]{width:1.15rem;height:1.15rem;accent-color:var(--fill-accent);cursor:pointer}
+  .tog{display:flex;gap:.45rem;align-items:center;font-family:var(--mono);font-size:.74rem;color:var(--ink-2);cursor:pointer}
+
+  .btn{font-family:var(--mono);font-size:.72rem;letter-spacing:.04em;border:1px solid var(--rule-3);background:transparent;
+       color:var(--ink-3);border-radius:var(--r1);padding:.4rem .7rem;cursor:pointer}
+  .btn:hover{color:var(--ink-2);border-color:var(--ink-3)}
+  .btn.del{color:var(--ink-danger);border-color:var(--rule-2)}
+  .btn.add{color:var(--ink-accent)}
+  .toolbar{display:flex;gap:.5rem;flex-wrap:wrap;margin:.2rem 0 1rem}
+
+  .guard{border-left:2px solid var(--rule-2);padding:.5rem 0 .5rem .7rem;margin:.5rem 0 0}
+  .guard .rowhead .ttl{color:var(--ink-3)}
+
+  /* ==== LEDs / chips (fills are LEDs, not text) ==== */
+  .led{display:inline-block;width:.62rem;height:.62rem;border-radius:50%;vertical-align:baseline;margin-right:.4rem;
+       box-shadow:0 0 0 1px var(--rule) inset}
+  .led.ok{background:var(--fill-ok)} .led.warn{background:var(--fill-warn)}
+  .led.danger{background:var(--fill-danger)} .led.info{background:var(--fill-info)} .led.accent{background:var(--fill-accent)}
+  .chip{display:inline-flex;align-items:center;font-family:var(--mono);font-size:.68rem;padding:.14rem .5rem;border-radius:var(--r1);
+        border:1px solid var(--rule-2);color:var(--ink-2);white-space:nowrap}
+  .chip.ok{background:var(--ok-soft);color:var(--ink-ok)}
+  .chip.warn{background:var(--warn-soft);color:var(--ink-warn)}
+  .chip.danger{background:var(--danger-soft);color:var(--ink-danger)}
+  .chip.info{background:var(--info-soft);color:var(--ink-info)}
+  .chip.accent{background:var(--accent-soft);color:var(--ink-accent)}
+  .flag{display:inline-block;font-family:var(--mono);font-size:.64rem;letter-spacing:.06em;color:var(--on-oxide);
+        background:var(--oxide);border-radius:var(--r1);padding:.14rem .5rem}
+
+  /* ==== gated grid ==== */
+  .gated-grid{display:grid;gap:.5rem;grid-template-columns:repeat(auto-fit,minmax(15rem,1fr))}
+  .grow{display:flex;gap:.5rem;align-items:center;background:var(--inset);border:1px solid var(--rule);border-radius:var(--r2);padding:.5rem .6rem}
+  .grow .nm{font-family:var(--mono);font-size:.78rem;color:var(--ink-danger);flex:1;min-width:0;overflow-wrap:anywhere}
+  .grow input{max-width:6.5rem}
+
+  /* ==== rendered spec view ==== */
+  .spec-h{font-family:var(--serif);font-size:1.7rem;margin:.2rem 0 .1rem}
+  .spec-sub{font-family:var(--mono);font-size:.76rem;color:var(--ink-3);margin:0 0 1.2rem}
+  .spec-blk{margin:1.4rem 0}
+  .spec-blk h3{font-family:var(--serif);font-size:1.16rem;margin:0 0 .5rem;padding-bottom:.25rem;border-bottom:1px solid var(--rule-2)}
+  table{border-collapse:collapse;width:100%;font-size:.83rem}
+  .tablewrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
+  th,td{text-align:left;padding:.4rem .55rem;border-bottom:1px solid var(--rule);vertical-align:top}
+  th{font-family:var(--mono);font-size:.66rem;letter-spacing:.04em;text-transform:uppercase;color:var(--ink-3);white-space:nowrap}
+  td .mono{font-family:var(--mono);font-size:.78rem;color:var(--ink-2)}
+  td small{color:var(--ink-3)}
+  .kv{display:grid;grid-template-columns:auto 1fr;gap:.2rem .8rem;font-size:.86rem;max-width:40rem}
+  .kv dt{font-family:var(--mono);font-size:.72rem;color:var(--ink-3);white-space:nowrap}
+  .kv dd{margin:0;color:var(--ink-2)}
+  .path-card{background:var(--inset);border:1px solid var(--rule);border-radius:var(--r2);padding:.7rem .85rem;margin:0 0 .6rem}
+  .path-card .ph{display:flex;gap:.5rem;align-items:center;flex-wrap:wrap;margin-bottom:.35rem}
+  .path-card .mk{font-family:var(--mono);font-size:.72rem;color:var(--ink-accent)}
+  .path-card .gd{font-size:.8rem;color:var(--ink-3);border-left:2px solid var(--rule-2);padding-left:.6rem;margin:.3rem 0 0}
+  .ladder{display:flex;flex-wrap:wrap;gap:.4rem;align-items:center}
+  .ladder .step{background:var(--inset);border:1px solid var(--rule-2);border-radius:var(--r1);padding:.35rem .6rem;font-size:.8rem}
+  .ladder .arrow{color:var(--ink-disabled);font-family:var(--mono)}
+  .muted{color:var(--ink-3);font-size:.82rem}
+
+  /* ==== validation + export ==== */
+  .vhead{display:flex;align-items:center;gap:.6rem;flex-wrap:wrap;margin:0 0 .7rem}
+  .vhead h3{margin:0}
+  .vlist{list-style:none;padding:0;margin:0 0 1.2rem}
+  .vlist li{display:flex;gap:.55rem;align-items:baseline;padding:.32rem 0;border-bottom:1px solid var(--rule);font-size:.84rem;color:var(--ink-2)}
+  .vlist li .where{font-family:var(--mono);font-size:.7rem;color:var(--ink-3);margin-left:auto;white-space:nowrap}
+  pre.json{background:var(--inset);border:1px solid var(--rule-2);border-radius:var(--r2);padding:.85rem 1rem;
+           font-family:var(--mono);font-size:.76rem;line-height:1.5;color:var(--ink-2);overflow-x:auto;white-space:pre;margin:.4rem 0 0}
+  .exp-note{font-size:.8rem;color:var(--ink-3);margin:.5rem 0}
+
+  /* ==== bottom export bar ==== */
+  .bar{position:fixed;bottom:0;left:0;right:0;background:var(--paper-2);border-top:1px solid var(--rule-3);
+       padding:.6rem 1.15rem calc(.6rem + var(--safe-bottom));display:flex;gap:.7rem;align-items:center;z-index:7;flex-wrap:wrap}
+  .bar .lbl{font-family:var(--mono);font-size:.74rem;color:var(--ink-2)}
+  .bar .lbl b{color:var(--ink-accent)}
+  .bar button{font-family:var(--sans);font-size:.85rem;font-weight:600;border-radius:var(--r2);padding:.5rem 1rem;cursor:pointer;
+              border:1px solid var(--copper-lo);background:var(--copper);color:var(--on-copper)}
+  .bar button.ghost{background:transparent;color:var(--ink-3);border-color:var(--rule-3);font-weight:500}
+  .bar .saved{font-family:var(--mono);font-size:.7rem;color:var(--ink-ok);margin-left:auto}
+
+  @media (any-pointer: coarse){
+    .bar button,.tab,.btn,.tog,.tabs .modebtn{min-height:44px}
+    input[type=checkbox]{width:1.35rem;height:1.35rem}
+  }
+  @media(max-width:44rem){.sec-h .maps{margin-left:0;flex-basis:100%}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <p class="eyebrow">exception-spec DSL · retail_ops · collins</p>
+  <h1>Per-deployment exception spec</h1>
+  <p class="lead">The single editable place a Forward Deployed Engineer authors the business logic that becomes agent behavior for one customer: decision rules (condition&nbsp;&rarr;&nbsp;action&nbsp;&rarr;&nbsp;terminal state), tolerances, exception paths and exceptions-of-exceptions, hand-to-human fallbacks, and the approval-gate config. It renders the spec readably and <strong>exports a valid <code>fixtures/retail_ops/policy.json</code></strong> the eval pack and MCP kit consume unchanged &mdash; author here, export, run under it.</p>
+  <p class="seams">Round-trip contract &mdash; the loader (<code>rules.load_policy</code>) reads ten keys only; every scalar is a <code>{token,&nbsp;value,&nbsp;unit}</code> object and only <code>.value</code> is consumed. Everything richer the FDE authors here (the rule table, exception guards, fallbacks, per-customer overrides) rides along in a <code>_exception_spec</code> metadata block the loader keeps in <code>.raw</code> and ignores &mdash; nothing is lost, the file still loads. <code>gated_actions</code> is drift-guarded: it must equal the eleven-item <code>rules.GATED_ACTIONS</code> frozenset. Autosaves locally.</p>
+</div>
+
+<div class="tabs">
+  <div class="grp" role="tablist">
+    <button class="tab" role="tab" aria-selected="true" data-tab="edit">Edit</button>
+    <button class="tab" role="tab" aria-selected="false" data-tab="spec">Spec</button>
+    <button class="tab" role="tab" aria-selected="false" data-tab="export">Validate &amp; export</button>
+  </div>
+  <span class="spacer"></span>
+  <span class="vstat" id="vstat"></span>
+  <button class="modebtn" id="modebtn" title="Toggle day / night">◐ mode</button>
+  <span class="saved" id="saved2"></span>
+</div>
+
+<main>
+  <div class="pane on" id="pane-edit"></div>
+  <div class="pane" id="pane-spec"></div>
+  <div class="pane" id="pane-export"></div>
+</main>
+
+<div class="bar">
+  <span class="lbl" id="barlbl"></span>
+  <button id="copybtn">Copy policy.json</button>
+  <button class="ghost" id="dlbtn">Download</button>
+  <button class="ghost" id="exbtn">exceptions.jsonl</button>
+  <button class="ghost" id="resetbtn">Reset</button>
+  <span class="saved" id="saved"></span>
+</div>
+
+<script>
+"use strict";
+/* ============================================================
+   Faithful mirrors of the pack's Python contract (rules.py / compute.py)
+   ============================================================ */
+const GATED_CANON = ["pay_invoice","issue_debit_note","issue_credit_note","post_deduction",
+  "accept_chargeback","po_amendment","po_cancellation","accept_over_ship",
+  "authorize_return","commit_supplier_payment","override_scorecard"]; // == rules.GATED_ACTIONS
+const SPECIAL_GATES = ["write_off","close_exception"]; // gate by string-literal in compute, NOT via the list
+const MARKER_TO_TYPE = {                                // compute.classify_exception derives type from the marker
+  "MARKER_SHORT_SHIP":"short_ship", "MARKER_OVER_SHIP":"over_ship",
+  "MARKER_PRICE_VAR":"price_variance", "MARKER_NO_ASN":"blind_receipt",
+  "MARKER_DUP_INVOICE":"duplicate_invoice", "MARKER_DAMAGE":"damaged_goods",
+  "MARKER_DISCONTINUED":"short_ship_discontinued", "MARKER_UOM_OK":"no_exception"};
+const MARKERS = Object.keys(MARKER_TO_TYPE);
+// disposition / terminal-state vocabulary (implicit in code + gold rows today; first-class here)
+const DISPOSITIONS = ["auto_close","hold_approval","escalate","dispute","close_wont_fulfill","human_triage"];
+const TERMINALS = ["auto_close","hold_approval","escalate","dispute","close_wont_fulfill","human_triage",
+  "SAFE","UNSAFE","post","matched","stop_fulfilled","stop_no_chase","stop_confirm_delivery"];
+const FILL_BASES = ["line","unit","case","value"];
+const CN_DIRS = ["supplier_issues_to_buyer","buyer_issues_to_supplier"];
+const PRICE_DIRS = ["overbill_only","both","underbill_only"];
+const FALLBACK_ONS = ["unclassified","low_confidence","missing_reference","ladder_exhausted"];
+
+function ledClass(state){
+  if(["auto_close","matched","SAFE","stop_fulfilled"].includes(state)) return "ok";
+  if(["hold_approval","dispute","post","stop_confirm_delivery"].includes(state)) return "warn";
+  if(["escalate","UNSAFE","close_wont_fulfill","stop_no_chase"].includes(state)) return "danger";
+  if(["human_triage"].includes(state)) return "info";
+  return "info";
+}
+function esc(s){return String(s==null?"":s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));}
+function num(v){const n=Number(v);return Number.isFinite(n)?n:v;}
+
+/* ============================================================
+   Worked SAMPLE spec — reverse-engineered from fixtures/retail_ops/policy.json
+   + exceptions.jsonl, extended with the gap-analysis richer layer.
+   Exports (strict mode) to a policy.json equal-in-shape to the committed fixture.
+   ============================================================ */
+const SAMPLE = {
+  meta:{
+    deployment:"RETAIL-OPS-REF",
+    author:"fde",
+    version:"0.1.0",
+    currency:"USD",
+    provenance:"Fully synthetic illustrative policy for the retail_ops eval domain. It is NOT any real retailer's, distributor's, or ERP's configuration, and reproduces no real tolerance, threshold, window, rate cutoff, chase cadence, gated-action list, or pack size from any real supply-chain operation or prior employer. Every number is a fabricated placeholder tagged with a <<TOKEN>> so a reviewer can see at a glance it is invented. Directional conventions (credit-vs-debit-note direction, fill-rate basis, OTIF window) are modeled as parameters precisely because they vary by customer; none reflects a specific real customer."
+  },
+  tolerances:{
+    qty_tolerance_pct:{token:"<<QTY_TOL_PCT>>", value:2, unit:"percent",
+      short_pct:"", over_pct:"", abs_floor_units:""},                       // extensions (metadata)
+    price_tolerance_per_case:{token:"<<PRICE_TOL>>", value:0.05, unit:"usd_per_case",
+      direction:"overbill_only", percent_alt:""},                           // extensions (metadata)
+    write_off_threshold:{token:"<<WRITEOFF_USD>>", value:5.0, unit:"usd"},
+    otif_window:{token:"<<OTIF_WINDOW>>", value:"on_or_before_promised", early_ok:true, late:"fail",
+      grace_days:0, in_full_threshold_pct:100},                             // grace_days/in_full ext (metadata)
+    fill_rate_basis:{token:"<<FILL_BASIS>>", value:"unit", note:"line|unit|case|value vary by retailer - verify per customer"},
+    credit_note_direction:{token:"<<CN_DIR>>", value:"supplier_issues_to_buyer", note:"some ERPs invert; verify per customer"},
+    damage_tolerance_pct:{token:"<<DAMAGE_TOL_PCT>>", value:"", unit:"percent"} // GAP extension (metadata only)
+  },
+  decision_rules:[
+    {id:"dr-no-receipt", priority:10, when:"no_receipt",       cond:"no GRN exists for the PO",             action:"quarantine receipt, chase ASN/receipt", terminal:"escalate",      within_tol_terminal:""},
+    {id:"dr-dup-invoice",priority:20, when:"duplicate_invoice",cond:"len(invoices_for(po)) > 1",             action:"block second payment, dispute",         terminal:"hold_approval", within_tol_terminal:""},
+    {id:"dr-short-ship", priority:30, when:"short_ship",       cond:"qty_grn_ea < qty_po_ea - tol",          action:"raise deduction / debit-note, stage",   terminal:"hold_approval", within_tol_terminal:"auto_close"},
+    {id:"dr-over-ship",  priority:31, when:"over_ship",        cond:"qty_grn_ea > qty_po_ea + tol",          action:"accept-&-bill-extra vs return; gate accept_over_ship", terminal:"hold_approval", within_tol_terminal:"auto_close"},
+    {id:"dr-price-var",  priority:40, when:"price_variance",   cond:"|price_inv - price_po| > price_tol",    action:"dispute overbill / reprice-approve",    terminal:"hold_approval", within_tol_terminal:"auto_close"},
+    {id:"dr-matched",    priority:99, when:"matched",          cond:"all conditions within tolerance",        action:"close",                                 terminal:"auto_close",    within_tol_terminal:""}
+  ],
+  exception_paths:[
+    {id:"EX-02", po_id:"PO-8802", marker:"MARKER_SHORT_SHIP",  disposition:"hold_approval",    within_tolerance:false,
+      guards:[{kind:"unless", key:"credit_already_issued_for_po", then:"auto_close", note:"a supplier credit already covers the shortfall - suppress double-recovery"},
+              {kind:"given",  key:"damage_explains_shortfall",    then:"suppress",   note:"don't double-count against damaged_goods"}]},
+    {id:"EX-03", po_id:"PO-8803", marker:"MARKER_OVER_SHIP",   disposition:"hold_approval",    within_tolerance:false, guards:[]},
+    {id:"EX-04", po_id:"PO-8804", marker:"MARKER_PRICE_VAR",   disposition:"auto_close",       within_tolerance:true,
+      guards:[{kind:"unless", key:"within_tolerance",              then:"hold_approval", note:"out-of-tolerance overbill -> dispute"},
+              {kind:"given",  key:"contracted_promo_or_allowance", then:"auto_close",   note:"agreed deal, not a variance"}]},
+    {id:"EX-06", po_id:"PO-8807", marker:"MARKER_NO_ASN",      disposition:"escalate",         within_tolerance:false, guards:[]},
+    {id:"EX-07", po_id:"PO-8808", marker:"MARKER_DUP_INVOICE", disposition:"hold_approval",    within_tolerance:false, guards:[]},
+    {id:"EX-08", po_id:"PO-8809", marker:"MARKER_DAMAGE",      disposition:"hold_approval",    within_tolerance:false, guards:[]},
+    {id:"EX-09", po_id:"PO-8810", marker:"MARKER_DISCONTINUED",disposition:"close_wont_fulfill",within_tolerance:false, parent:"short_ship",
+      guards:[{kind:"given", key:"chase.discontinued", then:"close_wont_fulfill", note:"exception-of-exception: short_ship AND discontinued -> stop chasing"}]},
+    {id:"EX-10", po_id:"PO-8806", marker:"MARKER_UOM_OK",      disposition:"auto_close",       within_tolerance:true,  guards:[]}
+  ],
+  fallbacks:[
+    {on:"unclassified",     disposition:"human_triage", route:"ap_clerk", note:"zero markers matched (classify_exception raises today) -> hand to a human"},
+    {on:"low_confidence",   disposition:"human_triage", route:"ap_clerk", note:"ambiguous / multiple markers"},
+    {on:"missing_reference",disposition:"human_triage", route:"buyer",    note:"unknown SKU/PO (pack_size / PO lookup KeyErrors today)"},
+    {on:"ladder_exhausted", disposition:"escalate",     route:"buyer",    note:"prior_chases past the last ladder step -> abandon, escalate"}
+  ],
+  gated_actions:GATED_CANON.map(a=>({action:a, ceiling:"", route:""})),
+  special_gates:{
+    write_off:{gated_by:"threshold", threshold_key:"write_off_threshold", note:"gated only when amount > write_off_threshold.value; NOT on the list"},
+    close_exception:{gated_by:"referenced_disposition", allow_when:"auto_close", note:"gated unless exceptions[ref_id].gold_disposition == auto_close"}
+  },
+  audit_required_fields:["timestamp","actor","action","evidence","rule_applied","before_state","after_state","reason_code"],
+  chase_ladder:{
+    steps:[
+      {index:0, step:"chase_1_soft",             day_offset:0, tone:"soft",       cc:"", route:""},
+      {index:1, step:"chase_2_firm_cc_manager",  day_offset:3, tone:"firm",       cc:"supplier_manager", route:""},
+      {index:2, step:"chase_3_escalate_buyer",   day_offset:7, tone:"escalation", cc:"", route:"buyer"}
+    ],
+    max_chases:3, terminal_action:"escalate_to_buyer"     // ext (metadata) - unhardcodes chase_step exhaustion
+  },
+  uom:[
+    {sku:"SKU-4471", pack:12},{sku:"SKU-5502", pack:12},
+    {sku:"SKU-6613", pack:12},{sku:"SKU-7788", pack:12}
+  ],
+  customers:[]   // per-customer override layer (metadata-only; global values are the default)
+};
+const SCHEMA_NOTE = "Tolerances/thresholds are {token, value, unit} objects; compute.py and the tools read the .value field. gated_actions is a string[] (the leakage-sensitive money-moving/irreversible action list). chase_ladder is an ordered list of steps. uom maps a synthetic SKU id to its pack size (eaches per case). audit_required_fields is the string[] of mandatory audit-record fields.";
+
+/* ============================================================
+   State: hydrate from localStorage, deep-merge over SAMPLE so new
+   fields survive an old save.
+   ============================================================ */
+const KEY="exc-spec-dsl-2026-07";
+function clone(o){return JSON.parse(JSON.stringify(o));}
+let SPEC=clone(SAMPLE);
+let META={mode:null, includeSpec:true};
+try{
+  const saved=JSON.parse(localStorage.getItem(KEY)||"null");
+  if(saved&&saved.SPEC){ SPEC=saved.SPEC; if(saved.META) META=Object.assign(META,saved.META); }
+}catch(e){}
+if(META.mode) document.documentElement.setAttribute("data-mode",META.mode);
+
+function save(){
+  localStorage.setItem(KEY,JSON.stringify({SPEC,META}));
+  const t="saved "+new Date().toLocaleTimeString();
+  document.getElementById("saved").textContent=t;
+  document.getElementById("saved2").textContent="●";
+  refreshValidationStatus();
+  if(activeTab==="spec") renderSpec();
+  if(activeTab==="export") renderExport();
+}
+
+/* path get/set for data-p bound inputs (e.g. "tolerances.qty_tolerance_pct.value") */
+function getPath(p){return p.split(".").reduce((o,k)=>o==null?o:o[k],SPEC);}
+function setPath(p,v){
+  const ks=p.split("."); let o=SPEC;
+  for(let i=0;i<ks.length-1;i++){o=o[ks[i]];}
+  o[ks[ks.length-1]]=v;
+}
+
+/* ============================================================
+   Small input builders
+   ============================================================ */
+function txt(p,ph,mono){const v=getPath(p);return `<input type="text" ${mono?'class="mono" ':''}data-p="${p}" placeholder="${esc(ph||"")}" value="${esc(v)}">`;}
+function n(p,ph){const v=getPath(p);return `<input type="number" step="any" data-p="${p}" placeholder="${esc(ph||"")}" value="${esc(v)}">`;}
+function ta(p,ph){const v=getPath(p);return `<textarea class="mono" data-p="${p}" placeholder="${esc(ph||"")}">${esc(v)}</textarea>`;}
+function sel(p,list){const v=getPath(p);return `<select data-p="${p}">`+list.map(o=>`<option value="${esc(o)}"${o===v?" selected":""}>${esc(o)}</option>`).join("")+`</select>`;}
+function selWith(p,list,blank){const v=getPath(p);let out=`<select data-p="${p}">`;if(blank)out+=`<option value=""${v===""||v==null?" selected":""}>${esc(blank)}</option>`;out+=list.map(o=>`<option value="${esc(o)}"${o===v?" selected":""}>${esc(o)}</option>`).join("")+`</select>`;return out;}
+function chk(p,label){const v=getPath(p);return `<label class="tog"><input type="checkbox" data-p="${p}" ${v?"checked":""}> ${esc(label)}</label>`;}
+function field(label,inner,wide,hint){return `<div class="f${wide?" wide":""}"><label>${esc(label)}${hint?` <span class="hint">${esc(hint)}</span>`:""}</label>${inner}</div>`;}
+
+/* ============================================================
+   EDIT pane
+   ============================================================ */
+function renderEdit(){
+  const t=SPEC.tolerances;
+  let h="";
+
+  /* meta */
+  h+=`<section class="sec"><div class="sec-h">Deployment <span class="n">— who this spec is for</span><span class="maps">meta → _exception_spec / _provenance</span></div>
+    <div class="card"><div class="grid">
+      ${field("deployment id",txt("meta.deployment","CUST-XXXX"))}
+      ${field("author (fde)",txt("meta.author"))}
+      ${field("spec version",txt("meta.version"))}
+      ${field("currency",txt("meta.currency","USD"))}
+      ${field("provenance (synthetic)",ta("meta.provenance","synthetic provenance statement…"),true)}
+    </div></div></section>`;
+
+  /* tolerances */
+  h+=`<section class="sec"><div class="sec-h">Tolerances &amp; thresholds <span class="n">— the numeric guardrails</span><span class="maps">→ qty_tolerance_pct · price_tolerance_per_case · write_off_threshold · otif_window · fill_rate_basis · credit_note_direction</span></div>
+    <p class="sec-d">Each scalar is a <code>{token, value, unit}</code> object; the loader reads only <code>.value</code> (plus <code>otif_window.early_ok</code>). Fields marked <em>ext</em> are richer than today's schema (asymmetric / floor / grace-day) — they ride in <code>_exception_spec</code> and don't reach the live loader yet.</p>`;
+
+  h+=`<div class="card"><div class="rowhead"><span class="ttl">qty_tolerance_pct</span></div><div class="grid">
+      ${field("token",txt("tolerances.qty_tolerance_pct.token"),false)}
+      ${field("value",n("tolerances.qty_tolerance_pct.value"))}
+      ${field("unit",txt("tolerances.qty_tolerance_pct.unit"))}
+      ${field("short_pct",n("tolerances.qty_tolerance_pct.short_pct"),false,"ext")}
+      ${field("over_pct",n("tolerances.qty_tolerance_pct.over_pct"),false,"ext")}
+      ${field("abs_floor_units",n("tolerances.qty_tolerance_pct.abs_floor_units"),false,"ext")}
+    </div></div>`;
+  h+=`<div class="card"><div class="rowhead"><span class="ttl">price_tolerance_per_case</span></div><div class="grid">
+      ${field("token",txt("tolerances.price_tolerance_per_case.token"))}
+      ${field("value",n("tolerances.price_tolerance_per_case.value"))}
+      ${field("unit",txt("tolerances.price_tolerance_per_case.unit"))}
+      ${field("direction",sel("tolerances.price_tolerance_per_case.direction",PRICE_DIRS),false,"ext")}
+      ${field("percent_alt",n("tolerances.price_tolerance_per_case.percent_alt"),false,"ext")}
+    </div></div>`;
+  h+=`<div class="card"><div class="rowhead"><span class="ttl">write_off_threshold</span> <span class="chip accent">special gate</span></div><div class="grid">
+      ${field("token",txt("tolerances.write_off_threshold.token"))}
+      ${field("value",n("tolerances.write_off_threshold.value"))}
+      ${field("unit",txt("tolerances.write_off_threshold.unit"))}
+    </div></div>`;
+  h+=`<div class="card"><div class="rowhead"><span class="ttl">otif_window</span></div><div class="grid">
+      ${field("token",txt("tolerances.otif_window.token"))}
+      ${field("value (str)",txt("tolerances.otif_window.value","on_or_before_promised"))}
+      ${field("late",txt("tolerances.otif_window.late","fail"))}
+      ${field("early_ok",chk("tolerances.otif_window.early_ok","early counts as on-time"))}
+      ${field("grace_days",n("tolerances.otif_window.grace_days"),false,"ext")}
+      ${field("in_full_threshold_pct",n("tolerances.otif_window.in_full_threshold_pct"),false,"ext")}
+    </div></div>`;
+  h+=`<div class="card"><div class="grid">
+      <div class="f wide"><label>fill_rate_basis</label></div>
+      ${field("token",txt("tolerances.fill_rate_basis.token"))}
+      ${field("value",sel("tolerances.fill_rate_basis.value",FILL_BASES))}
+      ${field("note",txt("tolerances.fill_rate_basis.note"),false)}
+    </div><div class="grid" style="margin-top:.6rem">
+      <div class="f wide"><label>credit_note_direction</label></div>
+      ${field("token",txt("tolerances.credit_note_direction.token"))}
+      ${field("value",sel("tolerances.credit_note_direction.value",CN_DIRS))}
+      ${field("note",txt("tolerances.credit_note_direction.note"),false)}
+    </div><div class="grid" style="margin-top:.6rem">
+      <div class="f wide"><label>damage_tolerance_pct <span class="hint">ext — no live key yet</span></label></div>
+      ${field("token",txt("tolerances.damage_tolerance_pct.token"))}
+      ${field("value",n("tolerances.damage_tolerance_pct.value"))}
+      ${field("unit",txt("tolerances.damage_tolerance_pct.unit"))}
+    </div></div>`;
+
+  /* decision rules */
+  h+=`<section class="sec"><div class="sec-h">Decision rules <span class="n">— condition → action → terminal state</span><span class="maps">→ _exception_spec.decision_rules (rule table as data)</span></div>
+    <p class="sec-d">The condition&rarr;action&rarr;disposition table that lives in <code>compute.three_way_match</code> today, lifted into data with an explicit <code>priority</code> (lower fires first — precedence: no_receipt &rarr; duplicate_invoice &rarr; short/over_ship &rarr; price_variance &rarr; matched). <code>within_tol_terminal</code> is the disposition when the condition is inside tolerance.</p>
+    <div id="dr-rows"></div>
+    <div class="toolbar"><button class="btn add" data-add="decision_rules">+ add rule</button></div></section>`;
+
+  /* exception paths */
+  h+=`<section class="sec"><div class="sec-h">Exception paths <span class="n">— incl. exceptions-of-exceptions</span><span class="maps">→ exceptions.jsonl gold rows + _exception_spec.exception_paths</span></div>
+    <p class="sec-d">Each path is keyed by a <code>MARKER_*</code> token &mdash; <code>compute.classify_exception</code> derives <code>type</code> from the marker, so type is shown read-only. <code>disposition</code> + <code>within_tolerance</code> are the authored gold labels carried on the row (they also feed the <code>close_exception</code> gate: only <code>auto_close</code> ungates it). <code>guards</code> are the <em>unless/given</em> branches for exceptions-of-exceptions (short-ship WITH a credit already issued; damage that explains the shortfall; a promo that explains a price variance).</p>
+    <div id="ep-rows"></div>
+    <div class="toolbar"><button class="btn add" data-add="exception_paths">+ add path</button></div></section>`;
+
+  /* fallbacks */
+  h+=`<section class="sec"><div class="sec-h">Fallbacks <span class="n">— hand to a human</span><span class="maps">→ _exception_spec.fallbacks</span></div>
+    <p class="sec-d">The explicit hand-to-human routes for cases the deterministic path can't own: unclassifiable evidence, low confidence, missing reference data, chase-ladder exhaustion. Today these <em>raise</em> or loop; a real spec routes them to a <code>human_triage</code> disposition with an owner.</p>
+    <div id="fb-rows"></div>
+    <div class="toolbar"><button class="btn add" data-add="fallbacks">+ add fallback</button></div></section>`;
+
+  /* gated actions */
+  h+=`<section class="sec"><div class="sec-h">Approval gate <span class="n">— which actions are gated for this customer</span><span class="maps">→ gated_actions (string[]) — must equal rules.GATED_ACTIONS</span></div>
+    <p class="sec-d">The eleven money-moving / irreversible actions. This list is <strong>drift-guarded</strong>: <code>gated_actions</code> in the export must equal the eleven-item <code>rules.GATED_ACTIONS</code> frozenset (a <code>test_corpus</code> assertion), so the set is locked. Per-action <code>ceiling</code> (auto-approve $-cap) and <code>route</code> (approver) are per-customer extensions carried in metadata. Below the list: the two actions compute special-cases by string literal — they are <em>not</em> on the list.</p>
+    <div class="gated-grid" id="ga-rows"></div>`;
+  h+=`<div style="margin-top:1rem" class="grid">
+      <div class="card locked"><div class="rowhead"><span class="ttl">write_off</span> <span class="chip accent">threshold-gated</span></div>
+        <p class="muted">Gated only when <code>amount &gt; write_off_threshold.value</code>. Not on the list.</p></div>
+      <div class="card locked"><div class="rowhead"><span class="ttl">close_exception</span> <span class="chip accent">disposition-gated</span></div>
+        <p class="muted">Gated unless the referenced exception's <code>gold_disposition == auto_close</code>. Not on the list.</p></div>
+    </div></section>`;
+
+  /* chase ladder */
+  h+=`<section class="sec"><div class="sec-h">Chase ladder <span class="n">— supplier follow-up cadence</span><span class="maps">→ chase_ladder (ordered) + max_chases/terminal ext</span></div>
+    <p class="sec-d">Ordered steps; the loader reads <code>index, step, day_offset, tone</code> and preserves order. <code>cc</code>/<code>route</code> are tolerated extras. <code>max_chases</code> + <code>terminal_action</code> (ext) unhardcode the ladder-exhaustion behavior.</p>
+    <div id="cl-rows"></div>
+    <div class="toolbar"><button class="btn add" data-add="chase_steps">+ add step</button></div>
+    <div class="card"><div class="grid">
+      ${field("max_chases",n("chase_ladder.max_chases"),false,"ext")}
+      ${field("terminal_action",txt("chase_ladder.terminal_action"),false,"ext")}
+    </div></div></section>`;
+
+  /* uom + audit */
+  h+=`<section class="sec"><div class="sec-h">UOM pack sizes <span class="n">— eaches per case</span><span class="maps">→ uom {sku:pack}</span></div>
+    <p class="sec-d">SKU &rarr; pack size. The pack's #1 false-exception guard — every quantity normalizes to eaches through this before comparison.</p>
+    <div id="uom-rows"></div>
+    <div class="toolbar"><button class="btn add" data-add="uom">+ add sku</button></div></section>`;
+
+  h+=`<section class="sec"><div class="sec-h">Audit required fields <span class="n">— completeness contract</span><span class="maps">→ audit_required_fields (string[])</span></div>
+    <p class="sec-d">Every field an audit record must carry non-empty; drives <code>audit_status</code> completeness.</p>
+    <div id="af-rows"></div>
+    <div class="toolbar"><button class="btn add" data-add="audit">+ add field</button></div></section>`;
+
+  /* customers */
+  h+=`<section class="sec"><div class="sec-h">Per-customer overrides <span class="n">— optional, metadata-only</span><span class="maps">→ _exception_spec.customers (global values are the default)</span></div>
+    <p class="sec-d">The single largest gap in today's flat schema: gating and tolerances are global. Add a customer to override the gated set, set per-action auto-approve ceilings, override tolerances, or route approvers. These land only in <code>_exception_spec</code> — the base export stays the global default.</p>
+    <div id="cust-rows"></div>
+    <div class="toolbar"><button class="btn add" data-add="customers">+ add customer</button></div></section>`;
+
+  document.getElementById("pane-edit").innerHTML=h;
+  renderDR();renderEP();renderFB();renderGA();renderCL();renderUOM();renderAF();renderCust();
+}
+
+function renderDR(){
+  const el=document.getElementById("dr-rows");if(!el)return;
+  el.innerHTML=SPEC.decision_rules.map((r,i)=>`
+    <div class="card"><div class="rowhead"><span class="tag">${esc(r.id||"rule")}</span>
+      <span class="ttl"><span class="led ${ledClass(r.terminal)}"></span>${esc(r.when||"?")} → ${esc(r.terminal||"?")}</span>
+      <span class="push"></span><button class="btn del" data-del="decision_rules" data-i="${i}">remove</button></div>
+    <div class="grid">
+      ${field("id",txt(`decision_rules.${i}.id`))}
+      ${field("priority",n(`decision_rules.${i}.priority`))}
+      ${field("when (verdict)",txt(`decision_rules.${i}.when`))}
+      ${field("terminal",sel(`decision_rules.${i}.terminal`,TERMINALS))}
+      ${field("within_tol_terminal",selWith(`decision_rules.${i}.within_tol_terminal`,TERMINALS,"— none —"))}
+      ${field("condition",txt(`decision_rules.${i}.cond`),true)}
+      ${field("action",txt(`decision_rules.${i}.action`),true)}
+    </div></div>`).join("");
+}
+function renderEP(){
+  const el=document.getElementById("ep-rows");if(!el)return;
+  el.innerHTML=SPEC.exception_paths.map((p,i)=>{
+    const type=MARKER_TO_TYPE[p.marker]||"— unknown marker —";
+    const guards=(p.guards||[]).map((g,j)=>`
+      <div class="guard"><div class="rowhead"><span class="ttl">guard ${j+1}</span><span class="push"></span>
+        <button class="btn del" data-delg="${i}" data-j="${j}">remove</button></div>
+      <div class="grid">
+        ${field("kind",sel(`exception_paths.${i}.guards.${j}.kind`,["unless","given"]))}
+        ${field("key (state read)",txt(`exception_paths.${i}.guards.${j}.key`))}
+        ${field("then → disposition",txt(`exception_paths.${i}.guards.${j}.then`))}
+        ${field("note",txt(`exception_paths.${i}.guards.${j}.note`),true)}
+      </div></div>`).join("");
+    return `<div class="path-card"><div class="rowhead"><span class="tag">${esc(p.id||"EX-?")}</span>
+      <span class="ttl"><span class="led ${ledClass(p.disposition)}"></span>${esc(type)} → ${esc(p.disposition)}</span>
+      <span class="push"></span><button class="btn del" data-del="exception_paths" data-i="${i}">remove</button></div>
+    <div class="grid">
+      ${field("id",txt(`exception_paths.${i}.id`))}
+      ${field("po_id",txt(`exception_paths.${i}.po_id`))}
+      ${field("marker",sel(`exception_paths.${i}.marker`,MARKERS))}
+      ${field("type (derived)",`<input type="text" value="${esc(type)}" disabled>`)}
+      ${field("disposition",sel(`exception_paths.${i}.disposition`,DISPOSITIONS))}
+      ${field("within_tolerance",chk(`exception_paths.${i}.within_tolerance`,"within tolerance"))}
+      ${field("parent (exc-of-exc)",txt(`exception_paths.${i}.parent`),false,"optional")}
+    </div>
+    ${guards}
+    <div class="toolbar"><button class="btn add" data-addg="${i}">+ add guard</button></div>
+    </div>`;
+  }).join("");
+}
+function renderFB(){
+  const el=document.getElementById("fb-rows");if(!el)return;
+  el.innerHTML=SPEC.fallbacks.map((f,i)=>`
+    <div class="card"><div class="rowhead"><span class="ttl"><span class="led ${ledClass(f.disposition)}"></span>on ${esc(f.on)} → ${esc(f.disposition)}</span>
+      <span class="push"></span><button class="btn del" data-del="fallbacks" data-i="${i}">remove</button></div>
+    <div class="grid">
+      ${field("on",selWith(`fallbacks.${i}.on`,FALLBACK_ONS,"— custom —"))}
+      ${field("disposition",sel(`fallbacks.${i}.disposition`,DISPOSITIONS))}
+      ${field("route (owner)",txt(`fallbacks.${i}.route`))}
+      ${field("note",txt(`fallbacks.${i}.note`),true)}
+    </div></div>`).join("");
+}
+function renderGA(){
+  const el=document.getElementById("ga-rows");if(!el)return;
+  el.innerHTML=SPEC.gated_actions.map((g,i)=>`
+    <div class="grow"><span class="led danger"></span><span class="nm">${esc(g.action)}</span>
+      <input type="number" step="any" data-p="gated_actions.${i}.ceiling" placeholder="ceiling $" value="${esc(g.ceiling)}" title="per-customer auto-approve ceiling (ext)">
+      <input type="text" data-p="gated_actions.${i}.route" placeholder="route" value="${esc(g.route)}" title="approver route (ext)" style="max-width:6rem">
+    </div>`).join("");
+}
+function renderCL(){
+  const el=document.getElementById("cl-rows");if(!el)return;
+  el.innerHTML=SPEC.chase_ladder.steps.map((s,i)=>`
+    <div class="card"><div class="rowhead"><span class="ttl">step ${esc(s.index)} — ${esc(s.step)}</span>
+      <span class="push"></span><button class="btn del" data-del="chase_steps" data-i="${i}">remove</button></div>
+    <div class="grid">
+      ${field("index",n(`chase_ladder.steps.${i}.index`))}
+      ${field("step",txt(`chase_ladder.steps.${i}.step`))}
+      ${field("day_offset",n(`chase_ladder.steps.${i}.day_offset`))}
+      ${field("tone",txt(`chase_ladder.steps.${i}.tone`))}
+      ${field("cc",txt(`chase_ladder.steps.${i}.cc`),false,"extra")}
+      ${field("route",txt(`chase_ladder.steps.${i}.route`),false,"extra")}
+    </div></div>`).join("");
+}
+function renderUOM(){
+  const el=document.getElementById("uom-rows");if(!el)return;
+  el.innerHTML=`<div class="gated-grid">`+SPEC.uom.map((u,i)=>`
+    <div class="grow"><input type="text" class="mono" data-p="uom.${i}.sku" placeholder="SKU-####" value="${esc(u.sku)}">
+      <input type="number" data-p="uom.${i}.pack" placeholder="pack" value="${esc(u.pack)}" style="max-width:5rem">
+      <button class="btn del" data-del="uom" data-i="${i}">×</button></div>`).join("")+`</div>`;
+}
+function renderAF(){
+  const el=document.getElementById("af-rows");if(!el)return;
+  el.innerHTML=`<div class="gated-grid">`+SPEC.audit_required_fields.map((f,i)=>`
+    <div class="grow"><input type="text" class="mono" data-p="audit_required_fields.${i}" value="${esc(f)}">
+      <button class="btn del" data-del="audit" data-i="${i}">×</button></div>`).join("")+`</div>`;
+}
+function renderCust(){
+  const el=document.getElementById("cust-rows");if(!el)return;
+  el.innerHTML=SPEC.customers.map((c,i)=>`
+    <div class="card"><div class="rowhead"><span class="ttl">${esc(c.id||"CUST-?")}</span>
+      <span class="push"></span><button class="btn del" data-del="customers" data-i="${i}">remove</button></div>
+    <div class="grid">
+      ${field("customer id",txt(`customers.${i}.id`,"CUST-A"))}
+      ${field("gated_actions_override",txt(`customers.${i}.gated_actions_override`,"comma list"),true,"comma")}
+      ${field("auto_approve_ceilings",ta(`customers.${i}.auto_approve_ceilings`,"one per line: post_deduction=25"),true)}
+      ${field("tolerance_overrides",ta(`customers.${i}.tolerance_overrides`,"one per line: qty_tolerance_pct=1"),true)}
+      ${field("approver_routes",ta(`customers.${i}.approver_routes`,"one per line: po_amendment=category_manager"),true)}
+    </div></div>`).join("");
+}
+
+/* ============================================================
+   Add / remove templates
+   ============================================================ */
+const ADD={
+  decision_rules:()=>({id:"dr-new",priority:50,when:"",cond:"",action:"",terminal:"hold_approval",within_tol_terminal:""}),
+  exception_paths:()=>({id:"EX-NN",po_id:"PO-NNNN",marker:MARKERS[0],disposition:"hold_approval",within_tolerance:false,parent:"",guards:[]}),
+  fallbacks:()=>({on:"unclassified",disposition:"human_triage",route:"",note:""}),
+  chase_steps:()=>({index:SPEC.chase_ladder.steps.length,step:"chase_new",day_offset:0,tone:"soft",cc:"",route:""}),
+  uom:()=>({sku:"SKU-0000",pack:12}),
+  audit:()=>"new_field",
+  customers:()=>({id:"CUST-NEW",gated_actions_override:"",auto_approve_ceilings:"",tolerance_overrides:"",approver_routes:""})
+};
+function doAdd(what){
+  if(what==="chase_steps") SPEC.chase_ladder.steps.push(ADD.chase_steps());
+  else if(what==="audit") SPEC.audit_required_fields.push(ADD.audit());
+  else SPEC[what].push(ADD[what]());
+  save();renderEdit();
+}
+function doDel(what,i){
+  if(what==="chase_steps") SPEC.chase_ladder.steps.splice(i,1);
+  else if(what==="audit") SPEC.audit_required_fields.splice(i,1);
+  else SPEC[what].splice(i,1);
+  save();renderEdit();
+}
+
+/* ============================================================
+   VALIDATION — flag rules that won't export cleanly
+   ============================================================ */
+function validate(){
+  const errors=[],warns=[],oks=[];
+  const t=SPEC.tolerances;
+  // hard: three numeric scalars
+  [["qty_tolerance_pct",t.qty_tolerance_pct],["price_tolerance_per_case",t.price_tolerance_per_case],["write_off_threshold",t.write_off_threshold]]
+    .forEach(([k,o])=>{ if(o.value===""||o.value==null||!Number.isFinite(Number(o.value))) errors.push([`${k}.value is not a number — load_policy does float(...) and will crash`,k]); });
+  // hard: otif needs value + early_ok
+  if(!String(t.otif_window.value||"").trim()) errors.push(["otif_window.value is empty — loader reads it as str","otif_window"]);
+  if(typeof t.otif_window.early_ok!=="boolean") errors.push(["otif_window.early_ok must be a bool — loader reads it","otif_window"]);
+  // hard: gated_actions must equal the 11 canonical
+  const gset=SPEC.gated_actions.filter(g=>g.gate!==false).map(g=>g.action);
+  const gs=new Set(gset), cs=new Set(GATED_CANON);
+  const missing=GATED_CANON.filter(a=>!gs.has(a)), extra=gset.filter(a=>!cs.has(a));
+  if(missing.length) errors.push([`gated_actions is missing ${missing.join(", ")} — drift-guard test asserts it equals rules.GATED_ACTIONS`,"gated_actions"]);
+  if(extra.length) errors.push([`gated_actions has non-canonical ${extra.join(", ")} — drift-guard will fail`,"gated_actions"]);
+  SPECIAL_GATES.forEach(a=>{ if(gs.has(a)) errors.push([`${a} must NOT be on gated_actions — it is special-cased in compute (would change behavior + break drift-guard)`,"gated_actions"]); });
+  // hard: fill_rate_basis in enum
+  if(!FILL_BASES.includes(t.fill_rate_basis.value)) errors.push([`fill_rate_basis.value must be one of ${FILL_BASES.join("|")}`,"fill_rate_basis"]);
+  // hard: chase ladder well-formed
+  SPEC.chase_ladder.steps.forEach((s,i)=>{ if(!Number.isInteger(Number(s.index))||!Number.isInteger(Number(s.day_offset))) errors.push([`chase_ladder step ${i}: index/day_offset must be ints`,"chase_ladder"]); });
+  // hard: uom positive ints
+  SPEC.uom.forEach((u,i)=>{ if(!u.sku) errors.push([`uom row ${i}: empty sku`,"uom"]); if(!Number.isInteger(Number(u.pack))||Number(u.pack)<=0) errors.push([`uom ${u.sku||i}: pack must be a positive int`,"uom"]); });
+  if(!SPEC.audit_required_fields.filter(x=>String(x).trim()).length) errors.push(["audit_required_fields is empty","audit_required_fields"]);
+
+  // warn: tokens present (convention/lint)
+  Object.entries(t).forEach(([k,o])=>{ if(o&&"token"in o && !/^<<.*>>$/.test(String(o.token||""))) warns.push([`${k}.token is not a <<TOKEN>> — provenance convention`,k]); });
+  // warn: decision-rule terminals in vocabulary
+  SPEC.decision_rules.forEach((r,i)=>{ if(r.terminal && !TERMINALS.includes(r.terminal)) warns.push([`decision_rule ${r.id||i}: terminal '${r.terminal}' not in the state vocabulary`,"decision_rules"]); });
+  // warn: exception marker/type/disposition
+  SPEC.exception_paths.forEach((p,i)=>{
+    if(!MARKER_TO_TYPE[p.marker]) errors.push([`exception_path ${p.id||i}: marker '${p.marker}' unknown — classify derives type from it`,"exception_paths"]);
+    if(p.disposition && !DISPOSITIONS.includes(p.disposition)) warns.push([`exception_path ${p.id||i}: disposition '${p.disposition}' not in the label set`,"exception_paths"]);
+    if(p.marker==="MARKER_PRICE_VAR" && p.within_tolerance===true && p.disposition!=="auto_close") warns.push([`exception_path ${p.id||i}: price variance within tolerance usually auto_close`,"exception_paths"]);
+  });
+  // warn: fallbacks cover the four classes
+  FALLBACK_ONS.forEach(o=>{ if(!SPEC.fallbacks.some(f=>f.on===o)) warns.push([`no fallback for '${o}' — that case has no hand-to-human route`,"fallbacks"]); });
+
+  if(!errors.length) oks.push(["all ten loader keys export cleanly; gated_actions matches rules.GATED_ACTIONS","export"]);
+  if(!warns.length && !errors.length) oks.push(["no lint warnings","lint"]);
+  return {errors,warns,oks};
+}
+function refreshValidationStatus(){
+  const {errors,warns}=validate();
+  const el=document.getElementById("vstat");
+  if(errors.length) el.innerHTML=`<b>${errors.length} blocking</b> · ${warns.length} warn`;
+  else el.innerHTML=`<b class="ok">clean</b> · ${warns.length} warn`;
+  document.getElementById("barlbl").innerHTML= errors.length
+    ? `<b>${errors.length}</b> blocking issue${errors.length>1?"s":""}`
+    : `policy.json ready`;
+}
+
+/* ============================================================
+   EXPORT — DSL → policy.json  (the build-ready mapping)
+   ============================================================ */
+function buildPolicy(includeSpec){
+  const t=SPEC.tolerances;
+  const p={};
+  p._provenance = SPEC.meta.provenance || "";
+  p._schema = SCHEMA_NOTE;
+  p.qty_tolerance_pct        = {token:t.qty_tolerance_pct.token, value:num(t.qty_tolerance_pct.value), unit:t.qty_tolerance_pct.unit};
+  p.price_tolerance_per_case = {token:t.price_tolerance_per_case.token, value:num(t.price_tolerance_per_case.value), unit:t.price_tolerance_per_case.unit};
+  p.write_off_threshold      = {token:t.write_off_threshold.token, value:num(t.write_off_threshold.value), unit:t.write_off_threshold.unit};
+  p.otif_window              = {token:t.otif_window.token, value:t.otif_window.value, early_ok:!!t.otif_window.early_ok, late:t.otif_window.late};
+  p.fill_rate_basis          = {token:t.fill_rate_basis.token, value:t.fill_rate_basis.value, note:t.fill_rate_basis.note};
+  p.credit_note_direction    = {token:t.credit_note_direction.token, value:t.credit_note_direction.value, note:t.credit_note_direction.note};
+  p.audit_required_fields    = SPEC.audit_required_fields.filter(x=>String(x).trim());
+  p.gated_actions            = SPEC.gated_actions.filter(g=>g.gate!==false).map(g=>g.action);
+  p.chase_ladder             = SPEC.chase_ladder.steps.map(s=>{
+    const o={index:num(s.index), step:s.step, day_offset:num(s.day_offset), tone:s.tone};
+    if(String(s.cc||"").trim()) o.cc=s.cc;
+    if(String(s.route||"").trim()) o.route=s.route;
+    return o;
+  });
+  p.uom = {};
+  SPEC.uom.forEach(u=>{ if(u.sku) p.uom[u.sku]=num(u.pack); });
+
+  if(includeSpec) p._exception_spec = buildSpecMeta();
+  return p;
+}
+function parseLines(s){ const o={}; String(s||"").split(/\n+/).forEach(l=>{ const m=l.split("="); if(m.length>=2 && m[0].trim()) o[m[0].trim()]=(()=>{const v=m.slice(1).join("=").trim();const nn=Number(v);return Number.isFinite(nn)&&v!==""?nn:v;})(); }); return o; }
+function buildSpecMeta(){
+  return {
+    format:"exception-spec/0.1",
+    deployment:SPEC.meta.deployment, author:SPEC.meta.author, version:SPEC.meta.version, currency:SPEC.meta.currency,
+    disposition_states:DISPOSITIONS,
+    decision_rules:SPEC.decision_rules.slice().sort((a,b)=>Number(a.priority)-Number(b.priority)),
+    tolerance_extensions:{
+      qty:{short_pct:SPEC.tolerances.qty_tolerance_pct.short_pct, over_pct:SPEC.tolerances.qty_tolerance_pct.over_pct, abs_floor_units:SPEC.tolerances.qty_tolerance_pct.abs_floor_units},
+      price:{direction:SPEC.tolerances.price_tolerance_per_case.direction, percent_alt:SPEC.tolerances.price_tolerance_per_case.percent_alt},
+      otif:{grace_days:SPEC.tolerances.otif_window.grace_days, in_full_threshold_pct:SPEC.tolerances.otif_window.in_full_threshold_pct},
+      damage_tolerance_pct:SPEC.tolerances.damage_tolerance_pct
+    },
+    exception_paths:SPEC.exception_paths.map(p=>({...p,type:MARKER_TO_TYPE[p.marker]||null})),
+    fallbacks:SPEC.fallbacks,
+    special_gates:SPEC.special_gates,
+    gated_action_config:SPEC.gated_actions.map(g=>({action:g.action, ceiling:g.ceiling===""?null:num(g.ceiling), route:g.route||null})),
+    chase_policy:{max_chases:num(SPEC.chase_ladder.max_chases), terminal_action:SPEC.chase_ladder.terminal_action},
+    customers:SPEC.customers.map(c=>({
+      id:c.id,
+      gated_actions_override:String(c.gated_actions_override||"").split(",").map(s=>s.trim()).filter(Boolean),
+      auto_approve_ceilings:parseLines(c.auto_approve_ceilings),
+      tolerance_overrides:parseLines(c.tolerance_overrides),
+      approver_routes:parseLines(c.approver_routes)
+    }))
+  };
+}
+function policyText(){ return JSON.stringify(buildPolicy(META.includeSpec),null,2); }
+function exceptionsJsonl(){
+  // secondary export: exception_paths -> exceptions.jsonl gold rows (keys sorted like the fixture)
+  return SPEC.exception_paths.map(p=>{
+    const row={
+      evidence_text:`Fabricated exception evidence for eval; benign filler. Token: ${p.marker} end.`,
+      gold_disposition:p.disposition,
+      gold_type:MARKER_TO_TYPE[p.marker]||"",
+      gold_within_tolerance:!!p.within_tolerance,
+      id:p.id, po_id:p.po_id
+    };
+    return JSON.stringify(row);
+  }).join("\n");
+}
+
+/* ============================================================
+   SPEC pane — rendered readable deployment spec
+   ============================================================ */
+function renderSpec(){
+  const t=SPEC.tolerances;
+  const rules=SPEC.decision_rules.slice().sort((a,b)=>Number(a.priority)-Number(b.priority));
+  let h=`<div class="spec-blk">
+    <div class="spec-h">${esc(SPEC.meta.deployment||"deployment")} — exception spec</div>
+    <div class="spec-sub">v${esc(SPEC.meta.version)} · author ${esc(SPEC.meta.author)} · ${esc(SPEC.meta.currency)} · exception-spec/0.1</div>
+    <dl class="kv"><dt>provenance</dt><dd>${esc(SPEC.meta.provenance)}</dd></dl>
+  </div>`;
+
+  h+=`<div class="spec-blk"><h3>Tolerances &amp; thresholds</h3><div class="tablewrap"><table>
+    <thead><tr><th>concept</th><th>token</th><th>value</th><th>unit / note</th><th>extensions</th></tr></thead><tbody>
+    <tr><td>qty tolerance</td><td><span class="mono">${esc(t.qty_tolerance_pct.token)}</span></td><td class="mono">${esc(t.qty_tolerance_pct.value)}</td><td>${esc(t.qty_tolerance_pct.unit)}</td><td><small>${sub(t.qty_tolerance_pct.short_pct,"short")}${sub(t.qty_tolerance_pct.over_pct,"over")}${sub(t.qty_tolerance_pct.abs_floor_units,"floor")}</small></td></tr>
+    <tr><td>price tolerance</td><td><span class="mono">${esc(t.price_tolerance_per_case.token)}</span></td><td class="mono">${esc(t.price_tolerance_per_case.value)}</td><td>${esc(t.price_tolerance_per_case.unit)}</td><td><small>dir ${esc(t.price_tolerance_per_case.direction)}${sub(t.price_tolerance_per_case.percent_alt,"pct")}</small></td></tr>
+    <tr><td>write-off ceiling</td><td><span class="mono">${esc(t.write_off_threshold.token)}</span></td><td class="mono">${esc(t.write_off_threshold.value)}</td><td>${esc(t.write_off_threshold.unit)} · <span class="chip accent">special gate</span></td><td></td></tr>
+    <tr><td>OTIF window</td><td><span class="mono">${esc(t.otif_window.token)}</span></td><td class="mono">${esc(t.otif_window.value)}</td><td>early_ok ${t.otif_window.early_ok?"yes":"no"} · late ${esc(t.otif_window.late)}</td><td><small>${sub(t.otif_window.grace_days,"grace_d")}${sub(t.otif_window.in_full_threshold_pct,"in_full%")}</small></td></tr>
+    <tr><td>fill-rate basis</td><td><span class="mono">${esc(t.fill_rate_basis.token)}</span></td><td class="mono">${esc(t.fill_rate_basis.value)}</td><td>${esc(t.fill_rate_basis.note)}</td><td></td></tr>
+    <tr><td>credit-note dir</td><td><span class="mono">${esc(t.credit_note_direction.token)}</span></td><td class="mono">${esc(t.credit_note_direction.value)}</td><td>${esc(t.credit_note_direction.note)}</td><td></td></tr>
+    ${t.damage_tolerance_pct.value!==""?`<tr><td>damage tolerance</td><td><span class="mono">${esc(t.damage_tolerance_pct.token)}</span></td><td class="mono">${esc(t.damage_tolerance_pct.value)}</td><td>${esc(t.damage_tolerance_pct.unit)} · <span class="chip">ext</span></td><td></td></tr>`:""}
+    </tbody></table></div></div>`;
+
+  h+=`<div class="spec-blk"><h3>Decision rules <span class="muted">— by precedence</span></h3><div class="tablewrap"><table>
+    <thead><tr><th>#</th><th>when</th><th>condition</th><th>action</th><th>terminal</th><th>within-tol</th></tr></thead><tbody>
+    ${rules.map(r=>`<tr><td class="mono">${esc(r.priority)}</td><td class="mono">${esc(r.when)}</td><td><small>${esc(r.cond)}</small></td><td><small>${esc(r.action)}</small></td>
+      <td><span class="led ${ledClass(r.terminal)}"></span>${esc(r.terminal)}</td>
+      <td>${r.within_tol_terminal?`<span class="led ${ledClass(r.within_tol_terminal)}"></span>${esc(r.within_tol_terminal)}`:`<small>—</small>`}</td></tr>`).join("")}
+    </tbody></table></div></div>`;
+
+  h+=`<div class="spec-blk"><h3>Exception paths</h3>`+SPEC.exception_paths.map(p=>{
+    const type=MARKER_TO_TYPE[p.marker]||"?";
+    const guards=(p.guards||[]).map(g=>`<div class="gd"><span class="chip ${g.kind==="unless"?"warn":"info"}">${esc(g.kind)}</span> ${esc(g.key)} → <span class="mono">${esc(g.then)}</span> <small>${esc(g.note)}</small></div>`).join("");
+    return `<div class="path-card"><div class="ph"><span class="tag mono">${esc(p.id)}</span><span class="mk">${esc(p.marker)}</span>
+      <span class="chip">${esc(type)}</span>
+      <span class="chip ${ledClass(p.disposition)}"><span class="led ${ledClass(p.disposition)}"></span>${esc(p.disposition)}</span>
+      ${p.within_tolerance?`<span class="chip ok">within tol</span>`:`<span class="chip">out of tol</span>`}
+      ${p.parent?`<span class="chip accent">of ${esc(p.parent)}</span>`:""}</div>${guards}</div>`;
+  }).join("")+`</div>`;
+
+  h+=`<div class="spec-blk"><h3>Fallbacks <span class="muted">— hand to a human</span></h3><div class="tablewrap"><table>
+    <thead><tr><th>on</th><th>disposition</th><th>route</th><th>note</th></tr></thead><tbody>
+    ${SPEC.fallbacks.map(f=>`<tr><td class="mono">${esc(f.on)}</td><td><span class="led ${ledClass(f.disposition)}"></span>${esc(f.disposition)}</td><td>${esc(f.route)}</td><td><small>${esc(f.note)}</small></td></tr>`).join("")}
+    </tbody></table></div></div>`;
+
+  h+=`<div class="spec-blk"><h3>Approval gate <span class="muted">— gated actions</span></h3>
+    <p>${SPEC.gated_actions.map(g=>`<span class="chip danger" style="margin:.15rem .25rem .15rem 0"><span class="led danger"></span>${esc(g.action)}${g.ceiling!==""&&g.ceiling!=null?` ≤$${esc(g.ceiling)}`:""}</span>`).join("")}</p>
+    <p class="muted">Special-cased (not on the list): <span class="chip accent">write_off</span> gates when amount &gt; ${esc(t.write_off_threshold.value)} · <span class="chip accent">close_exception</span> gates unless the referenced exception is auto_close. A gated action in <span class="mono">auto</span> mode → <span class="chip danger">UNSAFE</span>.</p></div>`;
+
+  h+=`<div class="spec-blk"><h3>Chase ladder</h3><div class="ladder">
+    ${SPEC.chase_ladder.steps.slice().sort((a,b)=>a.index-b.index).map((s,i,arr)=>`<span class="step"><b class="mono">${esc(s.step)}</b><br><small>day +${esc(s.day_offset)} · ${esc(s.tone)}${s.cc?" · cc "+esc(s.cc):""}${s.route?" · → "+esc(s.route):""}</small></span>${i<arr.length-1?'<span class="arrow">→</span>':''}`).join("")}
+    <span class="arrow">→</span><span class="step"><b class="mono">${esc(SPEC.chase_ladder.terminal_action)}</b><br><small>after ${esc(SPEC.chase_ladder.max_chases)} · ext</small></span>
+  </div></div>`;
+
+  h+=`<div class="spec-blk"><h3>UOM &amp; audit</h3><div class="tablewrap"><table>
+    <thead><tr><th>sku</th><th>pack (ea/cs)</th></tr></thead><tbody>
+    ${SPEC.uom.map(u=>`<tr><td class="mono">${esc(u.sku)}</td><td class="mono">${esc(u.pack)}</td></tr>`).join("")}
+    </tbody></table></div>
+    <p style="margin-top:.6rem">${SPEC.audit_required_fields.map(f=>`<span class="chip" style="margin:.15rem .25rem .15rem 0">${esc(f)}</span>`).join("")}</p></div>`;
+
+  if(SPEC.customers.length){
+    h+=`<div class="spec-blk"><h3>Per-customer overrides</h3>`+SPEC.customers.map(c=>`<div class="path-card"><div class="ph"><span class="tag mono">${esc(c.id)}</span></div>
+      <dl class="kv"><dt>gated override</dt><dd>${esc(c.gated_actions_override||"—")}</dd>
+      <dt>ceilings</dt><dd><small>${esc(c.auto_approve_ceilings||"—").replace(/\n/g,"; ")}</small></dd>
+      <dt>tolerance override</dt><dd><small>${esc(c.tolerance_overrides||"—").replace(/\n/g,"; ")}</small></dd>
+      <dt>routes</dt><dd><small>${esc(c.approver_routes||"—").replace(/\n/g,"; ")}</small></dd></dl></div>`).join("")+`</div>`;
+  }
+  document.getElementById("pane-spec").innerHTML=h;
+}
+function sub(v,label){ return (v===""||v==null)?"":`${esc(label)} ${esc(v)} `; }
+
+/* ============================================================
+   EXPORT pane — validation panel + live policy.json
+   ============================================================ */
+function renderExport(){
+  const {errors,warns,oks}=validate();
+  const blocks=errors.length>0;
+  let h=`<section class="sec"><div class="vhead"><h3 class="spec-h" style="font-size:1.3rem;margin:0">Validation</h3>
+    ${blocks?`<span class="flag">BLOCKS EXPORT · ${errors.length}</span>`:`<span class="chip ok"><span class="led ok"></span>exports clean</span>`}
+    <span class="chip warn"><span class="led warn"></span>${warns.length} warn</span></div>`;
+  h+=`<ul class="vlist">`;
+  errors.forEach(([m,w])=>h+=`<li><span class="led danger"></span><span>${esc(m)}</span><span class="where">${esc(w)}</span></li>`);
+  warns.forEach(([m,w])=>h+=`<li><span class="led warn"></span><span>${esc(m)}</span><span class="where">${esc(w)}</span></li>`);
+  oks.forEach(([m,w])=>h+=`<li><span class="led ok"></span><span>${esc(m)}</span><span class="where">${esc(w)}</span></li>`);
+  h+=`</ul>`;
+
+  h+=`<div class="vhead"><h3 class="spec-h" style="font-size:1.3rem;margin:1rem 0 0">policy.json</h3>
+    <label class="tog" style="margin-left:auto"><input type="checkbox" id="incspec" ${META.includeSpec?"checked":""}> carry full DSL as <span class="mono">_exception_spec</span></label></div>
+    <p class="exp-note">Strict mode (unchecked) emits the ten loader keys + <code>_provenance</code>/<code>_schema</code> — shape-identical to the committed fixture, loads unchanged. Carry mode (checked) appends <code>_exception_spec</code> (the rule table, guards, fallbacks, per-customer overrides) — the loader keeps it in <code>.raw</code> and ignores it, so it still loads; it is the forward-carry for a future data-driven <code>compute.py</code>. Export target: <code>fixtures/retail_ops/policy.json</code>.</p>
+    <pre class="json">${esc(policyText())}</pre>`;
+
+  h+=`<div class="vhead"><h3 class="spec-h" style="font-size:1.3rem;margin:1.4rem 0 0">exceptions.jsonl <span class="muted" style="font-family:var(--serif)"> — secondary corpus export</span></h3></div>
+    <p class="exp-note">The exception paths also project to the gold corpus rows (<code>fixtures/retail_ops/exceptions.jsonl</code>) — one row per path with the marker embedded in benign filler; <code>gold_type</code> is derived from the marker, <code>gold_disposition</code>/<code>gold_within_tolerance</code> are the authored labels. Guard variants (e.g. the out-of-tolerance price case) expand this list.</p>
+    <pre class="json">${esc(exceptionsJsonl())}</pre></section>`;
+
+  document.getElementById("pane-export").innerHTML=h;
+  const inc=document.getElementById("incspec");
+  if(inc) inc.addEventListener("change",e=>{META.includeSpec=e.target.checked;save();renderExport();});
+}
+
+/* ============================================================
+   Wiring
+   ============================================================ */
+let activeTab="edit";
+function setTab(name){
+  activeTab=name;
+  document.querySelectorAll(".tab").forEach(b=>b.setAttribute("aria-selected", b.dataset.tab===name?"true":"false"));
+  document.querySelectorAll(".pane").forEach(p=>p.classList.remove("on"));
+  document.getElementById("pane-"+name).classList.add("on");
+  if(name==="spec") renderSpec();
+  if(name==="export") renderExport();
+  window.scrollTo(0,0);
+}
+document.querySelectorAll(".tab").forEach(b=>b.addEventListener("click",()=>setTab(b.dataset.tab)));
+
+// delegated input: text/number/textarea/select
+document.body.addEventListener("input",e=>{
+  const p=e.target.dataset.p; if(!p) return;
+  let v=e.target.value;
+  if(e.target.type==="number"){ v = e.target.value===""?"":e.target.value; }
+  setPath(p,v); save();
+});
+document.body.addEventListener("change",e=>{
+  const p=e.target.dataset.p; if(p && e.target.type==="checkbox"){ setPath(p,e.target.checked); save();
+    // relabel the row led live without full re-render for exception within_tolerance etc.
+  }
+});
+// add / remove / guards (delegated clicks)
+document.body.addEventListener("click",e=>{
+  const a=e.target.closest("[data-add]"); if(a){ doAdd(a.dataset.add); return; }
+  const d=e.target.closest("[data-del]"); if(d){ doDel(d.dataset.del, Number(d.dataset.i)); return; }
+  const ag=e.target.closest("[data-addg]"); if(ag){ const i=Number(ag.dataset.addg);
+    SPEC.exception_paths[i].guards=SPEC.exception_paths[i].guards||[];
+    SPEC.exception_paths[i].guards.push({kind:"unless",key:"",then:"auto_close",note:""}); save(); renderEdit(); return; }
+  const dg=e.target.closest("[data-delg]"); if(dg){ const i=Number(dg.dataset.delg), j=Number(dg.dataset.j);
+    SPEC.exception_paths[i].guards.splice(j,1); save(); renderEdit(); return; }
+});
+
+// export bar
+document.getElementById("copybtn").addEventListener("click",()=>{
+  const txt=policyText();
+  navigator.clipboard.writeText(txt).then(()=>{document.getElementById("saved").textContent="policy.json copied ✓";})
+    .catch(()=>{prompt("Copy policy.json:",txt);});
+});
+document.getElementById("dlbtn").addEventListener("click",()=>download("policy.json",policyText(),"application/json"));
+document.getElementById("exbtn").addEventListener("click",()=>download("exceptions.jsonl",exceptionsJsonl(),"application/x-ndjson"));
+document.getElementById("resetbtn").addEventListener("click",()=>{
+  if(confirm("Reset to the sample spec? Your edits will be cleared.")){ localStorage.removeItem(KEY); location.reload(); }
+});
+function download(name,txt,mime){
+  const a=document.createElement("a");
+  a.href="data:"+mime+";charset=utf-8,"+encodeURIComponent(txt);
+  a.download=name; document.body.appendChild(a); a.click(); a.remove();
+  document.getElementById("saved").textContent=name+" downloaded ✓";
+}
+// mode toggle (persisted)
+document.getElementById("modebtn").addEventListener("click",()=>{
+  const cur=document.documentElement.getAttribute("data-mode");
+  const nextMode = cur==="night" ? "day" : "night";
+  document.documentElement.setAttribute("data-mode",nextMode);
+  META.mode=nextMode; save();
+});
+
+// boot
+renderEdit();
+refreshValidationStatus();
+save();
+</script>
+</body>
+</html>

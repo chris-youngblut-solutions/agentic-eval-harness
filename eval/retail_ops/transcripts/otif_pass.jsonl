@@ -1,0 +1,4 @@
+{"content": "Compute OTIF for PO-8801. Answer exactly one word: pass or fail.", "role": "user"}
+{"content": [{"text": "Working otif_pass.", "type": "text"}, {"id": "otif_pass-0", "input": {"id": "PO-8801", "scope": "po"}, "name": "otif_fill_rate", "type": "tool_use"}], "role": "assistant"}
+{"content": [{"content": "{\"fill_rate\": 100.0, \"in_full\": true, \"on_time\": true, \"otif\": \"pass\"}", "is_error": false, "tool_use_id": "otif_pass-0", "type": "tool_result"}], "role": "user"}
+{"content": [{"id": "otif_pass-submit", "input": {"answer": "pass"}, "name": "submit_answer", "type": "tool_use"}], "role": "assistant"}

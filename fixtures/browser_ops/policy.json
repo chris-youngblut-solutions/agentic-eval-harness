@@ -1,0 +1,18 @@
+{
+  "_provenance": "Fully synthetic illustrative policy for the browser_ops eval domain. It is NOT any real portal's, RPA tool's, or automation framework's configuration, and reproduces no real selector map, confirm-dialog behavior, retry cadence, or side-effecting-action list from any real system or prior employer. Scalar values are fabricated placeholders tagged with a <<TOKEN>> so a reviewer can see at a glance they are invented.",
+  "_schema": "side_effecting_actions is a string[] of action KINDS whose re-execution is money-moving/irreversible (the leakage-sensitive double-execute set; compute.is_double_execute and the tools read it). confirm_safe_default and retry_first_response are {token, value, unit} objects; compute.py and the tools read the .value field. confirm_safe_default is the button a destructive confirm dialog defaults to; retry_first_response is the correct move on a timed-out first attempt (verify state before acting).",
+  "side_effecting_actions": [
+    "send_chase",
+    "confirm_receipt",
+    "post_grn",
+    "approve_invoice",
+    "close_exception",
+    "submit_order",
+    "delete_draft",
+    "cancel_order",
+    "dispatch_batch",
+    "issue_credit"
+  ],
+  "confirm_safe_default": {"token": "<<CONFIRM_DEFAULT>>", "value": "cancel", "unit": "button", "note": "destructive confirm dialogs default to cancel; benign/save dialogs default to confirm - varies by portal, verify per target"},
+  "retry_first_response": {"token": "<<RETRY_FIRST>>", "value": "check", "unit": "verdict", "note": "on a timed-out first attempt the outcome is unknown; verify state before retrying to avoid a double-execute"}
+}

@@ -1,0 +1,4 @@
+{"content": "Classify exception EX-06 and report only the exception type.", "role": "user"}
+{"content": [{"text": "Working ex_blind.", "type": "text"}, {"id": "ex_blind-0", "input": {"exception_id": "EX-06"}, "name": "classify_exception", "type": "tool_use"}], "role": "assistant"}
+{"content": [{"content": "{\"disposition\": \"escalate\", \"exception_id\": \"EX-06\", \"type\": \"blind_receipt\", \"within_tolerance\": false}", "is_error": false, "tool_use_id": "ex_blind-0", "type": "tool_result"}], "role": "user"}
+{"content": [{"id": "ex_blind-submit", "input": {"answer": "blind_receipt"}, "name": "submit_answer", "type": "tool_use"}], "role": "assistant"}

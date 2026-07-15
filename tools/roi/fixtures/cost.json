@@ -1,0 +1,88 @@
+{
+  "_provenance": "Fully synthetic illustrative cost/rate deck for the retail_ops ROI harness. NOT any real customer's, vendor's, or prior employer's labor rate, subscription price, integration cost, deduction-dispute fee, OTIF fine schedule, or attribution factor. Every scalar is a fabricated placeholder tagged with a <<TOKEN>> so a reviewer can see at a glance it is invented. Only .value is read by roi.py. Re-source every value per deployment.",
+  "schema": "roi-cost/0.1",
+  "currency": "USD",
+  "period_unit": "week",
+  "params": {
+    "t_manual_min": {
+      "token": "<<T_MANUAL_MIN>>",
+      "value": 12,
+      "unit": "minutes",
+      "note": "avg human handle time per exception"
+    },
+    "t_rework_min": {
+      "token": "<<T_REWORK_MIN>>",
+      "value": 25,
+      "unit": "minutes",
+      "note": "discover + reverse + re-handle one bad auto-action; > t_manual by design"
+    },
+    "t_review_min": {
+      "token": "<<T_REVIEW_MIN>>",
+      "value": 5,
+      "unit": "minutes",
+      "note": "review + dismiss one nuisance false flag"
+    },
+    "w_fte_usd_per_hr": {
+      "token": "<<W_FTE>>",
+      "value": 45,
+      "unit": "usd_per_hour",
+      "note": "fully-loaded ops labor rate (benefits/overhead), not base wage"
+    },
+    "fte_hours_per_period": {
+      "token": "<<FTE_HRS_WK>>",
+      "value": 40,
+      "unit": "hours_per_week",
+      "note": "one FTE-week of capacity"
+    },
+    "subscription_per_period": {
+      "token": "<<SUB_WK>>",
+      "value": 4500,
+      "unit": "usd_per_week",
+      "note": "software subscription cost per week (~19.5k/mo)"
+    },
+    "integration_onetime": {
+      "token": "<<INTEGRATION>>",
+      "value": 30000,
+      "unit": "usd",
+      "note": "one-time integration / FDE deployment cost (I_0)"
+    },
+    "otif_attribution_alpha": {
+      "token": "<<ALPHA>>",
+      "value": 0.6,
+      "unit": "factor_0_1",
+      "note": "share of the OTIF delta causally tied to faster exception clearance; carrier/demand/supplier variance confound the rest"
+    },
+    "otif_fine_per_unit": {
+      "token": "<<OTIF_FINE>>",
+      "value": 1.5,
+      "unit": "usd_per_unit",
+      "note": "chargeback fine or margin per shipped unit tied to an OTIF miss"
+    },
+    "dispute_cost_each": {
+      "token": "<<C_DISPUTE>>",
+      "value": 45,
+      "unit": "usd_per_dispute",
+      "note": "labor/fees to file one deduction dispute"
+    },
+    "wrong_dispute_penalty_each": {
+      "token": "<<PEN_WRONG>>",
+      "value": 220,
+      "unit": "usd_per_wrong_dispute",
+      "note": "valid deduction wrongly disputed: chargeback re-post + relationship cost"
+    }
+  },
+  "targets": {
+    "efficiency_pct": {
+      "token": "<<TARGET_EFF>>",
+      "value": 40,
+      "unit": "percent",
+      "note": "VENDOR FRAMING TARGET the report can display, never baked-in ground truth"
+    },
+    "breakeven_weeks": {
+      "token": "<<TARGET_TTV>>",
+      "value": 4,
+      "unit": "weeks",
+      "note": "VENDOR FRAMING TARGET the report can display, never baked-in ground truth"
+    }
+  }
+}

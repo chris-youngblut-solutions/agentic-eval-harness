@@ -1,0 +1,65 @@
+# Deployment kit — {{CUSTOMER}} (`{{SLUG}}`)
+
+A per-customer FDE deployment kit, stamped by `{{GENERATOR}}`. It unifies four already-built
+artifacts into one folder so this deployment is faster to stand up than the last one. Author
+business logic here, not scaffolding.
+
+## Layout
+
+| Path | Kind | Purpose |
+|---|---|---|
+| `README.md` | stamped | this index |
+| `runbook.md` | stamped | Phase 0 → 6 go-live → expansion runbook with gates |
+| `scoping-checklist.md` | stamped | Phase-0 intake: tolerances / gated-actions / systems / approval-owners |
+| `connector-config.env.example` | stamped | the four `*_SYSTEM` dialects + the approval-token placeholder |
+| `.mcp.json` | stamped | host wiring snippet for the four MCP servers |
+| `roi-baseline.json` | seeded | ROI cost deck — every scalar an `<<TOKEN>>` the FDE fills |
+| `exception-spec.inkspec.html` | copied | **the board — the one place you author this customer's rules** |
+| `fixtures/retail_ops/` | created | export target: the board writes `policy.json` here |
+| `roi/ops_baseline.jsonl` | seeded | BEFORE weekly ops data (replace with real) |
+| `roi/ops_automated.jsonl` | seeded | AFTER weekly ops data (true-vs-false labeled) |
+| `roi/roi-report.inkspec.html` | copied | Collins ROI report (open after filling the decks) |
+| `refs/` | copied | read-only reference sidecars (board README/PROVENANCE + sample export) |
+
+## The two token layers (do not confuse them)
+
+- **Scaffolding tokens** — written as double curly braces in the templates; substituted once, at
+  stamp time (slug `{{SLUG}}`, customer `{{CUSTOMER}}`, the four `*_SYSTEM` dialects, and dates as
+  `____-__-__` fill-ins). None remain in the stamped files.
+- **Authoring tokens** — written as double angle brackets, `<<LIKE_THIS>>`; the business-value
+  placeholders you fill **inside** the board and `roi-baseline.json` (`<<QTY_TOL_PCT>>`,
+  `<<PRICE_TOL>>`, `<<OTIF_WINDOW>>`, `<<T_MANUAL_MIN>>`, `<<W_FTE>>`, …). These are the editable
+  surface — leave them as tokens until you replace them with the customer's real numbers.
+
+## The three source artifacts this kit unifies
+
+1. **MCP connector kit** — `frameworks/agents/retail-ops-mcp-kit` (referenced **by name**, not
+   vendored). `connector-config.env.example` + `.mcp.json` wire its four servers to this
+   customer's SaaS dialects. Run the servers from the kit; point your host at the stamped `.mcp.json`.
+2. **Exception-spec DSL (item 4)** — `exception-spec.inkspec.html` is copied **in full** (single-file,
+   no build, no CDN, no network; all state in browser `localStorage`). Author the spec inside it,
+   then export `policy.json` to `fixtures/retail_ops/`.
+3. **ROI harness (item 5)** — `roi-baseline.json` (cost deck) + `roi/ops_baseline.jsonl` /
+   `roi/ops_automated.jsonl` + `roi/roi-report.inkspec.html`. Fill the decks with re-sourced
+   customer numbers, then run the harness.
+
+## Wired systems
+
+| Server | Env var | This deployment |
+|---|---|---|
+| `retail-erp-mcp` | `RETAIL_ERP_SYSTEM` | `{{ERP_SYSTEM}}` |
+| `retail-supplier-mcp` | `RETAIL_SUPPLIER_SYSTEM` | `{{SUPPLIER_SYSTEM}}` |
+| `retail-email-mcp` | `RETAIL_EMAIL_SYSTEM` | `{{EMAIL_SYSTEM}}` |
+| `retail-sheets-mcp` | `RETAIL_SHEETS_SYSTEM` | `{{SHEETS_SYSTEM}}` |
+
+## Start here
+1. Read `runbook.md` top-to-bottom; work Phase 0 → 6.
+2. Fill `scoping-checklist.md`.
+3. Copy `connector-config.env.example` → `.local/connector-config.env` and inject
+   `{{APPROVAL_TOKEN_VAR}}` (host env only, never VCS).
+4. Open `exception-spec.inkspec.html` and author the spec (Phase 2).
+
+## What `{{GENERATOR}}` did NOT do
+It stamped the **blank** board and the **seed** decks. It did **not** author the `<<TOKEN>>`
+business values, did **not** run the export, and did **not** inject the approval token — those
+are your supervised, per-customer acts.

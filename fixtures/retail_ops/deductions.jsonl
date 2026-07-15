@@ -1,0 +1,4 @@
+{"amount": 1240, "id": "DED-01", "kpi": "otif", "po_id": "PO-8801", "pod_present": true}
+{"amount": 800, "id": "DED-02", "kpi": "fill_rate", "po_id": "PO-8802", "pod_present": true}
+{"amount": 500, "id": "DED-03", "kpi": "otif", "po_id": "PO-8805", "pod_present": true}
+{"amount": 300, "id": "DED-04", "kpi": "asn_accuracy", "po_id": "PO-8806", "pod_present": true}

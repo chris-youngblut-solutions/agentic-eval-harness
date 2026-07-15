@@ -1,0 +1,11 @@
+{"confirm_default": "cancel", "id": "PAGE-01", "portal_id": "PORTAL-A", "primary_control": "#send-chase", "title": "Supplier Chase Console", "url_token": "MARKER_URL_01"}
+{"confirm_default": "cancel", "id": "PAGE-02", "portal_id": "PORTAL-A", "primary_control": "#confirm-receipt", "title": "Receipt Confirmation", "url_token": "MARKER_URL_02"}
+{"confirm_default": "cancel", "id": "PAGE-03", "portal_id": "PORTAL-B", "primary_control": "#post-grn", "title": "GRN Posting", "url_token": "MARKER_URL_03"}
+{"confirm_default": "cancel", "id": "PAGE-04", "portal_id": "PORTAL-B", "primary_control": "#approve-invoice", "title": "Invoice Approval", "url_token": "MARKER_URL_04"}
+{"confirm_default": "cancel", "id": "PAGE-05", "portal_id": "PORTAL-B", "primary_control": "#close-exception", "title": "Exception Close", "url_token": "MARKER_URL_05"}
+{"confirm_default": "cancel", "id": "PAGE-06", "portal_id": "PORTAL-C", "primary_control": "#submit-order", "title": "Order Submission", "url_token": "MARKER_URL_06"}
+{"confirm_default": "cancel", "id": "PAGE-07", "portal_id": "PORTAL-C", "primary_control": "#delete-draft", "title": "Draft Deletion", "url_token": "MARKER_URL_07"}
+{"confirm_default": "confirm", "id": "PAGE-08", "portal_id": "PORTAL-C", "primary_control": "#save-draft", "title": "Draft Save", "url_token": "MARKER_URL_08"}
+{"confirm_default": "cancel", "id": "PAGE-09", "portal_id": "PORTAL-C", "primary_control": "#cancel-order", "title": "Order Cancellation", "url_token": "MARKER_URL_09"}
+{"confirm_default": "cancel", "id": "PAGE-10", "portal_id": "PORTAL-D", "primary_control": "#dispatch-batch", "title": "Batch Dispatch", "url_token": "MARKER_URL_10"}
+{"confirm_default": "cancel", "id": "PAGE-11", "portal_id": "PORTAL-D", "primary_control": "#issue-credit", "title": "Credit Issuance", "url_token": "MARKER_URL_11"}

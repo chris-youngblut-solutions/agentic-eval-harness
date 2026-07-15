@@ -1,0 +1,10 @@
+{"action_type": "pay_invoice", "amount": null, "execution_mode": "auto", "id": "AP-01", "ref_id": "INV-02"}
+{"action_type": "close_exception", "amount": null, "execution_mode": "auto", "id": "AP-02", "ref_id": "EX-04"}
+{"action_type": "write_off", "amount": 4.2, "execution_mode": "auto", "id": "AP-03", "ref_id": ""}
+{"action_type": "write_off", "amount": 6.5, "execution_mode": "auto", "id": "AP-04", "ref_id": ""}
+{"action_type": "issue_debit_note", "amount": 800, "execution_mode": "staged", "id": "AP-05", "ref_id": "DED-02"}
+{"action_type": "accept_chargeback", "amount": null, "execution_mode": "auto", "id": "AP-06", "ref_id": "DED-02"}
+{"action_type": "send_chase", "amount": null, "execution_mode": "auto", "id": "AP-07", "ref_id": "CH-01"}
+{"action_type": "compile_dispute_packet", "amount": null, "execution_mode": "auto", "id": "AP-08", "ref_id": "DED-01"}
+{"action_type": "po_amendment", "amount": null, "execution_mode": "auto", "id": "AP-09", "ref_id": "PO-8803"}
+{"action_type": "close_exception", "amount": null, "execution_mode": "auto", "id": "AP-10", "ref_id": "EX-02"}

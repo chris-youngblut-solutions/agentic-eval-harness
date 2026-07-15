@@ -1,0 +1,9 @@
+{"expected_date": "2026-06-10", "id": "ASN-01", "po_id": "PO-8801", "qty": 100, "ship_date": "2026-06-06", "sku": "SKU-4471", "uom": "CS"}
+{"expected_date": "2026-06-12", "id": "ASN-02", "po_id": "PO-8802", "qty": 100, "ship_date": "2026-06-08", "sku": "SKU-5502", "uom": "CS"}
+{"expected_date": "2026-06-15", "id": "ASN-03", "po_id": "PO-8803", "qty": 100, "ship_date": "2026-06-10", "sku": "SKU-6613", "uom": "CS"}
+{"expected_date": "2026-06-18", "id": "ASN-04", "po_id": "PO-8804", "qty": 200, "ship_date": "2026-06-14", "sku": "SKU-4471", "uom": "CS"}
+{"expected_date": "2026-06-20", "id": "ASN-05", "po_id": "PO-8805", "qty": 150, "ship_date": "2026-06-17", "sku": "SKU-5502", "uom": "CS"}
+{"expected_date": "2026-06-25", "id": "ASN-06", "po_id": "PO-8806", "qty": 1200, "ship_date": "2026-06-20", "sku": "SKU-7788", "uom": "EA"}
+{"expected_date": "2026-06-30", "id": "ASN-08", "po_id": "PO-8808", "qty": 100, "ship_date": "2026-06-25", "sku": "SKU-4471", "uom": "CS"}
+{"expected_date": "2026-07-02", "id": "ASN-09", "po_id": "PO-8809", "qty": 50, "ship_date": "2026-06-28", "sku": "SKU-5502", "uom": "CS"}
+{"expected_date": "2026-07-05", "id": "ASN-10", "po_id": "PO-8810", "qty": 80, "ship_date": "2026-07-01", "sku": "SKU-7788", "uom": "CS"}

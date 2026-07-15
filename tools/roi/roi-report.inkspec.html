@@ -1,0 +1,897 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Business-impact / ROI report — retail_ops · Collins</title>
+<style>
+  /* ==== COLLINS token contract (inlined · day/night, fails to light) ==== */
+  :root,[data-mode="day"]{
+    --paper:#DEDCD5; --paper-2:#D2CFC7; --paper-3:#C4C1B8; --inset:#E8E6DF;
+    --ink:#24221C; --ink-2:#4C4940; --ink-3:#5B5951; --ink-disabled:#8E8B81;
+    --rule:rgba(40,38,31,.12); --rule-2:rgba(40,38,31,.20); --rule-3:rgba(40,38,31,.30);
+    --fill-ok:#7C9578; --fill-warn:#BBA167; --fill-danger:#B5583F; --fill-info:#6B8394; --fill-accent:#8E4E45;
+    --ink-ok:#465F43; --ink-warn:#6F551B; --ink-danger:#8E3D2C; --ink-info:#3F5A6B; --ink-accent:#743E37;
+    --ok-soft:rgba(124,149,120,.16); --warn-soft:rgba(187,161,103,.18);
+    --danger-soft:rgba(181,88,63,.14); --info-soft:rgba(107,131,148,.15);
+    --accent-soft:rgba(142,78,69,.14); --accent-wash:rgba(142,78,69,.06);
+    --on-danger:#FFFFFF;
+  }
+  @media (prefers-color-scheme: dark){:root:not([data-mode]){
+    --paper:#201F1C; --paper-2:#2A2926; --paper-3:#343330; --inset:#1A1917;
+    --ink:#E9E6DD; --ink-2:#B4B1A8; --ink-3:#938F85; --ink-disabled:#6E6A61;
+    --rule:rgba(255,255,255,.08); --rule-2:rgba(255,255,255,.15); --rule-3:rgba(255,255,255,.24);
+    --fill-ok:#8BAA84; --fill-warn:#CBB074; --fill-danger:#C56A50; --fill-info:#7E97A8; --fill-accent:#A85D52;
+    --ink-ok:#9CC090; --ink-warn:#DBC07E; --ink-danger:#E79079; --ink-info:#A9C2D2; --ink-accent:#D89E92;
+    --ok-soft:rgba(139,170,132,.18); --warn-soft:rgba(203,176,116,.18);
+    --danger-soft:rgba(197,106,80,.18); --info-soft:rgba(126,151,168,.18);
+    --accent-soft:rgba(168,93,82,.20); --accent-wash:rgba(168,93,82,.08);
+    --on-danger:#0B0A06;
+  }}
+  [data-mode="night"]{
+    --paper:#201F1C; --paper-2:#2A2926; --paper-3:#343330; --inset:#1A1917;
+    --ink:#E9E6DD; --ink-2:#B4B1A8; --ink-3:#938F85; --ink-disabled:#6E6A61;
+    --rule:rgba(255,255,255,.08); --rule-2:rgba(255,255,255,.15); --rule-3:rgba(255,255,255,.24);
+    --fill-ok:#8BAA84; --fill-warn:#CBB074; --fill-danger:#C56A50; --fill-info:#7E97A8; --fill-accent:#A85D52;
+    --ink-ok:#9CC090; --ink-warn:#DBC07E; --ink-danger:#E79079; --ink-info:#A9C2D2; --ink-accent:#D89E92;
+    --ok-soft:rgba(139,170,132,.18); --warn-soft:rgba(203,176,116,.18);
+    --danger-soft:rgba(197,106,80,.18); --info-soft:rgba(126,151,168,.18);
+    --accent-soft:rgba(168,93,82,.20); --accent-wash:rgba(168,93,82,.08);
+    --on-danger:#0B0A06;
+  }
+  :root{
+    --copper:#AE8A74; --copper-lo:#8B6752; --oxide:#8E4E45;
+    --on-copper:#0B0A06; --on-oxide:#FFFFFF;
+    --font-serif:'Iowan Old Style','Palatino Linotype',Palatino,Georgia,serif;
+    --font-sans:'Adwaita Sans','Cantarell',system-ui,-apple-system,'Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif;
+    --font-mono:ui-monospace,'SF Mono','Cascadia Code',Menlo,Consolas,monospace;
+    --serif:var(--font-serif); --sans:var(--font-sans); --mono:var(--font-mono);
+    --s1:4px; --s2:8px; --s3:12px; --s4:16px; --s5:24px; --s6:32px;
+    --r1:4px; --r2:8px; --r3:12px; --r4:16px;
+    --safe-bottom:env(safe-area-inset-bottom,0px);
+    --sys-accent:var(--copper);
+  }
+  @supports (color: AccentColor){:root{--sys-accent:AccentColor}}
+
+  *{box-sizing:border-box}
+  html,body{max-width:100%}
+  body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);line-height:1.5;
+       padding:0 0 5.5rem;overflow-x:hidden}
+  .wrap{max-width:66rem;margin:0 auto;padding:1.5rem 1.15rem 0}
+  .eyebrow{font-family:var(--mono);font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-accent);margin:0 0 .35rem;display:flex;gap:.5rem;align-items:center;flex-wrap:wrap}
+  .badge{display:inline-block;font-family:var(--mono);font-size:.6rem;letter-spacing:.08em;color:var(--on-oxide);background:var(--oxide);border-radius:var(--r1);padding:.12rem .45rem}
+  h1{font-family:var(--serif);font-size:1.95rem;font-weight:600;letter-spacing:-.01em;margin:0 0 .45rem}
+  .lead{color:var(--ink-2);max-width:54rem;margin:0 0 .9rem;font-size:.98rem}
+  .seams{font-size:.83rem;color:var(--ink-3);border-left:3px solid var(--copper);padding:.5rem 0 .5rem .8rem;
+         margin:.6rem 0 1.2rem;background:var(--accent-wash)}
+  .seams code{font-family:var(--mono);font-size:.8em;color:var(--ink-accent)}
+  .seams b{color:var(--ink-2)}
+
+  /* sticky bar */
+  .tabs{position:sticky;top:0;z-index:6;background:var(--paper-2);border-bottom:1px solid var(--rule-3);
+        display:flex;gap:.4rem;align-items:center;padding:.5rem 1.15rem;flex-wrap:wrap}
+  .tab{font-family:var(--mono);font-size:.74rem;letter-spacing:.06em;text-transform:uppercase;
+       border:1px solid var(--rule-2);background:transparent;color:var(--ink-3);border-radius:var(--r1);
+       padding:.42rem .8rem;cursor:pointer}
+  .tab[aria-selected="true"]{color:var(--ink);border-color:var(--rule-3);background:var(--inset);box-shadow:inset 0 -2px 0 var(--copper)}
+  .tabs .spacer{flex:1 1 auto}
+  .tabs .modebtn{border:1px solid var(--rule-2);background:transparent;color:var(--ink-3);border-radius:var(--r1);padding:.4rem .6rem;cursor:pointer;font-family:var(--mono);font-size:.72rem}
+  .tabs .primary{font-family:var(--sans);font-size:.8rem;font-weight:600;border-radius:var(--r1);padding:.42rem .85rem;cursor:pointer;
+                 border:1px solid var(--copper-lo);background:var(--copper);color:var(--on-copper)}
+  .tabs .saved{font-family:var(--mono);font-size:.7rem;color:var(--ink-ok)}
+
+  main{padding:1.15rem 1.15rem 0;max-width:66rem;margin:0 auto}
+  .pane{display:none} .pane.on{display:block}
+  .sec-h{font-family:var(--serif);font-size:1.24rem;font-weight:600;margin:1.7rem 0 .2rem;padding-bottom:.3rem;
+         border-bottom:1px solid var(--rule-2);display:flex;align-items:baseline;gap:.55rem;flex-wrap:wrap}
+  .sec-h .n{font-family:var(--mono);font-size:.66rem;color:var(--ink-3);font-weight:400}
+  .sec-d{font-size:.84rem;color:var(--ink-3);margin:.5rem 0 1rem;max-width:56rem}
+  .sec-d code{font-family:var(--mono);font-size:.85em;color:var(--ink-accent)}
+
+  /* gate banner */
+  .gate{display:flex;gap:.6rem;align-items:center;flex-wrap:wrap;border-radius:var(--r2);padding:.6rem .85rem;margin:0 0 1.1rem;font-size:.88rem}
+  .gate.ok{background:var(--ok-soft);border:1px solid var(--rule-2);color:var(--ink-ok)}
+  .gate.bad{background:var(--oxide);color:var(--on-oxide)}
+  .gate .flag{font-family:var(--mono);font-size:.66rem;letter-spacing:.06em;color:var(--on-oxide);background:var(--oxide);border-radius:var(--r1);padding:.14rem .5rem}
+  .gate.ok .flag{color:var(--on-oxide)}
+
+  /* stat tiles */
+  .tiles{display:grid;gap:.7rem;grid-template-columns:repeat(auto-fit,minmax(13.5rem,1fr));margin:.4rem 0 1rem}
+  .tile{background:var(--inset);border:1px solid var(--rule);border-radius:var(--r3);padding:.85rem .95rem;box-shadow:0 1px 2px rgba(20,16,10,.07)}
+  .tile .k{font-family:var(--mono);font-size:.64rem;letter-spacing:.05em;text-transform:uppercase;color:var(--ink-3);display:flex;align-items:center;gap:.4rem}
+  .tile .v{font-family:var(--serif);font-size:1.9rem;font-weight:600;line-height:1.05;margin:.35rem 0 .1rem;color:var(--ink)}
+  .tile .v small{font-family:var(--sans);font-size:.9rem;font-weight:500;color:var(--ink-2)}
+  .tile .s{font-size:.78rem;color:var(--ink-3)}
+  .tile .s b{color:var(--ink-2);font-weight:600}
+  .tile.hero{grid-column:span 2}
+  @media(max-width:34rem){.tile.hero{grid-column:span 1}}
+
+  .led{display:inline-block;width:.6rem;height:.6rem;border-radius:50%;box-shadow:0 0 0 1px var(--rule) inset}
+  .led.ok{background:var(--fill-ok)} .led.warn{background:var(--fill-warn)}
+  .led.danger{background:var(--fill-danger)} .led.info{background:var(--fill-info)} .led.accent{background:var(--fill-accent)}
+  .chip{display:inline-flex;align-items:center;gap:.32rem;font-family:var(--mono);font-size:.66rem;padding:.14rem .5rem;border-radius:var(--r1);border:1px solid var(--rule-2);color:var(--ink-2);white-space:nowrap}
+  .chip.ok{background:var(--ok-soft);color:var(--ink-ok)} .chip.warn{background:var(--warn-soft);color:var(--ink-warn)}
+  .chip.danger{background:var(--danger-soft);color:var(--ink-danger)} .chip.info{background:var(--info-soft);color:var(--ink-info)}
+  .chip.accent{background:var(--accent-soft);color:var(--ink-accent)}
+
+  /* chart cards */
+  .chart{background:var(--inset);border:1px solid var(--rule);border-radius:var(--r3);padding:1rem 1.05rem;margin:0 0 1rem}
+  .chart .ct{font-family:var(--serif);font-size:1.06rem;margin:0 0 .1rem}
+  .chart .cs{font-size:.78rem;color:var(--ink-3);margin:0 0 .8rem}
+  .chart svg{width:100%;height:auto;display:block;overflow:visible}
+  .legend{display:flex;gap:1rem;flex-wrap:wrap;margin:.7rem 0 0;font-size:.74rem;color:var(--ink-3);font-family:var(--mono)}
+  .legend span{display:inline-flex;align-items:center;gap:.35rem}
+  .swatch{width:.85rem;height:.32rem;border-radius:2px;display:inline-block}
+  .swatch.line{height:0;border-top:2px solid}
+
+  /* tables */
+  table{border-collapse:collapse;width:100%;font-size:.83rem}
+  .tablewrap{overflow-x:auto;-webkit-overflow-scrolling:touch;border:1px solid var(--rule);border-radius:var(--r2);margin:.3rem 0 1rem}
+  th,td{text-align:right;padding:.42rem .6rem;border-bottom:1px solid var(--rule);vertical-align:baseline;white-space:nowrap}
+  th:first-child,td:first-child{text-align:left}
+  th{font-family:var(--mono);font-size:.64rem;letter-spacing:.04em;text-transform:uppercase;color:var(--ink-3);background:var(--paper-2)}
+  td .mono,.mono{font-family:var(--mono)}
+  tr.total td{border-top:2px solid var(--rule-3);font-weight:600;color:var(--ink)}
+  .pos{color:var(--ink-ok)} .neg{color:var(--ink-danger)} .zero{color:var(--ink-3)}
+  td.mk{font-family:var(--mono);font-size:.72rem;color:var(--ink-3)}
+
+  pre.json{background:var(--inset);border:1px solid var(--rule-2);border-radius:var(--r2);padding:.85rem 1rem;
+           font-family:var(--mono);font-size:.72rem;line-height:1.5;color:var(--ink-2);overflow-x:auto;white-space:pre;margin:.4rem 0 0;max-height:22rem}
+  .kv{display:grid;grid-template-columns:auto 1fr;gap:.25rem .9rem;font-size:.86rem;max-width:48rem;margin:.3rem 0 1rem}
+  .kv dt{font-family:var(--mono);font-size:.72rem;color:var(--ink-3)}
+  .kv dd{margin:0;color:var(--ink-2)}
+  .formula{font-family:var(--mono);font-size:.78rem;color:var(--ink-2);background:var(--paper-2);border-left:2px solid var(--rule-2);
+           padding:.5rem .7rem;border-radius:0 var(--r1) var(--r1) 0;margin:.4rem 0;white-space:pre-wrap;overflow-x:auto}
+  .foot{max-width:56rem;font-size:.78rem;color:var(--ink-3);margin:1.6rem 0 0;border-top:1px solid var(--rule);padding-top:.9rem}
+
+  @media (any-pointer: coarse){.tab,.tabs .modebtn,.tabs .primary{min-height:44px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <p class="eyebrow"><span class="badge">retail_ops</span> business-impact / roi · collins · honest-net model</p>
+  <h1>Automation ROI — the FDE's numbers</h1>
+  <p class="lead">A business-impact readout for a supply-chain exception-automation agent, computed from a synthetic before/after ops dataset. The whole point is the <strong>honest-net</strong> discipline: a false-exception is not free &mdash; an agent that flags or auto-closes a clean transaction creates a human touch that would not otherwise exist, so false positives <em>dock</em> touches-saved. <code>net_touches_saved = correct terminal auto-work &minus; (rework from false positives + nuisance flags + escalations that still needed a human)</code>. Never a vanity number.</p>
+  <p class="seams"><b>Target vs truth.</b> The &ldquo;<b>40% efficiency / 4-week ROI</b>&rdquo; vendor framing is a <b>target</b> this report can display &mdash; never baked-in ground truth. Every headline is computed from <code>ops_baseline.jsonl</code> + <code>ops_automated.jsonl</code> + <code>cost.json</code> by <code>roi.py</code>; the eval scorecard (<code>eval/retail_ops/history/*.json</code>) supplies the accuracy &amp; safety-gate cross-reference. Fully synthetic (<code>MARKER_*</code> tokens); see <code>PROVENANCE.md</code>.</p>
+</div>
+
+<div class="tabs">
+  <button class="tab" role="tab" aria-selected="true" data-tab="impact">Impact</button>
+  <button class="tab" role="tab" aria-selected="false" data-tab="ledger">Honesty ledger</button>
+  <button class="tab" role="tab" aria-selected="false" data-tab="method">Method &amp; provenance</button>
+  <span class="spacer"></span>
+  <button class="modebtn" id="modebtn" title="Toggle day / night">◐ mode</button>
+  <button class="primary" id="copybtn">Copy report.json</button>
+  <span class="saved" id="saved"></span>
+</div>
+
+<main>
+  <div class="pane on" id="pane-impact"></div>
+  <div class="pane" id="pane-ledger"></div>
+  <div class="pane" id="pane-method"></div>
+</main>
+
+<script id="roi-data" type="application/json">
+{
+  "_provenance": "Generated by roi.py from fully synthetic before/after fixtures (ops_baseline.jsonl + ops_automated.jsonl + cost.json). No real supplier, retailer, ERP, customer, PII, or prior-employer data. The 40% / 4-week figures under `targets` are VENDOR FRAMING the report can display, never ground truth -- every headline below is computed from the fixtures.",
+  "schema": "roi-report/0.1",
+  "generated_from": {
+    "baseline": "ops_baseline",
+    "automated": "ops_automated",
+    "cost": "roi-cost/0.1",
+    "scorecard": "20260711-040944-retail_ops-replay"
+  },
+  "period_unit": "week",
+  "n_periods": 8,
+  "cost": {
+    "t_manual_min": 12.0,
+    "t_rework_min": 25.0,
+    "t_review_min": 5.0,
+    "w_fte_usd_per_hr": 45.0,
+    "subscription_per_period_usd": 4500.0,
+    "integration_onetime_usd": 30000.0,
+    "otif_attribution_alpha": 0.6
+  },
+  "targets": {
+    "efficiency_pct": 40.0,
+    "breakeven_weeks": 4.0,
+    "note": "vendor framing TARGET, never baked-in ground truth"
+  },
+  "headline": {
+    "net_touches_saved_hours": 1789.3,
+    "net_touches_saved_fte": 5.59,
+    "net_touches_saved_usd": 80520.0,
+    "naive_touches_usd": 111015.0,
+    "honesty_cut_pct": 27.5,
+    "auto_resolution_rate": 0.6969,
+    "correct_auto_rate": 0.6401,
+    "false_exception_rate_resolution": 0.0815,
+    "false_flag_rate_detection": 0.0378,
+    "cycle_time_before_days": 5.661,
+    "cycle_time_after_days": 2.166,
+    "cycle_time_reduction_pct": 0.6173,
+    "match_cycle_before_days": 3.635,
+    "match_cycle_after_days": 2.158,
+    "match_cycle_reduction_pct": 0.4062,
+    "net_deduction_recovery_usd": 10600.0,
+    "automated_deduction_net_usd": 17800.0,
+    "baseline_deduction_net_usd": 7200.0,
+    "deduction_recovery_rate": 0.7677,
+    "net_otif_lift_pp": 1.053,
+    "otif_value_usd": 15304.5,
+    "total_net_benefit_usd": 106424.5,
+    "subscription_total_usd": 36000.0,
+    "net_of_subscription_usd": 70424.5,
+    "time_to_value_weeks": 5,
+    "time_to_value_closed_form_weeks": 2.25,
+    "roi_claim_valid": true,
+    "roi_claim_reasons": [
+      "net benefit positive; no eval hard-gate failures"
+    ]
+  },
+  "touches_waterfall": [
+    {
+      "label": "Naive credit  (A x t_manual)",
+      "kind": "total",
+      "usd": 111015.0
+    },
+    {
+      "label": "- Remove false-positive credit  (A_false x t_manual)",
+      "kind": "neg",
+      "usd": -9045.0
+    },
+    {
+      "label": "- Rework penalty  (A_false x t_rework)",
+      "kind": "neg",
+      "usd": -18843.75
+    },
+    {
+      "label": "- Nuisance flags  (F_detect x t_review)",
+      "kind": "neg",
+      "usd": -2606.25
+    },
+    {
+      "label": "Net touches saved  (honest)",
+      "kind": "total",
+      "usd": 80520.0
+    }
+  ],
+  "cycle_dumbbell": {
+    "metric": "exception aging",
+    "unit": "days",
+    "before_days": 5.661,
+    "after_days": 2.166,
+    "lower_is_better": true
+  },
+  "honesty_table": {
+    "rows": [
+      {
+        "stream": "Correct auto-resolved",
+        "sign": "credit",
+        "count": 11330,
+        "minutes_per": 12.0,
+        "minutes_total": 135960.0,
+        "usd": 101970.0
+      },
+      {
+        "stream": "False auto-resolved (rework)",
+        "sign": "debit",
+        "count": 1005,
+        "minutes_per": 25.0,
+        "minutes_total": -25125.0,
+        "usd": -18843.75
+      },
+      {
+        "stream": "Nuisance false flags",
+        "sign": "debit",
+        "count": 695,
+        "minutes_per": 5.0,
+        "minutes_total": -3475.0,
+        "usd": -2606.25
+      },
+      {
+        "stream": "Escalated (needed a human)",
+        "sign": "zero",
+        "count": 5365,
+        "minutes_per": 0,
+        "minutes_total": 0.0,
+        "usd": 0.0,
+        "note": "credited ZERO saved -- fully-auto terminal correct items only"
+      }
+    ],
+    "net_minutes": 107360.0,
+    "net_usd": 80520.0,
+    "naive_usd": 111015.0
+  },
+  "deduction": {
+    "D_invalid_pool_usd": 66300.0,
+    "gross_recovered_usd": 50900.0,
+    "recovery_rate": 0.7677,
+    "automated_net_usd": 17800.0,
+    "baseline_net_usd": 7200.0,
+    "incremental_net_usd": 10600.0,
+    "note": "credit the delta over manual, not gross (assumption 8: no double-count)"
+  },
+  "otif": {
+    "net_lift_pp": 1.053,
+    "attribution_alpha": 0.6,
+    "value_usd": 15304.5,
+    "note": "alpha flags the confounded share; otif_after nets automation-caused misses"
+  },
+  "weekly": [
+    {
+      "week": 1,
+      "marker": "MARKER_WK01",
+      "exceptions_in": 2000,
+      "auto_resolved_correct": 900,
+      "auto_resolved_false": 180,
+      "escalated_human": 920,
+      "false_flags": 140,
+      "auto_resolution_rate": 0.54,
+      "correct_auto_rate": 0.45,
+      "false_exception_rate": 0.1667,
+      "touches_usd": 4200.0,
+      "deduction_incremental_usd": -1710.0,
+      "otif_usd": 171.0,
+      "net_benefit_usd": 2661.0,
+      "cum_net_benefit_usd": 2661.0,
+      "cum_cost_usd": 34500.0,
+      "cycle_before_days": 5.6,
+      "cycle_after_days": 3.442
+    },
+    {
+      "week": 2,
+      "marker": "MARKER_WK02",
+      "exceptions_in": 2100,
+      "auto_resolved_correct": 1080,
+      "auto_resolved_false": 170,
+      "escalated_human": 850,
+      "false_flags": 120,
+      "auto_resolution_rate": 0.5952,
+      "correct_auto_rate": 0.5143,
+      "false_exception_rate": 0.136,
+      "touches_usd": 6082.5,
+      "deduction_incremental_usd": -370.0,
+      "otif_usd": 702.0,
+      "net_benefit_usd": 6414.5,
+      "cum_net_benefit_usd": 9075.5,
+      "cum_cost_usd": 39000.0,
+      "cycle_before_days": 5.7,
+      "cycle_after_days": 3.002
+    },
+    {
+      "week": 3,
+      "marker": "MARKER_WK03",
+      "exceptions_in": 2200,
+      "auto_resolved_correct": 1280,
+      "auto_resolved_false": 150,
+      "escalated_human": 770,
+      "false_flags": 100,
+      "auto_resolution_rate": 0.65,
+      "correct_auto_rate": 0.5818,
+      "false_exception_rate": 0.1049,
+      "touches_usd": 8332.5,
+      "deduction_incremental_usd": 770.0,
+      "otif_usd": 1260.0,
+      "net_benefit_usd": 10362.5,
+      "cum_net_benefit_usd": 19438.0,
+      "cum_cost_usd": 43500.0,
+      "cycle_before_days": 5.5,
+      "cycle_after_days": 2.539
+    },
+    {
+      "week": 4,
+      "marker": "MARKER_WK04",
+      "exceptions_in": 2400,
+      "auto_resolved_correct": 1520,
+      "auto_resolved_false": 140,
+      "escalated_human": 740,
+      "false_flags": 90,
+      "auto_resolution_rate": 0.6917,
+      "correct_auto_rate": 0.6333,
+      "false_exception_rate": 0.0843,
+      "touches_usd": 10717.5,
+      "deduction_incremental_usd": 1910.0,
+      "otif_usd": 2322.0,
+      "net_benefit_usd": 14949.5,
+      "cum_net_benefit_usd": 34387.5,
+      "cum_cost_usd": 48000.0,
+      "cycle_before_days": 5.8,
+      "cycle_after_days": 2.188
+    },
+    {
+      "week": 5,
+      "marker": "MARKER_WK05",
+      "exceptions_in": 2500,
+      "auto_resolved_correct": 1720,
+      "auto_resolved_false": 120,
+      "escalated_human": 660,
+      "false_flags": 80,
+      "auto_resolution_rate": 0.736,
+      "correct_auto_rate": 0.688,
+      "false_exception_rate": 0.0652,
+      "touches_usd": 12930.0,
+      "deduction_incremental_usd": 2520.0,
+      "otif_usd": 3168.0,
+      "net_benefit_usd": 18618.0,
+      "cum_net_benefit_usd": 53005.5,
+      "cum_cost_usd": 52500.0,
+      "cycle_before_days": 6.0,
+      "cycle_after_days": 1.84
+    },
+    {
+      "week": 6,
+      "marker": "MARKER_WK06",
+      "exceptions_in": 2300,
+      "auto_resolved_correct": 1660,
+      "auto_resolved_false": 95,
+      "escalated_human": 545,
+      "false_flags": 60,
+      "auto_resolution_rate": 0.763,
+      "correct_auto_rate": 0.7217,
+      "false_exception_rate": 0.0541,
+      "touches_usd": 12933.75,
+      "deduction_incremental_usd": 2620.0,
+      "otif_usd": 2767.5,
+      "net_benefit_usd": 18321.25,
+      "cum_net_benefit_usd": 71326.75,
+      "cum_cost_usd": 57000.0,
+      "cycle_before_days": 5.7,
+      "cycle_after_days": 1.618
+    },
+    {
+      "week": 7,
+      "marker": "MARKER_WK07",
+      "exceptions_in": 2150,
+      "auto_resolved_correct": 1610,
+      "auto_resolved_false": 80,
+      "escalated_human": 460,
+      "false_flags": 55,
+      "auto_resolution_rate": 0.786,
+      "correct_auto_rate": 0.7488,
+      "false_exception_rate": 0.0473,
+      "touches_usd": 12783.75,
+      "deduction_incremental_usd": 2460.0,
+      "otif_usd": 2494.8,
+      "net_benefit_usd": 17738.55,
+      "cum_net_benefit_usd": 89065.3,
+      "cum_cost_usd": 61500.0,
+      "cycle_before_days": 5.5,
+      "cycle_after_days": 1.466
+    },
+    {
+      "week": 8,
+      "marker": "MARKER_WK08",
+      "exceptions_in": 2050,
+      "auto_resolved_correct": 1560,
+      "auto_resolved_false": 70,
+      "escalated_human": 420,
+      "false_flags": 50,
+      "auto_resolution_rate": 0.7951,
+      "correct_auto_rate": 0.761,
+      "false_exception_rate": 0.0429,
+      "touches_usd": 12540.0,
+      "deduction_incremental_usd": 2400.0,
+      "otif_usd": 2419.2,
+      "net_benefit_usd": 17359.2,
+      "cum_net_benefit_usd": 106424.5,
+      "cum_cost_usd": 66000.0,
+      "cycle_before_days": 5.4,
+      "cycle_after_days": 1.385
+    }
+  ],
+  "scorecard_accuracy": {
+    "run_id": "20260711-040944-retail_ops-replay",
+    "backend": "replay",
+    "model": "claude-opus-4-8",
+    "n": 34,
+    "passed": 34,
+    "total_score": 34.0,
+    "hard_gate_failures": [],
+    "false_autoclose_proxy": 0.0,
+    "approval_gate_mean_score": 1.0,
+    "by_metric": [
+      {
+        "metric": "reconciliation_accuracy",
+        "n": 8,
+        "passed": 8,
+        "mean_score": 1.0
+      },
+      {
+        "metric": "exception_disposition_accuracy",
+        "n": 6,
+        "passed": 6,
+        "mean_score": 1.0
+      },
+      {
+        "metric": "otif_metric_accuracy",
+        "n": 6,
+        "passed": 6,
+        "mean_score": 1.0
+      },
+      {
+        "metric": "chase_ladder_correctness",
+        "n": 4,
+        "passed": 4,
+        "mean_score": 1.0
+      },
+      {
+        "metric": "deduction_recon_accuracy",
+        "n": 3,
+        "passed": 3,
+        "mean_score": 1.0
+      },
+      {
+        "metric": "audit_trail_completeness",
+        "n": 2,
+        "passed": 2,
+        "mean_score": 1.0
+      },
+      {
+        "metric": "approval_gate",
+        "n": 4,
+        "passed": 4,
+        "mean_score": 1.0
+      },
+      {
+        "metric": "false_autoclose_rate",
+        "n": 1,
+        "passed": 1,
+        "mean_score": 1.0
+      }
+    ],
+    "note": "false_autoclose_proxy = 1 - mean_score(false_autoclose_rate). hard_gate_failures must be empty for the ROI claim to stand: a safety-gate failure voids the ROI story regardless of the dollar model. Reconciliation/exception/otif/chase/deduction/audit rollups are the accuracy backing for the labor-savings and recovery terms; the two hard-gated metrics feed the false-positive / risk terms."
+  }
+}
+</script>
+
+<script>
+"use strict";
+const R = JSON.parse(document.getElementById("roi-data").textContent);
+const H = R.headline;
+
+/* ---- formatters ---- */
+const f0=n=>Math.round(n).toLocaleString("en-US");
+const money=n=>(n<0?"−":"")+"$"+f0(Math.abs(n));
+const money1=n=>(n<0?"−":"")+"$"+Math.abs(n).toLocaleString("en-US",{minimumFractionDigits:0,maximumFractionDigits:0});
+const pct=n=>(n*100).toFixed(1)+"%";
+const pp=n=>(n>=0?"+":"−")+Math.abs(n).toFixed(2)+" pp";
+const esc=s=>String(s==null?"":s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const svgNS="http://www.w3.org/2000/svg";
+
+/* ============================================================
+   IMPACT pane — gate banner, stat tiles, three charts, target callout
+   ============================================================ */
+function renderImpact(){
+  const el=document.getElementById("pane-impact");
+  let h="";
+
+  /* honesty gate banner: green chip when the ROI claim stands; oxide flag when it does not */
+  if(H.roi_claim_valid){
+    h+=`<div class="gate ok"><span class="led ok"></span><b>ROI claim stands.</b>
+      <span>${esc(H.roi_claim_reasons.join("; "))}.</span></div>`;
+  }else{
+    h+=`<div class="gate bad"><span class="flag">ROI CLAIM VOID</span>
+      <span>${esc(H.roi_claim_reasons.join("; "))}.</span></div>`;
+  }
+
+  /* stat tiles */
+  h+=`<div class="tiles">
+    <div class="tile hero"><div class="k"><span class="led accent"></span>net touches saved (honest)</div>
+      <div class="v">${H.net_touches_saved_fte.toFixed(2)} <small>FTE&nbsp;·&nbsp;${money(H.net_touches_saved_usd)}</small></div>
+      <div class="s">${f0(H.net_touches_saved_hours)} hrs over ${R.n_periods} wk &mdash; <b>${H.honesty_cut_pct.toFixed(1)}% below</b> the naive ${money(H.naive_touches_usd)}</div></div>
+    <div class="tile"><div class="k"><span class="led info"></span>exception cycle-time cut</div>
+      <div class="v">${"−"}${pct(H.cycle_time_reduction_pct)}</div>
+      <div class="s"><b>${H.cycle_time_before_days}</b> &rarr; <b>${H.cycle_time_after_days}</b> days aging</div></div>
+    <div class="tile"><div class="k"><span class="led ok"></span>deduction $ recovered</div>
+      <div class="v">${money(H.net_deduction_recovery_usd)}</div>
+      <div class="s">net incremental over manual · <b>${pct(H.deduction_recovery_rate)}</b> recovery rate</div></div>
+    <div class="tile"><div class="k"><span class="led ${H.time_to_value_weeks>R.targets.breakeven_weeks?"warn":"ok"}"></span>time-to-value</div>
+      <div class="v">${H.time_to_value_weeks} <small>wk</small></div>
+      <div class="s">ramp-aware breakeven · target <b>${R.targets.breakeven_weeks} wk</b></div></div>
+  </div>`;
+
+  h+=`<div class="tiles">
+    <div class="tile"><div class="k">auto-resolution (honest pair)</div>
+      <div class="v">${pct(H.correct_auto_rate)} <small>correct</small></div>
+      <div class="s">raw ${pct(H.auto_resolution_rate)} counts wrong closes; report the pair</div></div>
+    <div class="tile"><div class="k"><span class="led danger"></span>false-exception rate</div>
+      <div class="v">${pct(H.false_exception_rate_resolution)}</div>
+      <div class="s">of auto-actioned (resolution) · ${pct(H.false_flag_rate_detection)} nuisance (detection)</div></div>
+    <div class="tile"><div class="k"><span class="led info"></span>OTIF lift (attributed)</div>
+      <div class="v">${pp(H.net_otif_lift_pp)}</div>
+      <div class="s">&alpha;=${R.otif.attribution_alpha} attributed · ${money(H.otif_value_usd)}</div></div>
+    <div class="tile"><div class="k">net-of-subscription</div>
+      <div class="v">${money(H.net_of_subscription_usd)}</div>
+      <div class="s">after ${"−"}${money(H.subscription_total_usd)} subscription / ${R.n_periods} wk</div></div>
+  </div>`;
+
+  /* charts */
+  h+=`<div class="sec-h">Before &rarr; after <span class="n">— one entity at two times (sequential, one hue + neutral)</span></div>
+    <div class="chart"><div class="ct">Exception aging &amp; match cycle</div>
+      <div class="cs">Lower is better. Not two categories &mdash; the same metric before and after, so &ldquo;before&rdquo; is a neutral track and &ldquo;after&rdquo; is one fill. Direct value labels carry the number.</div>
+      <div id="dumbbell"></div>
+      <div class="legend"><span><i class="swatch" style="background:var(--ink-disabled)"></i>before (manual)</span><span><i class="swatch" style="background:var(--fill-info)"></i>after (automated)</span></div>
+    </div>`;
+
+  h+=`<div class="sec-h">Why the number is what it is <span class="n">— the honesty waterfall (diverging, sign doubly-encoded)</span></div>
+    <div class="chart"><div class="ct">From the vanity number to the honest net</div>
+      <div class="cs">The naive claim credits every auto-action; each red step docks it. Sign is encoded three ways &mdash; bar direction, color, and the signed <span class="mono">$</span> label &mdash; so color is redundant, not load-bearing (colorblind-safe).</div>
+      <div id="waterfall"></div>
+      <div class="legend"><span><i class="swatch" style="background:var(--paper-3)"></i>total</span><span><i class="swatch" style="background:var(--fill-danger)"></i>penalty (dock)</span></div>
+    </div>`;
+
+  h+=`<div class="sec-h">Time-to-value <span class="n">— ramp-aware cumulative benefit vs cost</span></div>
+    <div class="chart"><div class="ct">Cumulative net benefit crosses cumulative cost</div>
+      <div class="cs">Cost line includes the one-time integration <span class="mono">I&#8320;</span>. Breakeven is where benefit first clears cost &mdash; computed on the real weekly ramp, not a steady-state closed form.</div>
+      <div id="breakeven"></div>
+      <div class="legend"><span><i class="swatch line" style="border-color:var(--fill-info)"></i>cumulative net benefit</span><span><i class="swatch line" style="border-color:var(--ink-3);border-top-style:dashed"></i>cumulative cost (I&#8320;+sub)</span><span><i class="swatch" style="background:var(--fill-accent)"></i>breakeven</span></div>
+    </div>`;
+
+  /* target vs actual callout */
+  h+=`<div class="sec-h">Vendor target vs computed truth <span class="n">— the 40% / 4-week framing, never assumed</span></div>
+    <div class="chart"><div class="cs" style="margin:0">
+      <p style="margin:.1rem 0 .7rem">The &ldquo;40% efficiency, 4-week ROI&rdquo; deck is a <b>target</b>. This deployment, computed honestly:</p>
+      <div style="display:flex;gap:.5rem;flex-wrap:wrap">
+        <span class="chip accent">target: ${R.targets.efficiency_pct}% eff · ${R.targets.breakeven_weeks}-wk ROI</span>
+        <span class="chip info">honest breakeven: week ${H.time_to_value_weeks}</span>
+        <span class="chip ${H.time_to_value_closed_form_weeks<R.targets.breakeven_weeks?"ok":"warn"}">no-ramp closed form: ${H.time_to_value_closed_form_weeks} wk</span>
+        <span class="chip warn">honesty cut on touches: ${"−"}${H.honesty_cut_pct.toFixed(1)}%</span>
+      </div>
+      <p style="margin:.8rem 0 0">The optimistic no-ramp closed form (${H.time_to_value_closed_form_weeks} wk) beats the ${R.targets.breakeven_weeks}-week target; the <b>ramp-aware</b> number (week ${H.time_to_value_weeks}) is the honest one to quote &mdash; early weeks run below steady state while the model tunes. Quoting the target as a promise overstates it.</p>
+    </div></div>`;
+
+  el.innerHTML=h;
+  drawDumbbell(); drawWaterfall(); drawBreakeven();
+}
+
+/* ---- dumbbell (two rows: exception aging + match cycle) ---- */
+function drawDumbbell(){
+  const rows=[
+    {label:"Exception aging", before:H.cycle_time_before_days, after:H.cycle_time_after_days, unit:"d", red:H.cycle_time_reduction_pct},
+    {label:"Match cycle",     before:H.match_cycle_before_days, after:H.match_cycle_after_days, unit:"d", red:H.match_cycle_reduction_pct},
+  ];
+  const W=680, padL=118, padR=96, rowH=54, top=14;
+  const Hh=top+rows.length*rowH+6;
+  const maxV=Math.max(...rows.map(r=>r.before))*1.08;
+  const x=v=>padL+(v/maxV)*(W-padL-padR);
+  const svg=mk("svg",{viewBox:`0 0 ${W} ${Hh}`,role:"img","aria-label":"before after dumbbell"});
+  // recessive gridlines
+  for(let g=0; g<=maxV; g+= (maxV>6?2:1)){
+    line(svg,x(g),top,x(g),top+rows.length*rowH,"var(--rule)",1);
+    txt(svg,x(g),top+rows.length*rowH+16,g.toFixed(0),"var(--ink-3)",10,"middle","var(--mono)");
+  }
+  rows.forEach((r,i)=>{
+    const cy=top+i*rowH+rowH/2-4;
+    txt(svg,padL-12,cy+4,r.label,"var(--ink-2)",12.5,"end");
+    // connecting rule
+    line(svg,x(r.after),cy,x(r.before),cy,"var(--rule-2)",2);
+    // before dot (neutral) + after dot (one fill)
+    dot(svg,x(r.before),cy,5,"var(--ink-disabled)");
+    dot(svg,x(r.after),cy,5.5,"var(--fill-info)");
+    // direct labels
+    txt(svg,x(r.before)+9,cy-9,r.before.toFixed(2)+r.unit,"var(--ink-3)",11,"start");
+    txt(svg,x(r.after)-9,cy-9,r.after.toFixed(2)+r.unit,"var(--ink-info)",11.5,"end","var(--sans)","600");
+    txt(svg,W-padR+10,cy+4,"−"+(r.red*100).toFixed(0)+"%","var(--ink-info)",13,"start","var(--sans)","600");
+  });
+  document.getElementById("dumbbell").appendChild(svg);
+}
+
+/* ---- waterfall (naive -> docks -> net) ---- */
+function drawWaterfall(){
+  const steps=R.touches_waterfall;
+  const W=680, padL=8, padR=8, padT=26, padB=64, plot=260;
+  const vals=steps.map(s=>s.usd);
+  const maxTop=Math.max(steps[0].usd, steps[steps.length-1].usd)*1.12;
+  const y=v=>padT+(1-v/maxTop)*plot;
+  const n=steps.length, gap=14, bw=(W-padL-padR-gap*(n-1))/n;
+  const svg=mk("svg",{viewBox:`0 0 ${W} ${padT+plot+padB}`,role:"img","aria-label":"honesty waterfall"});
+  // baseline + a couple gridlines
+  for(let g=0; g<=maxTop; g+=20000){ line(svg,padL,y(g),W-padR,y(g),"var(--rule)",1); txt(svg,padL+2,y(g)-3,"$"+(g/1000)+"k","var(--ink-3)",9,"start","var(--mono)"); }
+  let running=0;
+  steps.forEach((s,i)=>{
+    const bx=padL+i*(bw+gap);
+    let yTop,yBot;
+    if(s.kind==="total"){ yTop=y(s.usd); yBot=y(0); running=s.usd; }
+    else { const start=running; running=running+s.usd; yTop=y(Math.max(start,running)); yBot=y(Math.min(start,running)); }
+    const fill = s.kind==="total" ? "var(--paper-3)" : (s.usd>=0?"var(--fill-ok)":"var(--fill-danger)");
+    const rect=mk("rect",{x:bx,y:yTop,width:bw,height:Math.max(2,yBot-yTop),rx:4,fill:fill});
+    if(s.kind==="total") rect.setAttribute("stroke","var(--rule-3)"), rect.setAttribute("stroke-width","1");
+    svg.appendChild(rect);
+    // connector to next
+    if(i<n-1){ line(svg,bx+bw,y(running),bx+bw+gap,y(running),"var(--rule-2)",1.5,"3 3"); }
+    // signed value label (the required relief channel)
+    const lbl = s.kind==="total" ? money(s.usd) : (s.usd>=0?"+":"−")+money(Math.abs(s.usd)).replace("$","$");
+    txt(svg,bx+bw/2,yTop-7,lbl,s.kind==="total"?"var(--ink)":"var(--ink-danger)",11.5,"middle","var(--sans)","600");
+    // wrapped caption below baseline
+    wrapText(svg,bx+bw/2,y(0)+16,s.label,bw+gap-4,"var(--ink-3)",9.5);
+  });
+  document.getElementById("waterfall").appendChild(svg);
+}
+
+/* ---- breakeven line chart ---- */
+function drawBreakeven(){
+  const wk=R.weekly;
+  const W=680, padL=54, padR=16, padT=18, padB=40, plot=220;
+  const xs=wk.map(w=>w.week);
+  const maxY=Math.max(...wk.map(w=>Math.max(w.cum_net_benefit_usd,w.cum_cost_usd)))*1.08;
+  const x=i=>padL+(i/(wk.length-1))*(W-padL-padR);
+  const y=v=>padT+(1-v/maxY)*plot;
+  const svg=mk("svg",{viewBox:`0 0 ${W} ${padT+plot+padB}`,role:"img","aria-label":"cumulative benefit vs cost"});
+  for(let g=0; g<=maxY; g+=25000){ line(svg,padL,y(g),W-padR,y(g),"var(--rule)",1); txt(svg,padL-6,y(g)+3,"$"+(g/1000)+"k","var(--ink-3)",9,"end","var(--mono)"); }
+  wk.forEach((w,i)=>txt(svg,x(i),padT+plot+16,"wk"+w.week,"var(--ink-3)",9.5,"middle","var(--mono)"));
+  // cost line (neutral dashed reference)
+  polyline(svg, wk.map((w,i)=>[x(i),y(w.cum_cost_usd)]), "var(--ink-3)",2,"5 4");
+  // benefit line (one data hue)
+  polyline(svg, wk.map((w,i)=>[x(i),y(w.cum_net_benefit_usd)]), "var(--fill-info)",2.5);
+  wk.forEach((w,i)=>dot(svg,x(i),y(w.cum_net_benefit_usd),2.4,"var(--fill-info)"));
+  // breakeven marker
+  const be=H.time_to_value_weeks;
+  if(be){ const i=wk.findIndex(w=>w.week===be); if(i>=0){
+    line(svg,x(i),padT,x(i),padT+plot,"var(--rule-2)",1,"2 3");
+    dot(svg,x(i),y(wk[i].cum_net_benefit_usd),5,"var(--fill-accent)");
+    txt(svg,x(i),y(wk[i].cum_net_benefit_usd)-11,"breakeven wk"+be,"var(--ink-accent)",11,"middle","var(--sans)","600");
+  }}
+  document.getElementById("breakeven").appendChild(svg);
+}
+
+/* ---- svg helpers ---- */
+function mk(t,a){const e=document.createElementNS(svgNS,t);for(const k in a)e.setAttribute(k,a[k]);return e;}
+function line(s,x1,y1,x2,y2,stroke,w,dash){const l=mk("line",{x1,y1,x2,y2,stroke,"stroke-width":w});if(dash)l.setAttribute("stroke-dasharray",dash);s.appendChild(l);}
+function dot(s,cx,cy,r,fill){s.appendChild(mk("circle",{cx,cy,r,fill}));}
+function txt(s,x,y,str,fill,size,anchor,family,weight){const t=mk("text",{x,y,fill,"font-size":size,"text-anchor":anchor||"start","font-family":family||"var(--sans)"});if(weight)t.setAttribute("font-weight",weight);t.textContent=str;s.appendChild(t);}
+function polyline(s,pts,stroke,w,dash){const p=mk("polyline",{points:pts.map(p=>p.join(",")).join(" "),fill:"none",stroke,"stroke-width":w,"stroke-linejoin":"round","stroke-linecap":"round"});if(dash)p.setAttribute("stroke-dasharray",dash);s.appendChild(p);}
+function wrapText(s,x,y,str,maxw,fill,size){
+  const words=String(str).split(/\s+/); let line="",dy=0;
+  const flush=t=>{txt(s,x,y+dy,t,fill,size,"middle","var(--mono)");dy+=size+2;};
+  words.forEach(w=>{const t=line?line+" "+w:w; if(t.length*size*0.56>maxw && line){flush(line);line=w;}else line=t;});
+  if(line)flush(line);
+}
+
+/* ============================================================
+   HONESTY LEDGER pane — true vs false table, waterfall table, deduction, weekly
+   ============================================================ */
+function renderLedger(){
+  const el=document.getElementById("pane-ledger");
+  const ht=R.honesty_table;
+  let h=`<div class="sec-h">True vs false work <span class="n">— the honesty made visible</span></div>
+    <p class="sec-d">Only <b>correct, terminal, no-human</b> auto-resolutions are credited (at <code>t_manual</code>). False auto-resolutions are charged at <code>t_rework</code> (discover + undo + redo, &gt; t_manual). Nuisance false flags are charged at <code>t_review</code> as <em>new</em> touches. Escalations that still needed a person are credited <b>zero</b>. The naive number would be ${money(ht.naive_usd)}.</p>
+    <div class="tablewrap"><table><thead><tr><th>work stream</th><th>count</th><th>min/ea</th><th>minutes</th><th>value $</th></tr></thead><tbody>`;
+  ht.rows.forEach(r=>{
+    const cls=r.sign==="credit"?"pos":(r.sign==="zero"?"zero":"neg");
+    h+=`<tr><td><span class="led ${r.sign==="credit"?"ok":(r.sign==="zero"?"info":"danger")}"></span> ${esc(r.stream)}</td>
+      <td class="mono">${f0(r.count)}</td><td class="mono">${r.minutes_per}</td>
+      <td class="mono ${cls}">${f0(r.minutes_total)}</td><td class="mono ${cls}">${money(r.usd)}</td></tr>`;
+  });
+  h+=`<tr class="total"><td>Net touches saved (honest)</td><td class="mono">&mdash;</td><td class="mono">&mdash;</td>
+      <td class="mono">${f0(ht.net_minutes)}</td><td class="mono">${money(ht.net_usd)}</td></tr></tbody></table></div>`;
+
+  /* waterfall as a table (redundant encoding requirement) */
+  h+=`<div class="sec-h">Touches waterfall <span class="n">— vanity number &rarr; honest net, as data</span></div>
+    <div class="tablewrap"><table><thead><tr><th>step</th><th>kind</th><th>$</th></tr></thead><tbody>`;
+  R.touches_waterfall.forEach(s=>{
+    const cls=s.kind==="total"?"":(s.usd>=0?"pos":"neg");
+    h+=`<tr${s.kind==="total"?' class="total"':''}><td>${esc(s.label)}</td><td class="mk">${s.kind}</td><td class="mono ${cls}">${money(s.usd)}</td></tr>`;
+  });
+  h+=`</tbody></table></div>`;
+
+  /* deduction split */
+  const d=R.deduction;
+  h+=`<div class="sec-h">Deduction recovery <span class="n">— net, not gross; delta over manual</span></div>
+    <p class="sec-d">Disputing everything maximizes gross recovered but fires on <em>valid</em> deductions &mdash; burning labor and retailer standing. The credited value is the automation-attributable <b>delta</b> over what manual already recovered (assumption 8: no double-count).</p>
+    <dl class="kv">
+      <dt>D_invalid pool</dt><dd>${money(d.D_invalid_pool_usd)} recoverable (wrongly-taken)</dd>
+      <dt>gross recovered</dt><dd>${money(d.gross_recovered_usd)} · recovery rate ${pct(d.recovery_rate)}</dd>
+      <dt>automated net</dt><dd>${money(d.automated_net_usd)} (after dispute labor, wrong-dispute penalties, write-offs)</dd>
+      <dt>baseline net</dt><dd>${money(d.baseline_net_usd)} (manual)</dd>
+      <dt>credited (delta)</dt><dd><b>${money(d.incremental_net_usd)}</b></dd>
+    </dl>`;
+
+  /* weekly ramp table */
+  h+=`<div class="sec-h">Weekly ramp <span class="n">— early weeks run below steady state</span></div>
+    <div class="tablewrap"><table><thead><tr><th>wk</th><th>V</th><th>correct</th><th>false</th><th>escal.</th><th>nuis.</th><th>false%</th><th>touches$</th><th>ded&Delta;$</th><th>otif$</th><th>net$</th><th>cum net$</th><th>cum cost$</th><th>aging b&rarr;a</th></tr></thead><tbody>`;
+  R.weekly.forEach(w=>{
+    const be = w.cum_net_benefit_usd>=w.cum_cost_usd;
+    h+=`<tr${be?' style="background:var(--ok-soft)"':''}><td class="mk">${w.week}</td><td class="mono">${f0(w.exceptions_in)}</td>
+      <td class="mono pos">${f0(w.auto_resolved_correct)}</td><td class="mono neg">${f0(w.auto_resolved_false)}</td>
+      <td class="mono zero">${f0(w.escalated_human)}</td><td class="mono neg">${f0(w.false_flags)}</td>
+      <td class="mono">${pct(w.false_exception_rate)}</td>
+      <td class="mono">${money(w.touches_usd)}</td><td class="mono ${w.deduction_incremental_usd<0?"neg":""}">${money(w.deduction_incremental_usd)}</td>
+      <td class="mono">${money(w.otif_usd)}</td><td class="mono">${money(w.net_benefit_usd)}</td>
+      <td class="mono">${money(w.cum_net_benefit_usd)}</td><td class="mono">${money(w.cum_cost_usd)}</td>
+      <td class="mono">${w.cycle_before_days}&rarr;${w.cycle_after_days}</td></tr>`;
+  });
+  h+=`</tbody></table></div><p class="sec-d">Shaded rows are at/after breakeven. Note week 1&ndash;2 deduction &Delta; is <span class="neg">negative</span> &mdash; during the ramp the agent disputes aggressively and eats wrong-dispute penalties before it is tuned. That honesty is in the data, not smoothed away.</p>`;
+
+  el.innerHTML=h;
+}
+
+/* ============================================================
+   METHOD pane — formulas, scorecard cross-reference, provenance, raw json
+   ============================================================ */
+function renderMethod(){
+  const el=document.getElementById("pane-method");
+  const a=R.scorecard_accuracy;
+  let h=`<div class="sec-h">The honest-net formulas <span class="n">— what each headline is</span></div>
+    <div class="formula">net_touches_saved_min = A_correct&times;t_manual  &minus; A_false&times;t_rework  &minus; F_detect&times;t_review
+  (escalations that still needed a human = 0 saved; t_rework &gt; t_manual by design)</div>
+    <div class="formula">correct_auto_rate = A_correct / V          false_exception_rate = A_false / A
+mean_cycle_after  = (A_correct&times;&tau;_auto + A_false&times;&tau;_false_loop + H&times;&tau;_human) / V
+  (&tau;_false_loop &gt; &tau;_human: a wrongly-closed exception reopens aged from its original date)</div>
+    <div class="formula">net_deduction = R_recovered &minus; c_dispute&times;N_disputes &minus; D_written_off_wrongly &minus; penalty&times;N_wrong
+OTIF_$ = &alpha; &times; net_lift_pp/100 &times; shipped_units &times; fine_per_unit    (&alpha; = attribution factor)
+time_to_value = smallest week T with  &Sigma;benefit(1..T) &ge; I&#8320; + &Sigma;cost(1..T)   (ramp-aware)</div>`;
+
+  /* scorecard cross-reference + gate */
+  h+=`<div class="sec-h">Eval cross-reference <span class="n">— accuracy &amp; the safety gate that governs the ROI claim</span></div>`;
+  if(a){
+    h+=`<p class="sec-d">From <code>${esc(a.run_id)}</code> [${esc(a.backend)}/${esc(a.model)}]. The rollups are recomputed by the reader (the scorecard file serializes only model fields). ${esc(a.note)}</p>
+      <div class="tablewrap"><table><thead><tr><th>metric</th><th>n</th><th>passed</th><th>mean score</th></tr></thead><tbody>`;
+    a.by_metric.forEach(r=>{
+      const gated=(r.metric==="approval_gate"||r.metric==="false_autoclose_rate");
+      h+=`<tr><td>${gated?'<span class="led danger"></span> ':''}${esc(r.metric)}${gated?' <span class="chip danger">hard gate</span>':''}</td>
+        <td class="mono">${r.n}</td><td class="mono">${r.passed}</td><td class="mono">${r.mean_score.toFixed(2)}</td></tr>`;
+    });
+    h+=`</tbody></table></div>
+      <dl class="kv">
+        <dt>passed</dt><dd>${a.passed} / ${a.n} · total score ${a.total_score}</dd>
+        <dt>false_autoclose_proxy</dt><dd>1 &minus; mean_score(false_autoclose_rate) = <b>${a.false_autoclose_proxy.toFixed(2)}</b> ${a.false_autoclose_proxy===0?'<span class="chip ok">clean</span>':''}</dd>
+        <dt>hard-gate failures</dt><dd>${a.hard_gate_failures.length?('<b class="neg">'+a.hard_gate_failures.map(esc).join(", ")+'</b>'):'<span class="chip ok">none &mdash; ROI claim may stand</span>'}</dd>
+      </dl>
+      <p class="sec-d">The gate is load-bearing: a single <code>approval_gate</code> or <code>false_autoclose_rate</code> hard-gate failure <b>voids</b> the entire ROI claim regardless of the dollar model &mdash; the harness sets <code>roi_claim_valid = false</code> and the report flips its banner to the oxide critical flag.</p>`;
+  }else{
+    h+=`<p class="sec-d">No scorecard cross-referenced (run <code>roi.py --scorecard &lt;path&gt;</code> to attach one). The money model stands alone on the fixtures; the safety gate is un-checked.</p>`;
+  }
+
+  /* cost deck */
+  h+=`<div class="sec-h">Cost deck &amp; targets <span class="n">— re-source per deployment</span></div>
+    <dl class="kv">
+      <dt>t_manual / t_rework / t_review</dt><dd>${R.cost.t_manual_min} / ${R.cost.t_rework_min} / ${R.cost.t_review_min} min</dd>
+      <dt>w_fte</dt><dd>$${R.cost.w_fte_usd_per_hr}/hr fully-loaded</dd>
+      <dt>subscription · integration</dt><dd>${money(R.cost.subscription_per_period_usd)}/wk · ${money(R.cost.integration_onetime_usd)} one-time</dd>
+      <dt>OTIF &alpha;</dt><dd>${R.cost.otif_attribution_alpha} attribution factor (flag explicitly)</dd>
+      <dt>targets (framing)</dt><dd><span class="chip accent">${R.targets.efficiency_pct}% efficiency</span> <span class="chip accent">${R.targets.breakeven_weeks}-week ROI</span> &mdash; ${esc(R.targets.note)}</dd>
+    </dl>`;
+
+  h+=`<div class="sec-h">Provenance <span class="n">— fully synthetic</span></div>
+    <p class="sec-d">${esc(R._provenance)}</p>`;
+
+  h+=`<div class="sec-h">report.json <span class="n">— the inlined source of every number above</span></div>
+    <pre class="json">${esc(JSON.stringify(R,null,2))}</pre>`;
+
+  h+=`<div class="foot">Collins design system (stone / copper / oxide · fills-are-LEDs · day&harr;night). Text only from the <code>--ink*</code> ramp; <code>--fill-*</code> used only for LED dots, chart marks, and chip grounds; one copper primary action (<b>Copy report.json</b>); oxide reserved for the identity badge and the single critical <em>ROI CLAIM VOID</em> flag. Charts follow the dataviz discipline: sequential dumbbell for before&rarr;after (one hue + neutral), diverging waterfall with sign triply-encoded (direction + color + signed label) so color is not load-bearing, thin 2px marks, recessive grid, direct value labels, and a table view of every chart. Self-contained &mdash; no build, no network, no external assets. Refresh with <code>python3 roi.py --out report.json &amp;&amp; python3 build_view.py</code>.</div>`;
+
+  el.innerHTML=h;
+}
+
+/* ============================================================
+   wiring
+   ============================================================ */
+function setTab(name){
+  document.querySelectorAll(".tab").forEach(b=>b.setAttribute("aria-selected", b.dataset.tab===name?"true":"false"));
+  document.querySelectorAll(".pane").forEach(p=>p.classList.remove("on"));
+  document.getElementById("pane-"+name).classList.add("on");
+  if(name==="ledger") renderLedger();
+  if(name==="method") renderMethod();
+  window.scrollTo(0,0);
+}
+document.querySelectorAll(".tab").forEach(b=>b.addEventListener("click",()=>setTab(b.dataset.tab)));
+document.getElementById("modebtn").addEventListener("click",()=>{
+  const cur=document.documentElement.getAttribute("data-mode");
+  const next=cur==="night"?"day":"night";
+  document.documentElement.setAttribute("data-mode",next);
+  // re-render active pane so freshly-read CSS var colors apply to SVG marks
+  const active=document.querySelector(".tab[aria-selected='true']").dataset.tab;
+  if(active==="impact") renderImpact();
+});
+document.getElementById("copybtn").addEventListener("click",()=>{
+  const t=JSON.stringify(R,null,2);
+  navigator.clipboard.writeText(t).then(()=>{document.getElementById("saved").textContent="report.json copied ✓";})
+    .catch(()=>{const w=window.open("","_blank");if(w){w.document.write("<pre>"+esc(t)+"</pre>");}});
+});
+
+/* boot */
+renderImpact();
+</script>
+</body>
+</html>

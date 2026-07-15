@@ -1,0 +1,4 @@
+{"content": "Reconcile retailer deduction DED-01 against the delivery record. Answer exactly one word: post or dispute.", "role": "user"}
+{"content": [{"text": "Working ded_invalid_dispute.", "type": "text"}, {"id": "ded_invalid_dispute-0", "input": {"deduction_id": "DED-01"}, "name": "reconcile_deduction", "type": "tool_use"}], "role": "assistant"}
+{"content": [{"content": "{\"deduction_id\": \"DED-01\", \"evidence\": [\"otif=pass\", \"on_time=True\", \"in_full=True\"], \"kpi\": \"otif\", \"recommended_action\": \"dispute\", \"validity\": \"invalid\"}", "is_error": false, "tool_use_id": "ded_invalid_dispute-0", "type": "tool_result"}], "role": "user"}
+{"content": [{"id": "ded_invalid_dispute-submit", "input": {"answer": "dispute"}, "name": "submit_answer", "type": "tool_use"}], "role": "assistant"}

@@ -1,0 +1,4 @@
+{"content": "Run a three-way match on PO-8801 and report only the verdict.", "role": "user"}
+{"content": [{"text": "Working tm_clean_match.", "type": "text"}, {"id": "tm_clean_match-0", "input": {"po_id": "PO-8801"}, "name": "three_way_match", "type": "tool_use"}], "role": "assistant"}
+{"content": [{"content": "{\"price_inv\": 12.0, \"price_po\": 12.0, \"price_within_tol\": true, \"qty_grn_ea\": 1200.0, \"qty_inv_ea\": 1200.0, \"qty_po_ea\": 1200.0, \"qty_within_tol\": true, \"variance_units_cs\": 0.0, \"verdict\": \"matched\"}", "is_error": false, "tool_use_id": "tm_clean_match-0", "type": "tool_result"}], "role": "user"}
+{"content": [{"id": "tm_clean_match-submit", "input": {"answer": "matched"}, "name": "submit_answer", "type": "tool_use"}], "role": "assistant"}

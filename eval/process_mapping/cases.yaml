@@ -1,0 +1,173 @@
+# process_mapping golden set. Every expected value is COMPUTED from fixtures/process_mapping/
+# processes.jsonl (the gold answer key) via compute.py + dimensions.f1 — NOT asserted by hand;
+# test_case_expectations_match_gold recomputes and guards drift. Tools return only the messy
+# fragments (sources.jsonl); the gold map is never exposed to the agent. Fully synthetic,
+# generic retail/CPG buyer-side processes with MARKER tokens (PROC-##/STEP-##/SRC-##); no real
+# company, process, data, or product is represented. Clarity/Duvo inform framing only, abstractly.
+cases:
+  # --- process_inventory ---
+  - id: pm_inventory_count
+    prompt: "How many processes are in the catalog? Answer with the count."
+    checker: {type: numeric, expected: "8", tolerance: 0.5}
+    expected_tools: [list_processes]
+    metric: process_inventory
+    max_turns: 4
+  - id: pm_inventory_set
+    prompt: "List every process id in the catalog, comma-separated."
+    checker: {type: set, expected: "PROC-01,PROC-02,PROC-03,PROC-04,PROC-05,PROC-06,PROC-07,PROC-08"}
+    expected_tools: [list_processes]
+    metric: process_inventory
+    max_turns: 4
+
+  # --- step_extraction (set-F1 on STEP ids) ---
+  - id: pm_steps_proc04
+    prompt: "Reconstruct PROC-04. List the step_ids of the real workflow steps, comma-separated (drop any distractor that belongs to another flow)."
+    checker: {type: set, expected: "STEP-40,STEP-41,STEP-42,STEP-43,STEP-44,STEP-45,STEP-46"}
+    expected_tools: [get_process, get_source]
+    metric: step_extraction
+    max_turns: 10
+  - id: pm_steps_proc06
+    prompt: "Reconstruct PROC-06. List the real step_ids, comma-separated."
+    checker: {type: set, expected: "STEP-60,STEP-61,STEP-62,STEP-63,STEP-64,STEP-65,STEP-66"}
+    expected_tools: [get_process, get_source]
+    metric: step_extraction
+    max_turns: 10
+  - id: pm_steps_proc02
+    prompt: "Reconstruct PROC-02. List the real step_ids, comma-separated."
+    checker: {type: set, expected: "STEP-20,STEP-21,STEP-22,STEP-23,STEP-24,STEP-25,STEP-26"}
+    expected_tools: [get_process, get_source]
+    metric: step_extraction
+    max_turns: 10
+  - id: pm_steps_proc07
+    prompt: "Reconstruct PROC-07. List the real step_ids, comma-separated."
+    checker: {type: set, expected: "STEP-70,STEP-71,STEP-72,STEP-73,STEP-74,STEP-75,STEP-76,STEP-77"}
+    expected_tools: [get_process, get_source]
+    metric: step_extraction
+    max_turns: 12
+
+  # --- system_coverage (set-F1 on systems touched + exact system-of-step) ---
+  - id: pm_systems_proc04
+    prompt: "For PROC-04, list the distinct systems touched across all steps, comma-separated (from: erp, supplier_portal, spreadsheet, email, manual, edi, wms, tms, bi)."
+    checker: {type: set, expected: "edi,wms,erp,spreadsheet,email"}
+    expected_tools: [get_process, get_source]
+    metric: system_coverage
+    max_turns: 10
+  - id: pm_systems_proc02
+    prompt: "For PROC-02, list the distinct systems touched, comma-separated."
+    checker: {type: set, expected: "supplier_portal,manual,spreadsheet,erp"}
+    expected_tools: [get_process, get_source]
+    metric: system_coverage
+    max_turns: 10
+  - id: pm_systems_proc07
+    prompt: "For PROC-07, list the distinct systems touched, comma-separated."
+    checker: {type: set, expected: "edi,spreadsheet,manual,supplier_portal,email,erp"}
+    expected_tools: [get_process, get_source]
+    metric: system_coverage
+    max_turns: 12
+  - id: pm_system_of_step43
+    prompt: "In PROC-04, which single system does STEP-43 (the UOM-normalization step) touch? One bare token."
+    checker: {type: exact, expected: "spreadsheet"}
+    expected_tools: [get_process, get_source]
+    metric: system_coverage
+    max_turns: 6
+  - id: pm_system_of_step45
+    prompt: "In PROC-04, which single system does STEP-45 (routing mismatches to the buyer) touch? One bare token."
+    checker: {type: exact, expected: "email"}
+    expected_tools: [get_process, get_source]
+    metric: system_coverage
+    max_turns: 6
+
+  # --- fix_before_automate_flagging (set / numeric / exact) ---
+  - id: pm_fix_set_proc04
+    prompt: "For PROC-04, list the step_ids that are FIX-BEFORE-AUTOMATE, comma-separated."
+    checker: {type: set, expected: "STEP-41,STEP-43,STEP-44,STEP-45"}
+    expected_tools: [get_process, get_source]
+    metric: fix_before_automate_flagging
+    max_turns: 10
+  - id: pm_fix_count_proc07
+    prompt: "For PROC-07, how many steps are fix-before-automate? Answer with the count."
+    checker: {type: numeric, expected: "6", tolerance: 0.5}
+    expected_tools: [get_process, get_source]
+    metric: fix_before_automate_flagging
+    max_turns: 12
+  - id: pm_fix_count_proc06
+    prompt: "For PROC-06, how many steps are fix-before-automate? Answer with the count."
+    checker: {type: numeric, expected: "6", tolerance: 0.5}
+    expected_tools: [get_process, get_source]
+    metric: fix_before_automate_flagging
+    max_turns: 10
+  - id: pm_fix_reason_step43
+    prompt: "In PROC-04, STEP-43 is fix-before-automate. Give its reason code: one of UOM, SOT, JUDG, DATA."
+    checker: {type: exact, expected: "UOM"}
+    expected_tools: [get_process, get_source]
+    metric: fix_before_automate_flagging
+    max_turns: 6
+  - id: pm_fix_reason_step44
+    prompt: "In PROC-04, STEP-44 is fix-before-automate. Give its reason code: one of UOM, SOT, JUDG, DATA."
+    checker: {type: exact, expected: "JUDG"}
+    expected_tools: [get_process, get_source]
+    metric: fix_before_automate_flagging
+    max_turns: 6
+  - id: pm_disposition_step42
+    prompt: "In PROC-04, is STEP-42 (the three-way match) automation-ready or fix-before-automate? Answer AR or FBA."
+    checker: {type: exact, expected: "AR"}
+    expected_tools: [get_process, get_source]
+    metric: fix_before_automate_flagging
+    max_turns: 6
+
+  # --- handoff_identification (set edges / decision points / exact via) ---
+  - id: pm_edges_proc04
+    prompt: "For PROC-04, list the ordered handoffs as STEP-A->STEP-B tokens, comma-separated."
+    checker: {type: set, expected: "STEP-40->STEP-41,STEP-41->STEP-42,STEP-42->STEP-43,STEP-43->STEP-44,STEP-44->STEP-45,STEP-45->STEP-46"}
+    expected_tools: [get_process, get_source]
+    metric: handoff_identification
+    max_turns: 10
+  - id: pm_decision_edges_proc07
+    prompt: "For PROC-07, list only the DECISION-point handoffs (where a branch is chosen) as STEP-A->STEP-B tokens, comma-separated."
+    checker: {type: set, expected: "STEP-72->STEP-73,STEP-76->STEP-77"}
+    expected_tools: [get_process, get_source]
+    metric: handoff_identification
+    max_turns: 12
+  - id: pm_via_step44_45
+    prompt: "In PROC-04, which system carries the handoff between STEP-44 and STEP-45? One bare token."
+    checker: {type: exact, expected: "email"}
+    expected_tools: [get_process, get_source]
+    metric: handoff_identification
+    max_turns: 6
+  - id: pm_via_step64_65
+    prompt: "In PROC-06, which system carries the handoff between STEP-64 and STEP-65? One bare token."
+    checker: {type: exact, expected: "email"}
+    expected_tools: [get_process, get_source]
+    metric: handoff_identification
+    max_turns: 6
+
+  # --- ready_to_automate_safety (HARD GATE) ---
+  # Marking a fix-before-automate step READY/safe fails the whole run.
+  - id: pm_safety_step44
+    prompt: "In PROC-04, is STEP-44 (the tolerance check) safe to automate as-is? Answer exactly one word: READY or FIX_FIRST."
+    checker: {type: exact, expected: "FIX_FIRST"}
+    expected_tools: [get_process, get_source]
+    metric: ready_to_automate_safety
+    hard_gate: true
+    max_turns: 6
+  - id: pm_safety_step71
+    prompt: "In PROC-07, is STEP-71 (decoding the retailer reason code) safe to automate as-is? Answer exactly one word: READY or FIX_FIRST."
+    checker: {type: exact, expected: "FIX_FIRST"}
+    expected_tools: [get_process, get_source]
+    metric: ready_to_automate_safety
+    hard_gate: true
+    max_turns: 6
+  - id: pm_safety_audit_proc06
+    prompt: "Someone proposes automating these PROC-06 steps now, as-is: STEP-61, STEP-63, STEP-65. List the ones that must be FIXED FIRST, comma-separated."
+    checker: {type: set, expected: "STEP-61,STEP-63"}
+    expected_tools: [get_process, get_source]
+    metric: ready_to_automate_safety
+    hard_gate: true
+    max_turns: 10
+  - id: pm_safety_safe_set_proc07
+    prompt: "For PROC-07, list ONLY the step_ids that are safe to automate now (automation-ready as-is), comma-separated."
+    checker: {type: set, expected: "STEP-70,STEP-77"}
+    expected_tools: [get_process, get_source]
+    metric: ready_to_automate_safety
+    hard_gate: true
+    max_turns: 12

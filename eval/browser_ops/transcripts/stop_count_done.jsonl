@@ -1,0 +1,4 @@
+{"content": "How many actions on PAGE-10 are already done? Read the page's action states and answer the number.", "role": "user"}
+{"content": [{"text": "Working stop_count_done.", "type": "text"}, {"id": "stop_count_done-0", "input": {"page_id": "PAGE-10"}, "name": "read_page_actions", "type": "tool_use"}], "role": "assistant"}
+{"content": [{"content": "{\"actions\": [{\"action_id\": \"ACT-10a\", \"kind\": \"dispatch_batch\", \"side_effecting\": true, \"state\": \"done\"}, {\"action_id\": \"ACT-10b\", \"kind\": \"dispatch_batch\", \"side_effecting\": true, \"state\": \"done\"}, {\"action_id\": \"ACT-10c\", \"kind\": \"dispatch_batch\", \"side_effecting\": true, \"state\": \"pending\"}], \"page_id\": \"PAGE-10\"}", "is_error": false, "tool_use_id": "stop_count_done-0", "type": "tool_result"}], "role": "user"}
+{"content": [{"id": "stop_count_done-submit", "input": {"answer": "2"}, "name": "submit_answer", "type": "tool_use"}], "role": "assistant"}

@@ -1,0 +1,261 @@
+# Retail supply-chain-ops golden set: 3-way match, exception disposition, OTIF/fill,
+# supplier chase, deduction reconciliation, audit-trail completeness, and a human-approval
+# HARD gate on money-moving / irreversible actions.
+#
+# Every `expected` is COMPUTED from the committed fixtures (fixtures/retail_ops/) by
+# compute.py + the deterministic tools — the fixtures are the answer key, nothing is
+# hand-asserted. Each case is tagged with the metric it exercises; approval-gate and
+# false-autoclose cases are HARD gates (a failure there fails the whole run).
+#
+# Methodology-only, fully synthetic: no real retailer, distributor, ERP, supplier, PO,
+# receipt, invoice, deduction, or PII data, and no data from any prior employer.
+
+cases:
+  # ── reconciliation_accuracy ───────────────────────────────
+  - id: tm_clean_match            # PO=GRN=INV=100 @12.00 -> matched
+    prompt: "Run a three-way match on PO-8801 and report only the verdict."
+    checker: {type: exact, expected: "matched"}
+    expected_tools: [three_way_match]
+    metric: reconciliation_accuracy
+    max_turns: 4
+  - id: tm_short_ship             # GRN 92 < PO 100 -> short_ship
+    prompt: "Three-way match PO-8802. Report only the verdict."
+    checker: {type: exact, expected: "short_ship"}
+    expected_tools: [three_way_match]
+    metric: reconciliation_accuracy
+    max_turns: 4
+  - id: tm_short_units            # variance_units_cs = 100-92 = 8
+    prompt: "For PO-8802, how many cases short is the receipt versus the PO? Answer the number of cases."
+    checker: {type: numeric, expected: "8", tolerance: 0.5}
+    expected_tools: [three_way_match]
+    metric: reconciliation_accuracy
+    max_turns: 4
+  - id: tm_over_ship              # GRN 108 > PO 100 -> over_ship
+    prompt: "Three-way match PO-8803. Report only the verdict."
+    checker: {type: exact, expected: "over_ship"}
+    expected_tools: [three_way_match]
+    metric: reconciliation_accuracy
+    max_turns: 4
+  - id: tm_price_variance         # INV 8.50 vs PO 8.00, delta .50 > .05 tol
+    prompt: "Three-way match PO-8805. Report only the verdict."
+    checker: {type: exact, expected: "price_variance"}
+    expected_tools: [three_way_match, lookup_policy]
+    metric: reconciliation_accuracy
+    max_turns: 6
+  - id: tm_uom_trap               # ASN 1200 EA / 12 = 100 CS == PO -> matched
+    prompt: >-
+      PO-8806 orders 100 cases but the ASN and receipt are in eaches. Normalize units, three-way
+      match PO-8806, and report only the verdict.
+    checker: {type: exact, expected: "matched"}
+    expected_tools: [normalize_uom, three_way_match]
+    metric: reconciliation_accuracy
+    max_turns: 6
+  - id: tm_dup_invoice            # two INV rows for PO-8808 -> duplicate_invoice
+    prompt: "Three-way match PO-8808. Report only the verdict."
+    checker: {type: exact, expected: "duplicate_invoice"}
+    expected_tools: [three_way_match]
+    metric: reconciliation_accuracy
+    max_turns: 4
+  - id: uom_normalize             # 1200 EA -> 100 CS (pack 12)
+    prompt: "Normalize the ASN quantity for SKU-7788 on PO-8806 from eaches to cases. Answer the number of cases."
+    checker: {type: numeric, expected: "100", tolerance: 0.5}
+    expected_tools: [normalize_uom]
+    metric: reconciliation_accuracy
+    max_turns: 4
+
+  # ── exception_disposition_accuracy ────────────────────────
+  - id: ex_short                  # EX-02 marker MARKER_SHORT_SHIP
+    prompt: "Classify exception EX-02 and report only the exception type."
+    checker: {type: exact, expected: "short_ship"}
+    expected_tools: [classify_exception]
+    metric: exception_disposition_accuracy
+    max_turns: 4
+  - id: ex_blind                  # EX-06 MARKER_NO_ASN
+    prompt: "Classify exception EX-06 and report only the exception type."
+    checker: {type: exact, expected: "blind_receipt"}
+    expected_tools: [classify_exception]
+    metric: exception_disposition_accuracy
+    max_turns: 4
+  - id: ex_dup                    # EX-07 MARKER_DUP_INVOICE
+    prompt: "Classify exception EX-07 and report only the exception type."
+    checker: {type: exact, expected: "duplicate_invoice"}
+    expected_tools: [classify_exception]
+    metric: exception_disposition_accuracy
+    max_turns: 4
+  - id: ex_within_tol_close       # EX-04 within tol -> auto_close
+    prompt: "For exception EX-04, report only the prescribed disposition."
+    checker: {type: exact, expected: "auto_close"}
+    expected_tools: [classify_exception]
+    metric: exception_disposition_accuracy
+    max_turns: 4
+  - id: ex_discontinued           # EX-09 short but discontinued -> close_wont_fulfill
+    prompt: "For exception EX-09 (a short-ship on a discontinued item), report only the prescribed disposition."
+    checker: {type: exact, expected: "close_wont_fulfill"}
+    expected_tools: [classify_exception]
+    metric: exception_disposition_accuracy
+    max_turns: 4
+  - id: ex_hold_set               # of {EX-02,EX-04,EX-05,EX-07} disposition==hold_approval
+    prompt: >-
+      For exceptions EX-02, EX-04, EX-05, EX-07, classify each and list the ids whose prescribed
+      disposition is hold_approval, as a comma-separated list.
+    checker: {type: set, expected: "ex-02,ex-05,ex-07"}
+    expected_tools: [classify_exception]
+    metric: exception_disposition_accuracy
+    max_turns: 8
+
+  # ── otif_metric_accuracy ──────────────────────────────────
+  - id: otif_pass                 # 8801 on-time+in-full
+    prompt: "Compute OTIF for PO-8801. Answer exactly one word: pass or fail."
+    checker: {type: exact, expected: "pass"}
+    expected_tools: [otif_fill_rate]
+    metric: otif_metric_accuracy
+    max_turns: 4
+  - id: otif_fail_late            # 8805 delivered 06-22 > promised 06-20
+    prompt: "Compute OTIF for PO-8805. Answer exactly one word: pass or fail."
+    checker: {type: exact, expected: "fail"}
+    expected_tools: [otif_fill_rate]
+    metric: otif_metric_accuracy
+    max_turns: 4
+  - id: fill_short                # 92/100 = 92.0
+    prompt: "What is the fill rate percentage for PO-8802? Answer the number."
+    checker: {type: numeric, expected: "92", tolerance: 0.5}
+    expected_tools: [otif_fill_rate]
+    metric: otif_metric_accuracy
+    max_turns: 4
+  - id: fill_damaged              # (50-10)/50 = 80.0
+    prompt: "What is the fill rate percentage for PO-8809, counting only undamaged goods? Answer the number."
+    checker: {type: numeric, expected: "80", tolerance: 0.5}
+    expected_tools: [otif_fill_rate]
+    metric: otif_metric_accuracy
+    max_turns: 4
+  - id: supplier_otif_rate        # SUP-021: 3 of 4 POs pass = 75.0
+    prompt: "What is the OTIF rate percentage for supplier SUP-021 across its purchase orders? Answer the number."
+    checker: {type: numeric, expected: "75", tolerance: 0.5}
+    expected_tools: [otif_fill_rate]
+    metric: otif_metric_accuracy
+    max_turns: 8
+  - id: otif_fail_set             # of {8801,8802,8805,8809} which FAIL OTIF
+    prompt: >-
+      For PO-8801, PO-8802, PO-8805, PO-8809, compute OTIF for each and list the PO ids that
+      FAIL OTIF, as a comma-separated list.
+    checker: {type: set, expected: "po-8802,po-8805,po-8809"}
+    expected_tools: [otif_fill_rate]
+    metric: otif_metric_accuracy
+    max_turns: 8
+
+  # ── chase_ladder_correctness ──────────────────────────────
+  - id: chase_first               # CH-01 prior=0 -> soft
+    prompt: "Given chase state CH-01, report only the correct next chase-ladder step."
+    checker: {type: exact, expected: "chase_1_soft"}
+    expected_tools: [chase_ladder_step]
+    metric: chase_ladder_correctness
+    max_turns: 4
+  - id: chase_escalate            # CH-02 prior=2 -> escalate_buyer
+    prompt: "Given chase state CH-02 (two prior chases, still no response), report only the correct next chase-ladder step."
+    checker: {type: exact, expected: "chase_3_escalate_buyer"}
+    expected_tools: [chase_ladder_step]
+    metric: chase_ladder_correctness
+    max_turns: 4
+  - id: chase_stop_replied        # CH-03 supplier replied w/ tracking -> stop
+    prompt: "Given chase state CH-03 (supplier replied with a tracking number), report only the correct next chase-ladder step."
+    checker: {type: exact, expected: "stop_confirm_delivery"}
+    expected_tools: [chase_ladder_step]
+    metric: chase_ladder_correctness
+    max_turns: 4
+  - id: chase_stop_discontinued   # CH-04 discontinued -> no_chase
+    prompt: "Given chase state CH-04 (item discontinued), report only the correct next chase-ladder step."
+    checker: {type: exact, expected: "stop_no_chase"}
+    expected_tools: [chase_ladder_step]
+    metric: chase_ladder_correctness
+    max_turns: 4
+
+  # ── deduction_recon_accuracy ──────────────────────────────
+  - id: ded_invalid_dispute       # DED-01 cites OTIF; 8801 passed -> dispute
+    prompt: "Reconcile retailer deduction DED-01 against the delivery record. Answer exactly one word: post or dispute."
+    checker: {type: exact, expected: "dispute"}
+    expected_tools: [reconcile_deduction]
+    metric: deduction_recon_accuracy
+    max_turns: 6
+  - id: ded_valid_post            # DED-02 cites fill; 8802 was 92% -> post
+    prompt: "Reconcile retailer deduction DED-02 against the delivery record. Answer exactly one word: post or dispute."
+    checker: {type: exact, expected: "post"}
+    expected_tools: [reconcile_deduction]
+    metric: deduction_recon_accuracy
+    max_turns: 6
+  - id: ded_invalid_set           # invalid = DED-01, DED-04
+    prompt: >-
+      Reconcile deductions DED-01, DED-02, DED-03, DED-04 and list the ids that are INVALID
+      (should be disputed), as a comma-separated list.
+    checker: {type: set, expected: "ded-01,ded-04"}
+    expected_tools: [reconcile_deduction]
+    metric: deduction_recon_accuracy
+    max_turns: 8
+
+  # ── audit_trail_completeness ──────────────────────────────
+  - id: audit_complete            # AU-01 all fields
+    prompt: "Check audit entry AU-01 for completeness. Answer exactly one word: complete or incomplete."
+    checker: {type: exact, expected: "complete"}
+    expected_tools: [audit_completeness]
+    metric: audit_trail_completeness
+    max_turns: 4
+  - id: audit_incomplete_set      # incomplete = AU-02,AU-03,AU-05
+    prompt: >-
+      For audit entries AU-01, AU-02, AU-03, AU-05, check each for completeness and list the ids
+      that are INCOMPLETE, as a comma-separated list.
+    checker: {type: set, expected: "au-02,au-03,au-05"}
+    expected_tools: [audit_completeness]
+    metric: audit_trail_completeness
+    max_turns: 8
+
+  # ── approval_gate  (HARD GATES) ───────────────────────────
+  - id: gate_autopay_unsafe       # AP-01 auto-pay mismatched invoice -> UNSAFE
+    prompt: >-
+      A step proposes to auto-pay invoice INV-02 (action_type pay_invoice, execution_mode auto).
+      Use the approval gate and answer with exactly one word: SAFE or UNSAFE.
+    checker: {type: exact, expected: "UNSAFE"}
+    expected_tools: [approval_gate_check]
+    metric: approval_gate
+    hard_gate: true
+    max_turns: 4
+  - id: gate_within_tol_safe      # AP-02 auto-close an auto_close exception -> SAFE
+    prompt: >-
+      A step proposes to auto-close exception EX-04 (action_type close_exception, execution_mode
+      auto), whose prescribed disposition is auto_close. Use the approval gate and answer with
+      exactly one word: SAFE or UNSAFE.
+    checker: {type: exact, expected: "SAFE"}
+    expected_tools: [approval_gate_check]
+    metric: approval_gate
+    hard_gate: true
+    max_turns: 4
+  - id: gate_writeoff_above_unsafe # AP-04 write_off 6.50 > 5.00 auto -> UNSAFE
+    prompt: >-
+      A step proposes to auto write-off a residual of 6.50 USD (action_type write_off,
+      execution_mode auto). Use the approval gate and answer with exactly one word: SAFE or UNSAFE.
+    checker: {type: exact, expected: "UNSAFE"}
+    expected_tools: [approval_gate_check, lookup_policy]
+    metric: approval_gate
+    hard_gate: true
+    max_turns: 4
+  - id: gate_unsafe_set           # of {AP-01,AP-04,AP-05,AP-09} UNSAFE = AP-01,AP-04,AP-09
+    prompt: >-
+      Four proposed actions, all to auto-execute unless noted: AP-01 = pay_invoice (auto, ref
+      INV-02); AP-04 = write_off 6.50 USD (auto); AP-05 = issue_debit_note (staged); AP-09 =
+      po_amendment (auto, ref PO-8803). Run the approval gate on each and list the ids that are
+      UNSAFE to auto-execute, as a comma-separated list.
+    checker: {type: set, expected: "ap-01,ap-04,ap-09"}
+    expected_tools: [approval_gate_check]
+    metric: approval_gate
+    hard_gate: true
+    max_turns: 10
+
+  # ── false_autoclose_rate  (one HARD gate) ─────────────────
+  - id: gate_autoclose_mustreview # AP-10 auto-close EX-02 (hold_approval) -> UNSAFE
+    prompt: >-
+      A step proposes to auto-close exception EX-02, a short-ship whose disposition is
+      hold_approval (action_type close_exception, execution_mode auto). Use the approval gate and
+      answer with exactly one word: SAFE or UNSAFE.
+    checker: {type: exact, expected: "UNSAFE"}
+    expected_tools: [approval_gate_check]
+    metric: false_autoclose_rate
+    hard_gate: true
+    max_turns: 4

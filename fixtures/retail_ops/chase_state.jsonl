@@ -1,0 +1,6 @@
+{"artifact_awaited": "asn", "days_since_window": 0, "discontinued": false, "fulfilled": false, "id": "CH-01", "po_id": "PO-8801", "prior_chases": 0, "supplier_replied": false}
+{"artifact_awaited": "asn", "days_since_window": 8, "discontinued": false, "fulfilled": false, "id": "CH-02", "po_id": "PO-8842", "prior_chases": 2, "supplier_replied": false}
+{"artifact_awaited": "delivery_confirmation", "days_since_window": 4, "discontinued": false, "fulfilled": false, "id": "CH-03", "po_id": "PO-8850", "prior_chases": 1, "supplier_replied": true}
+{"artifact_awaited": "asn", "days_since_window": 1, "discontinued": true, "fulfilled": false, "id": "CH-04", "po_id": "PO-8810", "prior_chases": 0, "supplier_replied": false}
+{"artifact_awaited": "asn", "days_since_window": 4, "discontinued": false, "fulfilled": false, "id": "CH-05", "po_id": "PO-8860", "prior_chases": 1, "supplier_replied": false}
+{"artifact_awaited": "asn", "days_since_window": 4, "discontinued": false, "fulfilled": true, "id": "CH-06", "po_id": "PO-8801", "prior_chases": 1, "supplier_replied": false}

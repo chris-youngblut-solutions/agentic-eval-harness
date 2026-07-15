@@ -1,0 +1,4 @@
+{"content": "Given chase state CH-03 (supplier replied with a tracking number), report only the correct next chase-ladder step.", "role": "user"}
+{"content": [{"text": "Working chase_stop_replied.", "type": "text"}, {"id": "chase_stop_replied-0", "input": {"chase_id": "CH-03"}, "name": "chase_ladder_step", "type": "tool_use"}], "role": "assistant"}
+{"content": [{"content": "{\"chase_id\": \"CH-03\", \"next_step\": \"stop_confirm_delivery\"}", "is_error": false, "tool_use_id": "chase_stop_replied-0", "type": "tool_result"}], "role": "user"}
+{"content": [{"id": "chase_stop_replied-submit", "input": {"answer": "stop_confirm_delivery"}, "name": "submit_answer", "type": "tool_use"}], "role": "assistant"}

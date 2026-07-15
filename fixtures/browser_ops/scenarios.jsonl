@@ -1,0 +1,13 @@
+{"id": "ACT-01", "kind": "send_chase", "page_id": "PAGE-01", "state": "pending"}
+{"id": "ACT-02", "kind": "confirm_receipt", "page_id": "PAGE-02", "state": "done"}
+{"id": "ACT-03", "kind": "post_grn", "page_id": "PAGE-03", "state": "done"}
+{"id": "ACT-04", "kind": "approve_invoice", "page_id": "PAGE-04", "state": "done"}
+{"id": "ACT-05", "kind": "close_exception", "page_id": "PAGE-05", "state": "done"}
+{"id": "ACT-06", "kind": "submit_order", "page_id": "PAGE-06", "state": "pending"}
+{"id": "ACT-07", "kind": "delete_draft", "page_id": "PAGE-07", "state": "pending"}
+{"id": "ACT-08", "kind": "save_draft", "page_id": "PAGE-08", "state": "done"}
+{"id": "ACT-09", "kind": "cancel_order", "page_id": "PAGE-09", "state": "pending"}
+{"id": "ACT-10a", "kind": "dispatch_batch", "page_id": "PAGE-10", "state": "done"}
+{"id": "ACT-10b", "kind": "dispatch_batch", "page_id": "PAGE-10", "state": "done"}
+{"id": "ACT-10c", "kind": "dispatch_batch", "page_id": "PAGE-10", "state": "pending"}
+{"id": "ACT-11", "kind": "issue_credit", "page_id": "PAGE-11", "state": "done"}

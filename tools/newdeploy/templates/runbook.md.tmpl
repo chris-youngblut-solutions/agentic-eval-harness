@@ -1,0 +1,93 @@
+# Go-live → expansion runbook — {{CUSTOMER}}
+
+- **Deployment slug:** `{{SLUG}}`
+- **Customer:** {{CUSTOMER}}
+- **Stamped by:** {{GENERATOR}} (deterministic — every date below is a `____-__-__` fill-in, nothing is baked from a clock)
+- **Kickoff date:** ____-__-__   **Target go-live:** ____-__-__
+- **FDE owner:** ____________   **Economic buyer:** ____________   **Ops owner:** ____________
+
+This runbook exists so deployment #2 is faster than deployment #1: `{{GENERATOR}}` has
+already seeded every artifact each phase consumes, so the FDE authors business logic, not
+scaffolding. Two token layers appear in this kit — do not confuse them:
+
+- **Scaffolding tokens** (double curly braces in the templates) were substituted at stamp time (slug, customer, wired systems). None remain.
+- **Authoring tokens** (double angle brackets, `<<LIKE_THIS>>`) are the business-value placeholders **you** fill inside the exception board and the ROI cost deck. They are the deliverable's editable surface — leave them as tokens until you replace them with the customer's real numbers.
+
+## Wired systems (already stamped into `connector-config.env.example` and `.mcp.json`)
+
+| Server | Env var | This deployment |
+|---|---|---|
+| `retail-erp-mcp` | `RETAIL_ERP_SYSTEM` | `{{ERP_SYSTEM}}` |
+| `retail-supplier-mcp` | `RETAIL_SUPPLIER_SYSTEM` | `{{SUPPLIER_SYSTEM}}` |
+| `retail-email-mcp` | `RETAIL_EMAIL_SYSTEM` | `{{EMAIL_SYSTEM}}` |
+| `retail-sheets-mcp` | `RETAIL_SHEETS_SYSTEM` | `{{SHEETS_SYSTEM}}` |
+
+Approval token var (identical on all four): **`{{APPROVAL_TOKEN_VAR}}`** — operator-injected,
+never known to the agent; **absent ⇒ every approval fails closed (refused).**
+
+---
+
+## Phase 0 — Scope & data access
+- Name the **economic buyer** and the **ops owner**. No deployment without both.
+- Inventory the systems: which ERP / supplier-net / mail / sheets dialect the customer runs
+  → this sets the four `*_SYSTEM` values (already stamped above; re-stamp with `{{GENERATOR}} {{SLUG}} --erp … --supplier …` if wrong).
+- Secure data access **and consent**. Domain data is family-held / off-device — the constraint is access/consent, not ML.
+- **Gate:** signed scope + read access to all four system classes; each SaaS dialect chosen and validated against its allowlist.
+
+## Phase 1 — Deployment stamp  *(this artifact)*
+- `{{GENERATOR}} {{SLUG}}` copied the exception board + ROI report verbatim, stamped `.mcp.json`
+  with the chosen dialects, and seeded `roi-baseline.json` + `roi/ops_baseline.jsonl` + `roi/ops_automated.jsonl`.
+- Inject `{{APPROVAL_TOKEN_VAR}}` into the **host env only** (`.local/connector-config.env`), never VCS.
+- **Gate:** `just check` / `just smoke` green in the kit (staged-write proof — corpus fingerprint byte-identical before/after approve+execute); `active_system()` reports the intended dialect on all four servers; approvals **fail closed** with no token.
+
+## Phase 2 — Policy authoring  *(the FDE's core act)*
+- Open `exception-spec.inkspec.html`. Author tolerances, decision rules (condition → action →
+  terminal), exception paths and exceptions-of-exceptions, hand-to-human fallbacks, the chase
+  ladder, UOM, audit fields, and per-customer overrides. Replace every `<<TOKEN>>` with the
+  customer's real value.
+- Export `policy.json` into `fixtures/retail_ops/policy.json` (Strict = the ten loader keys;
+  Carry = the ten keys + `_exception_spec`, both load unchanged).
+- **Gate:** clean export — no *BLOCKS EXPORT* marks; Strict-mode export shape-identical to the
+  committed fixture; `frozenset(gated_actions) == rules.GATED_ACTIONS` (the frozen 11 —
+  `pay_invoice, issue_debit_note, issue_credit_note, post_deduction, accept_chargeback,
+  po_amendment, po_cancellation, accept_over_ship, authorize_return, commit_supplier_payment,
+  override_scorecard`; `write_off` / `close_exception` must **not** be in the list); each of
+  the four hand-to-human classes has a fallback.
+
+## Phase 3 — Baseline & shadow-run
+- Fill `roi-baseline.json` with **re-sourced** customer scalars (all eleven `params` + two
+  `targets`; only `.value` is read by `roi.py`).
+- Capture 6–8 weeks of real BEFORE data into `roi/ops_baseline.jsonl` (per-week `MARKER_WK##`),
+  replacing the seeded rows.
+- Run the agent in read/shadow — staged writes only, nothing approved.
+- **Gate:** shadow disposition matches human disposition within the agreed error bar; false-exception rate under threshold; ROI baseline signed by the buyer.
+
+## Phase 4 — Gated go-live
+- Enable staged writes with a human `approve()` in the loop. Humans hold `{{APPROVAL_TOKEN_VAR}}`
+  and decide run-vs-wait per pending approval.
+- **Gate:** every mutation traverses stage → human-approve; audit record complete over
+  `audit_required_fields`; **zero auto-execution** (structural — the agent cannot hold the token).
+
+## Phase 5 — Value proof
+- Fill `roi/ops_automated.jsonl` with real AFTER data (true-vs-false labeled). Run the ROI
+  harness; present the honest waterfall in `roi/roi-report.inkspec.html`:
+  `correct_auto_rate` beside raw `auto_resolution_rate`; net-touches-saved **after** false-positive
+  docking (`A_correct×t_manual − A_false×t_rework − F_detect×t_review`); deduction $ recovered;
+  OTIF lift × `otif_attribution_alpha`; weeks-to-breakeven vs. `targets`.
+- **Gate:** computed net value positive and reconciled to the buyer's ledger; time-to-value within the committed window.
+
+## Phase 6 — Expansion  *(land-and-expand)*
+Widen scope along the cheapest axis first:
+1. more suppliers / SKUs on the same dialects,
+2. new system dialect (flip a `*_SYSTEM` value — no code change),
+3. additional exception classes in the board (the `_exception_spec` carry layer feeds a future data-driven `compute.py`),
+4. additional sites / business units → **re-stamp with a new slug** (`{{GENERATOR}} <new-slug>`).
+- **Gate per increment:** re-run Phases 2–5 on the delta; drift-guard and fingerprint invariants stay green; each expansion re-proves ROI before the next.
+
+---
+
+## What this kit does NOT do (the deliberate manual step)
+`{{GENERATOR}}` stamped the **blank** board and the **seed** decks. It did **not** author the
+`<<TOKEN>>` business values, did **not** run the export, and did **not** inject
+`{{APPROVAL_TOKEN_VAR}}`. Those are the FDE's supervised, per-customer acts (Phases 2–4) — the
+CLI never authors business logic or holds a live credential.

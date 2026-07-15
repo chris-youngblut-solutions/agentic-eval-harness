@@ -16,14 +16,25 @@ deterministic tools, plus the eval harness that scores it — across pluggable
 domain packs selected with `--domain`. Mechanical checkers
 (numeric/exact/regex/set-F1), partial-credit rubric, per-metric rollups, hard
 gates, scorecard history + regression diff, and a record/replay backend seam so
-CI runs the full path without an API key. Four domains ship: `generic` (22 cases),
+CI runs the full path without an API key. Eleven domains ship: `generic` (22 cases),
 `industrial` (CAN/ISOBUS edge decode + diagnostics, 17 cases; public-standard
 decode ground-truth from opendbc-ag over a synthetic corpus), `trust_safety`
 (content-enforcement, 18 cases; methodology-only — a fully synthetic, generic policy
 with abstract MARKER tokens and benign filler, no real policy or harmful content), and
 `data_semantic` (NL→metric/SQL accuracy + metric-correctness, 20 cases; methodology-only
 — a fully synthetic, generic semantic layer / metric catalog over a tiny star schema, no
-real data model or data). It does NOT use an agent framework, LLM judges, or online
+real data model or data); the FDE-dimension packs `customer_support` (18 cases),
+`fintech_compliance` (19), and `routing` (16). Four retail/FDE domains join them:
+`retail_ops` (buyer-side
+retail/CPG supply-chain ops — 3-way match, exception disposition, OTIF, chase ladder,
+deduction reconciliation, and a deterministic human-approval hard gate on money-moving
+actions; 34 cases), `approval_audit` (red-team of that gate — tool-result injection lures
+tempting auto-execution; 24 cases), `process_mapping` (messy multi-source process
+description → structured workflow graph + fix-before-automate flags; 25 cases), and
+`browser_ops` (browser-automation reliability — idempotency, stop-conditions, retry
+safety against a mock portal state machine; 24 cases). All four are fully synthetic
+(MARKER-token corpora, PROVENANCE.md per fixture set).
+It does NOT use an agent framework, LLM judges, or online
 tools — see docs/design.md for why.
 
 ## Build / test / lint
@@ -72,6 +83,11 @@ Update when the layout changes.
   with `uv run python -m agentic_eval.domains.industrial.generate`; for `trust_safety`,
   `uv run python -m agentic_eval.domains.trust_safety.generate`.
 - `eval/<name>/` — cases.yaml, transcripts/ (recorded conversation: task + assistant turns + tool_result outputs), history/ (scorecards).
+- `tools/` — FDE deployment tools over the retail corpus: `exception-spec-dsl/`
+  (single-file spec board that round-trips to the retail_ops `policy.json`), `roi/`
+  (honest-ROI harness — false positives dock the score), `newdeploy/` (per-customer
+  deployment-kit scaffolder), `supplier-scorecard/` (per-supplier grade rollup +
+  single-file dashboard). Each has its own tests; `deployments/` output is gitignored.
 - `tests/` — scripted-backend tests; no network, no key. Keep it that way.
 - `.github/workflows/` — CI; SHA-pinned actions.
 

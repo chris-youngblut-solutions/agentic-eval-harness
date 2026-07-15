@@ -1,0 +1,4 @@
+{"content": "What is the fill rate percentage for PO-8802? Answer the number.", "role": "user"}
+{"content": [{"text": "Working fill_short.", "type": "text"}, {"id": "fill_short-0", "input": {"id": "PO-8802", "scope": "po"}, "name": "otif_fill_rate", "type": "tool_use"}], "role": "assistant"}
+{"content": [{"content": "{\"fill_rate\": 92.0, \"in_full\": false, \"on_time\": true, \"otif\": \"fail\"}", "is_error": false, "tool_use_id": "fill_short-0", "type": "tool_result"}], "role": "user"}
+{"content": [{"id": "fill_short-submit", "input": {"answer": "92"}, "name": "submit_answer", "type": "tool_use"}], "role": "assistant"}

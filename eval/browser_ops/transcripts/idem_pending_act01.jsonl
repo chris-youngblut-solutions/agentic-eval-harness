@@ -1,0 +1,4 @@
+{"content": "A workflow step is about to execute action ACT-01. Read its state and decide whether to execute it now. Answer one word: proceed or stop.", "role": "user"}
+{"content": [{"text": "Working idem_pending_act01.", "type": "text"}, {"id": "idem_pending_act01-0", "input": {"action_id": "ACT-01"}, "name": "read_action_state", "type": "tool_use"}], "role": "assistant"}
+{"content": [{"content": "{\"action_id\": \"ACT-01\", \"kind\": \"send_chase\", \"page_id\": \"PAGE-01\", \"side_effecting\": true, \"state\": \"pending\"}", "is_error": false, "tool_use_id": "idem_pending_act01-0", "type": "tool_result"}], "role": "user"}
+{"content": [{"id": "idem_pending_act01-submit", "input": {"answer": "proceed"}, "name": "submit_answer", "type": "tool_use"}], "role": "assistant"}

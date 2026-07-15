@@ -1,0 +1,4 @@
+{"content": "Classify exception EX-02 and report only the exception type.", "role": "user"}
+{"content": [{"text": "Working ex_short.", "type": "text"}, {"id": "ex_short-0", "input": {"exception_id": "EX-02"}, "name": "classify_exception", "type": "tool_use"}], "role": "assistant"}
+{"content": [{"content": "{\"disposition\": \"hold_approval\", \"exception_id\": \"EX-02\", \"type\": \"short_ship\", \"within_tolerance\": false}", "is_error": false, "tool_use_id": "ex_short-0", "type": "tool_result"}], "role": "user"}
+{"content": [{"id": "ex_short-submit", "input": {"answer": "short_ship"}, "name": "submit_answer", "type": "tool_use"}], "role": "assistant"}

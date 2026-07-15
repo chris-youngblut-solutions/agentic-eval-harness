@@ -1,0 +1,10 @@
+{"condition": "good", "id": "GRN-01", "po_id": "PO-8801", "qty_damaged": 0, "qty_received": 100, "received_date": "2026-06-09", "sku": "SKU-4471", "uom": "CS"}
+{"condition": "good", "id": "GRN-02", "po_id": "PO-8802", "qty_damaged": 0, "qty_received": 92, "received_date": "2026-06-12", "sku": "SKU-5502", "uom": "CS"}
+{"condition": "good", "id": "GRN-03", "po_id": "PO-8803", "qty_damaged": 0, "qty_received": 108, "received_date": "2026-06-14", "sku": "SKU-6613", "uom": "CS"}
+{"condition": "good", "id": "GRN-04", "po_id": "PO-8804", "qty_damaged": 0, "qty_received": 200, "received_date": "2026-06-18", "sku": "SKU-4471", "uom": "CS"}
+{"condition": "good", "id": "GRN-05", "po_id": "PO-8805", "qty_damaged": 0, "qty_received": 150, "received_date": "2026-06-22", "sku": "SKU-5502", "uom": "CS"}
+{"condition": "good", "id": "GRN-06", "po_id": "PO-8806", "qty_damaged": 0, "qty_received": 1200, "received_date": "2026-06-24", "sku": "SKU-7788", "uom": "EA"}
+{"condition": "good", "id": "GRN-07", "po_id": "PO-8807", "qty_damaged": 0, "qty_received": 100, "received_date": "2026-06-27", "sku": "SKU-6613", "uom": "CS"}
+{"condition": "good", "id": "GRN-08", "po_id": "PO-8808", "qty_damaged": 0, "qty_received": 100, "received_date": "2026-06-29", "sku": "SKU-4471", "uom": "CS"}
+{"condition": "partial_damage", "id": "GRN-09", "po_id": "PO-8809", "qty_damaged": 10, "qty_received": 50, "received_date": "2026-07-01", "sku": "SKU-5502", "uom": "CS"}
+{"condition": "good", "id": "GRN-10", "po_id": "PO-8810", "qty_damaged": 0, "qty_received": 60, "received_date": "2026-07-05", "sku": "SKU-7788", "uom": "CS"}

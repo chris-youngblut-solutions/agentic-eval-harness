@@ -1,0 +1,10 @@
+{"id": "INV-01", "invoice_date": "2026-06-11", "po_id": "PO-8801", "qty_billed": 100, "sku": "SKU-4471", "unit_price": 12.0, "uom": "CS"}
+{"id": "INV-02", "invoice_date": "2026-06-13", "po_id": "PO-8802", "qty_billed": 100, "sku": "SKU-5502", "unit_price": 8.0, "uom": "CS"}
+{"id": "INV-03", "invoice_date": "2026-06-15", "po_id": "PO-8803", "qty_billed": 108, "sku": "SKU-6613", "unit_price": 5.0, "uom": "CS"}
+{"id": "INV-04", "invoice_date": "2026-06-19", "po_id": "PO-8804", "qty_billed": 200, "sku": "SKU-4471", "unit_price": 12.03, "uom": "CS"}
+{"id": "INV-05", "invoice_date": "2026-06-23", "po_id": "PO-8805", "qty_billed": 150, "sku": "SKU-5502", "unit_price": 8.5, "uom": "CS"}
+{"id": "INV-06", "invoice_date": "2026-06-25", "po_id": "PO-8806", "qty_billed": 100, "sku": "SKU-7788", "unit_price": 10.0, "uom": "CS"}
+{"id": "INV-08a", "invoice_date": "2026-06-30", "po_id": "PO-8808", "qty_billed": 100, "sku": "SKU-4471", "unit_price": 12.0, "uom": "CS"}
+{"id": "INV-08b", "invoice_date": "2026-07-01", "po_id": "PO-8808", "qty_billed": 100, "sku": "SKU-4471", "unit_price": 12.0, "uom": "CS"}
+{"id": "INV-09", "invoice_date": "2026-07-02", "po_id": "PO-8809", "qty_billed": 50, "sku": "SKU-5502", "unit_price": 8.0, "uom": "CS"}
+{"id": "INV-10", "invoice_date": "2026-07-06", "po_id": "PO-8810", "qty_billed": 60, "sku": "SKU-7788", "unit_price": 10.0, "uom": "CS"}

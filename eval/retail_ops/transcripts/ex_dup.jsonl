@@ -1,0 +1,4 @@
+{"content": "Classify exception EX-07 and report only the exception type.", "role": "user"}
+{"content": [{"text": "Working ex_dup.", "type": "text"}, {"id": "ex_dup-0", "input": {"exception_id": "EX-07"}, "name": "classify_exception", "type": "tool_use"}], "role": "assistant"}
+{"content": [{"content": "{\"disposition\": \"hold_approval\", \"exception_id\": \"EX-07\", \"type\": \"duplicate_invoice\", \"within_tolerance\": false}", "is_error": false, "tool_use_id": "ex_dup-0", "type": "tool_result"}], "role": "user"}
+{"content": [{"id": "ex_dup-submit", "input": {"answer": "duplicate_invoice"}, "name": "submit_answer", "type": "tool_use"}], "role": "assistant"}

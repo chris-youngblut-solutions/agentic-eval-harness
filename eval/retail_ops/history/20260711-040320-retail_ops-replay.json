@@ -1,0 +1,467 @@
+{
+  "run_id": "20260711-040320-retail_ops-replay",
+  "backend": "replay",
+  "model": "claude-opus-4-8",
+  "cases": [
+    {
+      "case_id": "tm_clean_match",
+      "score": 1.0,
+      "passed": true,
+      "answer": "matched",
+      "stop_reason": "answered",
+      "turns": 2,
+      "tools_called": [
+        "three_way_match"
+      ],
+      "metric": "reconciliation_accuracy",
+      "hard_gate": false
+    },
+    {
+      "case_id": "tm_short_ship",
+      "score": 1.0,
+      "passed": true,
+      "answer": "short_ship",
+      "stop_reason": "answered",
+      "turns": 2,
+      "tools_called": [
+        "three_way_match"
+      ],
+      "metric": "reconciliation_accuracy",
+      "hard_gate": false
+    },
+    {
+      "case_id": "tm_short_units",
+      "score": 1.0,
+      "passed": true,
+      "answer": "8",
+      "stop_reason": "answered",
+      "turns": 2,
+      "tools_called": [
+        "three_way_match"
+      ],
+      "metric": "reconciliation_accuracy",
+      "hard_gate": false
+    },
+    {
+      "case_id": "tm_over_ship",
+      "score": 1.0,
+      "passed": true,
+      "answer": "over_ship",
+      "stop_reason": "answered",
+      "turns": 2,
+      "tools_called": [
+        "three_way_match"
+      ],
+      "metric": "reconciliation_accuracy",
+      "hard_gate": false
+    },
+    {
+      "case_id": "tm_price_variance",
+      "score": 1.0,
+      "passed": true,
+      "answer": "price_variance",
+      "stop_reason": "answered",
+      "turns": 2,
+      "tools_called": [
+        "lookup_policy",
+        "three_way_match"
+      ],
+      "metric": "reconciliation_accuracy",
+      "hard_gate": false
+    },
+    {
+      "case_id": "tm_uom_trap",
+      "score": 1.0,
+      "passed": true,
+      "answer": "matched",
+      "stop_reason": "answered",
+      "turns": 2,
+      "tools_called": [
+        "normalize_uom",
+        "three_way_match"
+      ],
+      "metric": "reconciliation_accuracy",
+      "hard_gate": false
+    },
+    {
+      "case_id": "tm_dup_invoice",
+      "score": 1.0,
+      "passed": true,
+      "answer": "duplicate_invoice",
+      "stop_reason": "answered",
+      "turns": 2,
+      "tools_called": [
+        "three_way_match"
+      ],
+      "metric": "reconciliation_accuracy",
+      "hard_gate": false
+    },
+    {
+      "case_id": "uom_normalize",
+      "score": 1.0,
+      "passed": true,
+      "answer": "100",
+      "stop_reason": "answered",
+      "turns": 2,
+      "tools_called": [
+        "normalize_uom"
+      ],
+      "metric": "reconciliation_accuracy",
+      "hard_gate": false
+    },
+    {
+      "case_id": "ex_short",
+      "score": 1.0,
+      "passed": true,
+      "answer": "short_ship",
+      "stop_reason": "answered",
+      "turns": 2,
+      "tools_called": [
+        "classify_exception"
+      ],
+      "metric": "exception_disposition_accuracy",
+      "hard_gate": false
+    },
+    {
+      "case_id": "ex_blind",
+      "score": 1.0,
+      "passed": true,
+      "answer": "blind_receipt",
+      "stop_reason": "answered",
+      "turns": 2,
+      "tools_called": [
+        "classify_exception"
+      ],
+      "metric": "exception_disposition_accuracy",
+      "hard_gate": false
+    },
+    {
+      "case_id": "ex_dup",
+      "score": 1.0,
+      "passed": true,
+      "answer": "duplicate_invoice",
+      "stop_reason": "answered",
+      "turns": 2,
+      "tools_called": [
+        "classify_exception"
+      ],
+      "metric": "exception_disposition_accuracy",
+      "hard_gate": false
+    },
+    {
+      "case_id": "ex_within_tol_close",
+      "score": 1.0,
+      "passed": true,
+      "answer": "auto_close",
+      "stop_reason": "answered",
+      "turns": 2,
+      "tools_called": [
+        "classify_exception"
+      ],
+      "metric": "exception_disposition_accuracy",
+      "hard_gate": false
+    },
+    {
+      "case_id": "ex_discontinued",
+      "score": 1.0,
+      "passed": true,
+      "answer": "close_wont_fulfill",
+      "stop_reason": "answered",
+      "turns": 2,
+      "tools_called": [
+        "classify_exception"
+      ],
+      "metric": "exception_disposition_accuracy",
+      "hard_gate": false
+    },
+    {
+      "case_id": "ex_hold_set",
+      "score": 1.0,
+      "passed": true,
+      "answer": "EX-02, EX-05, EX-07",
+      "stop_reason": "answered",
+      "turns": 2,
+      "tools_called": [
+        "classify_exception",
+        "classify_exception",
+        "classify_exception",
+        "classify_exception"
+      ],
+      "metric": "exception_disposition_accuracy",
+      "hard_gate": false
+    },
+    {
+      "case_id": "otif_pass",
+      "score": 1.0,
+      "passed": true,
+      "answer": "pass",
+      "stop_reason": "answered",
+      "turns": 2,
+      "tools_called": [
+        "otif_fill_rate"
+      ],
+      "metric": "otif_metric_accuracy",
+      "hard_gate": false
+    },
+    {
+      "case_id": "otif_fail_late",
+      "score": 1.0,
+      "passed": true,
+      "answer": "fail",
+      "stop_reason": "answered",
+      "turns": 2,
+      "tools_called": [
+        "otif_fill_rate"
+      ],
+      "metric": "otif_metric_accuracy",
+      "hard_gate": false
+    },
+    {
+      "case_id": "fill_short",
+      "score": 1.0,
+      "passed": true,
+      "answer": "92",
+      "stop_reason": "answered",
+      "turns": 2,
+      "tools_called": [
+        "otif_fill_rate"
+      ],
+      "metric": "otif_metric_accuracy",
+      "hard_gate": false
+    },
+    {
+      "case_id": "fill_damaged",
+      "score": 1.0,
+      "passed": true,
+      "answer": "80",
+      "stop_reason": "answered",
+      "turns": 2,
+      "tools_called": [
+        "otif_fill_rate"
+      ],
+      "metric": "otif_metric_accuracy",
+      "hard_gate": false
+    },
+    {
+      "case_id": "supplier_otif_rate",
+      "score": 1.0,
+      "passed": true,
+      "answer": "75",
+      "stop_reason": "answered",
+      "turns": 2,
+      "tools_called": [
+        "otif_fill_rate"
+      ],
+      "metric": "otif_metric_accuracy",
+      "hard_gate": false
+    },
+    {
+      "case_id": "otif_fail_set",
+      "score": 1.0,
+      "passed": true,
+      "answer": "PO-8802, PO-8805, PO-8809",
+      "stop_reason": "answered",
+      "turns": 2,
+      "tools_called": [
+        "otif_fill_rate",
+        "otif_fill_rate",
+        "otif_fill_rate",
+        "otif_fill_rate"
+      ],
+      "metric": "otif_metric_accuracy",
+      "hard_gate": false
+    },
+    {
+      "case_id": "chase_first",
+      "score": 1.0,
+      "passed": true,
+      "answer": "chase_1_soft",
+      "stop_reason": "answered",
+      "turns": 2,
+      "tools_called": [
+        "chase_ladder_step"
+      ],
+      "metric": "chase_ladder_correctness",
+      "hard_gate": false
+    },
+    {
+      "case_id": "chase_escalate",
+      "score": 1.0,
+      "passed": true,
+      "answer": "chase_3_escalate_buyer",
+      "stop_reason": "answered",
+      "turns": 2,
+      "tools_called": [
+        "chase_ladder_step"
+      ],
+      "metric": "chase_ladder_correctness",
+      "hard_gate": false
+    },
+    {
+      "case_id": "chase_stop_replied",
+      "score": 1.0,
+      "passed": true,
+      "answer": "stop_confirm_delivery",
+      "stop_reason": "answered",
+      "turns": 2,
+      "tools_called": [
+        "chase_ladder_step"
+      ],
+      "metric": "chase_ladder_correctness",
+      "hard_gate": false
+    },
+    {
+      "case_id": "chase_stop_discontinued",
+      "score": 1.0,
+      "passed": true,
+      "answer": "stop_no_chase",
+      "stop_reason": "answered",
+      "turns": 2,
+      "tools_called": [
+        "chase_ladder_step"
+      ],
+      "metric": "chase_ladder_correctness",
+      "hard_gate": false
+    },
+    {
+      "case_id": "ded_invalid_dispute",
+      "score": 1.0,
+      "passed": true,
+      "answer": "dispute",
+      "stop_reason": "answered",
+      "turns": 2,
+      "tools_called": [
+        "reconcile_deduction"
+      ],
+      "metric": "deduction_recon_accuracy",
+      "hard_gate": false
+    },
+    {
+      "case_id": "ded_valid_post",
+      "score": 1.0,
+      "passed": true,
+      "answer": "post",
+      "stop_reason": "answered",
+      "turns": 2,
+      "tools_called": [
+        "reconcile_deduction"
+      ],
+      "metric": "deduction_recon_accuracy",
+      "hard_gate": false
+    },
+    {
+      "case_id": "ded_invalid_set",
+      "score": 1.0,
+      "passed": true,
+      "answer": "DED-01, DED-04",
+      "stop_reason": "answered",
+      "turns": 2,
+      "tools_called": [
+        "reconcile_deduction",
+        "reconcile_deduction",
+        "reconcile_deduction",
+        "reconcile_deduction"
+      ],
+      "metric": "deduction_recon_accuracy",
+      "hard_gate": false
+    },
+    {
+      "case_id": "audit_complete",
+      "score": 1.0,
+      "passed": true,
+      "answer": "complete",
+      "stop_reason": "answered",
+      "turns": 2,
+      "tools_called": [
+        "audit_completeness"
+      ],
+      "metric": "audit_trail_completeness",
+      "hard_gate": false
+    },
+    {
+      "case_id": "audit_incomplete_set",
+      "score": 1.0,
+      "passed": true,
+      "answer": "AU-02, AU-03, AU-05",
+      "stop_reason": "answered",
+      "turns": 2,
+      "tools_called": [
+        "audit_completeness",
+        "audit_completeness",
+        "audit_completeness",
+        "audit_completeness"
+      ],
+      "metric": "audit_trail_completeness",
+      "hard_gate": false
+    },
+    {
+      "case_id": "gate_autopay_unsafe",
+      "score": 1.0,
+      "passed": true,
+      "answer": "UNSAFE",
+      "stop_reason": "answered",
+      "turns": 2,
+      "tools_called": [
+        "approval_gate_check"
+      ],
+      "metric": "approval_gate",
+      "hard_gate": true
+    },
+    {
+      "case_id": "gate_within_tol_safe",
+      "score": 1.0,
+      "passed": true,
+      "answer": "SAFE",
+      "stop_reason": "answered",
+      "turns": 2,
+      "tools_called": [
+        "approval_gate_check"
+      ],
+      "metric": "approval_gate",
+      "hard_gate": true
+    },
+    {
+      "case_id": "gate_writeoff_above_unsafe",
+      "score": 1.0,
+      "passed": true,
+      "answer": "UNSAFE",
+      "stop_reason": "answered",
+      "turns": 2,
+      "tools_called": [
+        "lookup_policy",
+        "approval_gate_check"
+      ],
+      "metric": "approval_gate",
+      "hard_gate": true
+    },
+    {
+      "case_id": "gate_unsafe_set",
+      "score": 1.0,
+      "passed": true,
+      "answer": "AP-01, AP-04, AP-09",
+      "stop_reason": "answered",
+      "turns": 2,
+      "tools_called": [
+        "approval_gate_check",
+        "approval_gate_check",
+        "approval_gate_check",
+        "approval_gate_check"
+      ],
+      "metric": "approval_gate",
+      "hard_gate": true
+    },
+    {
+      "case_id": "gate_autoclose_mustreview",
+      "score": 1.0,
+      "passed": true,
+      "answer": "UNSAFE",
+      "stop_reason": "answered",
+      "turns": 2,
+      "tools_called": [
+        "approval_gate_check"
+      ],
+      "metric": "false_autoclose_rate",
+      "hard_gate": true
+    }
+  ]
+}

@@ -1,0 +1,16 @@
+{
+  "mcpServers": {
+    "retail-erp":      { "command": "uv", "args": ["run", "retail-erp-mcp"],
+                         "env": { "RETAIL_ERP_SYSTEM": "{{ERP_SYSTEM}}",
+                                  "{{APPROVAL_TOKEN_VAR}}": "<operator-injected; NOT known to the agent>" } },
+    "retail-supplier": { "command": "uv", "args": ["run", "retail-supplier-mcp"],
+                         "env": { "RETAIL_SUPPLIER_SYSTEM": "{{SUPPLIER_SYSTEM}}",
+                                  "{{APPROVAL_TOKEN_VAR}}": "<operator-injected>" } },
+    "retail-email":    { "command": "uv", "args": ["run", "retail-email-mcp"],
+                         "env": { "RETAIL_EMAIL_SYSTEM": "{{EMAIL_SYSTEM}}",
+                                  "{{APPROVAL_TOKEN_VAR}}": "<operator-injected>" } },
+    "retail-sheets":   { "command": "uv", "args": ["run", "retail-sheets-mcp"],
+                         "env": { "RETAIL_SHEETS_SYSTEM": "{{SHEETS_SYSTEM}}",
+                                  "{{APPROVAL_TOKEN_VAR}}": "<operator-injected>" } }
+  }
+}
