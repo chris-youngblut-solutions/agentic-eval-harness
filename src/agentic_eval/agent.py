@@ -116,6 +116,117 @@ class ReplayBackend:
         return content
 
 
+LOCAL_MAX_TOKENS = 8192  # local reasoning models are token-hungry; leave room for think + the call
+
+
+def _to_openai_tool(schema: dict[str, Any]) -> dict[str, Any]:
+    return {
+        "type": "function",
+        "function": {
+            "name": schema["name"],
+            "description": schema.get("description", ""),
+            "parameters": schema["input_schema"],
+        },
+    }
+
+
+def _to_openai_messages(system: str, messages: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    """Translate the loop's Anthropic-shaped messages into OpenAI chat wire format.
+    User content is either the task string or a list of tool_result blocks; assistant
+    content is a list of text / tool_use blocks."""
+    out: list[dict[str, Any]] = [{"role": "system", "content": system}]
+    for message in messages:
+        role, content = message["role"], message["content"]
+        if role == "user":
+            if isinstance(content, str):
+                out.append({"role": "user", "content": content})
+                continue
+            for block in content:
+                if block.get("type") == "tool_result":
+                    body = block["content"]
+                    out.append(
+                        {
+                            "role": "tool",
+                            "tool_call_id": block["tool_use_id"],
+                            "content": body if isinstance(body, str) else json.dumps(body),
+                        }
+                    )
+        else:  # assistant
+            text = "".join(b["text"] for b in content if b.get("type") == "text")
+            tool_calls = [
+                {
+                    "id": b["id"],
+                    "type": "function",
+                    "function": {"name": b["name"], "arguments": json.dumps(b["input"])},
+                }
+                for b in content
+                if b.get("type") == "tool_use"
+            ]
+            msg: dict[str, Any] = {"role": "assistant", "content": text or None}
+            if tool_calls:
+                msg["tool_calls"] = tool_calls
+            out.append(msg)
+    return out
+
+
+def _from_openai_message(msg: dict[str, Any]) -> list[dict[str, Any]]:
+    """Translate an OpenAI assistant message back into Anthropic content blocks."""
+    blocks: list[dict[str, Any]] = []
+    text = msg.get("content")
+    if text:
+        blocks.append({"type": "text", "text": text})
+    for i, call in enumerate(msg.get("tool_calls") or []):
+        fn = call["function"]
+        raw = fn.get("arguments") or "{}"
+        if isinstance(raw, str):
+            try:
+                raw = json.loads(raw)
+            except json.JSONDecodeError:
+                raw = {}
+        blocks.append(
+            {
+                "type": "tool_use",
+                "id": call.get("id") or f"call_{i}",
+                "name": fn["name"],
+                "input": raw,
+            }
+        )
+    return blocks
+
+
+class LocalBackend:
+    """OpenAI-compatible chat-completions backend (ollama / vLLM) for local-model
+    evals — no API key, points at a base_url. Translates the loop's Anthropic-shaped
+    messages and tool schemas to OpenAI wire format and the response back to content
+    blocks, so the identical plan-act-observe loop runs against a local model."""
+
+    def __init__(self, model: str, base_url: str, max_tokens: int = LOCAL_MAX_TOKENS) -> None:
+        self.model = model
+        self.url = base_url.rstrip("/") + "/chat/completions"
+        self.max_tokens = max_tokens
+
+    def next_assistant_content(
+        self, system: str, tool_schemas: list[dict[str, Any]], messages: list[dict[str, Any]]
+    ) -> list[dict[str, Any]]:
+        import urllib.request
+
+        payload = {
+            "model": self.model,
+            "messages": _to_openai_messages(system, messages),
+            "tools": [_to_openai_tool(t) for t in tool_schemas],
+            "max_tokens": self.max_tokens,
+            "stream": False,
+        }
+        request = urllib.request.Request(
+            self.url,
+            data=json.dumps(payload).encode(),
+            headers={"Content-Type": "application/json"},
+        )
+        with urllib.request.urlopen(request, timeout=600) as response:
+            body = json.loads(response.read())
+        return _from_openai_message(body["choices"][0]["message"])
+
+
 def _write_transcript(path: Path, messages: list[dict[str, Any]]) -> None:
     """Persist the conversation as role-tagged JSONL — one message per line: the
     user task, each assistant turn, and the user turns carrying tool_result

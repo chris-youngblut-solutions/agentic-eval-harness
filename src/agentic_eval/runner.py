@@ -4,6 +4,8 @@ agentic-eval run "What is 17 * 23?"            one task, live backend
 agentic-eval eval --record                      full eval, live, record full transcripts
 agentic-eval eval --backend replay              full eval from recorded transcripts
 agentic-eval eval --backend replay --record     regenerate transcripts keyless (replay + re-record)
+agentic-eval eval --backend local \
+  --model qwen3:30b-a3b --base-url http://host:11434/v1   eval a local model (ollama/vLLM), no key
 agentic-eval report                             diff the two most recent scorecards
 """
 
@@ -15,7 +17,13 @@ import sys
 import time
 
 from agentic_eval import scoring
-from agentic_eval.agent import LiveBackend, ModelBackend, ReplayBackend, run_task
+from agentic_eval.agent import (
+    LiveBackend,
+    LocalBackend,
+    ModelBackend,
+    ReplayBackend,
+    run_task,
+)
 from agentic_eval.cases import load_cases
 from agentic_eval.domain import load_domain
 
@@ -46,6 +54,8 @@ def cmd_eval(args: argparse.Namespace) -> None:
     run_id = time.strftime("%Y%m%d-%H%M%S") + f"-{domain.name}-{args.backend}"
     if args.backend == "live":
         _require_key()
+    if args.backend == "local" and not args.base_url:
+        sys.exit("--backend local needs --base-url (e.g. http://host:11434/v1)")
 
     scores: list[scoring.CaseScore] = []
     for case in cases:
@@ -53,6 +63,8 @@ def cmd_eval(args: argparse.Namespace) -> None:
         backend: ModelBackend
         if args.backend == "live":
             backend = LiveBackend(model=args.model)
+        elif args.backend == "local":
+            backend = LocalBackend(model=args.model, base_url=args.base_url)
         else:
             if not transcript_path.exists():
                 sys.exit(f"no transcript for {case.id}; run the live eval with --record first")
@@ -105,8 +117,13 @@ def main() -> None:
 
     p_eval = sub.add_parser("eval", help="run the golden set and write a scorecard")
     p_eval.add_argument("--domain", default=DEFAULT_DOMAIN, help="domain pack to evaluate")
-    p_eval.add_argument("--backend", choices=["live", "replay"], default="live")
+    p_eval.add_argument("--backend", choices=["live", "replay", "local"], default="live")
     p_eval.add_argument("--model", default=DEFAULT_MODEL)
+    p_eval.add_argument(
+        "--base-url",
+        default=None,
+        help="OpenAI-compatible endpoint for --backend local (ollama/vLLM), e.g. http://host:11434/v1",
+    )
     p_eval.add_argument(
         "--record",
         action="store_true",

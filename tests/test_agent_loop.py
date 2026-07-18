@@ -177,3 +177,62 @@ def test_replay_record_does_not_clobber_on_short_replay(tmp_path: Path) -> None:
     with pytest.raises(RuntimeError):
         run_task("2 + 2?", ReplayBackend(record), DOMAIN, record_path=record)
     assert record.read_text() == original
+
+
+def test_local_backend_openai_roundtrip() -> None:
+    """The OpenAI wire adapters translate the loop's Anthropic-shaped messages/tools
+    out and an OpenAI response back to content blocks — offline, no network."""
+    from agentic_eval.agent import (
+        _from_openai_message,
+        _to_openai_messages,
+        _to_openai_tool,
+    )
+
+    tool = _to_openai_tool(
+        {"name": "get_po", "description": "look up", "input_schema": {"type": "object"}}
+    )
+    assert tool["type"] == "function"
+    assert tool["function"]["name"] == "get_po"
+    assert tool["function"]["parameters"] == {"type": "object"}
+
+    messages: list[dict[str, Any]] = [
+        {"role": "user", "content": "look up PO-8801"},
+        {
+            "role": "assistant",
+            "content": [
+                {"type": "text", "text": "checking"},
+                {"type": "tool_use", "id": "c1", "name": "get_po", "input": {"po_id": "PO-8801"}},
+            ],
+        },
+        {
+            "role": "user",
+            "content": [
+                {"type": "tool_result", "tool_use_id": "c1", "content": "{}", "is_error": False}
+            ],
+        },
+    ]
+    wire = _to_openai_messages("SYS", messages)
+    assert wire[0] == {"role": "system", "content": "SYS"}
+    assert wire[1] == {"role": "user", "content": "look up PO-8801"}
+    assistant = wire[2]
+    assert assistant["tool_calls"][0]["id"] == "c1"
+    assert assistant["tool_calls"][0]["function"]["name"] == "get_po"
+    assert json.loads(assistant["tool_calls"][0]["function"]["arguments"]) == {"po_id": "PO-8801"}
+    assert wire[3] == {"role": "tool", "tool_call_id": "c1", "content": "{}"}
+
+    # OpenAI response (string-encoded arguments, as ollama/vLLM emit) → content blocks
+    blocks = _from_openai_message(
+        {
+            "content": "done",
+            "tool_calls": [
+                {"id": "c9", "function": {"name": "submit_answer", "arguments": '{"answer": "42"}'}}
+            ],
+        }
+    )
+    assert blocks[0] == {"type": "text", "text": "done"}
+    assert blocks[1] == {
+        "type": "tool_use",
+        "id": "c9",
+        "name": "submit_answer",
+        "input": {"answer": "42"},
+    }
