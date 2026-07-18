@@ -179,21 +179,53 @@ def test_replay_record_does_not_clobber_on_short_replay(tmp_path: Path) -> None:
     assert record.read_text() == original
 
 
-def test_local_backend_openai_roundtrip() -> None:
-    """The OpenAI wire adapters translate the loop's Anthropic-shaped messages/tools
-    out and an OpenAI response back to content blocks — offline, no network."""
-    from agentic_eval.agent import (
-        _from_openai_message,
-        _to_openai_messages,
-        _to_openai_tool,
-    )
+def test_local_backend_roundtrip(monkeypatch: pytest.MonkeyPatch) -> None:
+    """LocalBackend translates the loop's Anthropic-shaped messages/tools out to OpenAI
+    wire format and the response back to content blocks — offline, via a mocked HTTP call
+    on the public interface (no network, no private access)."""
+    import urllib.request
 
-    tool = _to_openai_tool(
-        {"name": "get_po", "description": "look up", "input_schema": {"type": "object"}}
-    )
-    assert tool["type"] == "function"
-    assert tool["function"]["name"] == "get_po"
-    assert tool["function"]["parameters"] == {"type": "object"}
+    from agentic_eval.agent import LocalBackend
+
+    captured: dict[str, Any] = {}
+
+    class FakeResponse:
+        def __init__(self, body: dict[str, Any]) -> None:
+            self._body = body
+
+        def read(self) -> bytes:
+            return json.dumps(self._body).encode()
+
+        def __enter__(self) -> FakeResponse:
+            return self
+
+        def __exit__(self, *_: object) -> bool:
+            return False
+
+    def fake_urlopen(request: Any, timeout: float = 0) -> FakeResponse:
+        captured["payload"] = json.loads(request.data)
+        return FakeResponse(
+            {
+                "choices": [
+                    {
+                        "message": {
+                            "content": "done",
+                            "tool_calls": [
+                                {
+                                    "id": "c9",
+                                    "function": {
+                                        "name": "submit_answer",
+                                        "arguments": '{"answer": "42"}',
+                                    },
+                                }
+                            ],
+                        }
+                    }
+                ]
+            }
+        )
+
+    monkeypatch.setattr(urllib.request, "urlopen", fake_urlopen)
 
     messages: list[dict[str, Any]] = [
         {"role": "user", "content": "look up PO-8801"},
@@ -211,24 +243,12 @@ def test_local_backend_openai_roundtrip() -> None:
             ],
         },
     ]
-    wire = _to_openai_messages("SYS", messages)
-    assert wire[0] == {"role": "system", "content": "SYS"}
-    assert wire[1] == {"role": "user", "content": "look up PO-8801"}
-    assistant = wire[2]
-    assert assistant["tool_calls"][0]["id"] == "c1"
-    assert assistant["tool_calls"][0]["function"]["name"] == "get_po"
-    assert json.loads(assistant["tool_calls"][0]["function"]["arguments"]) == {"po_id": "PO-8801"}
-    assert wire[3] == {"role": "tool", "tool_call_id": "c1", "content": "{}"}
+    tools = [{"name": "get_po", "description": "look up", "input_schema": {"type": "object"}}]
 
-    # OpenAI response (string-encoded arguments, as ollama/vLLM emit) → content blocks
-    blocks = _from_openai_message(
-        {
-            "content": "done",
-            "tool_calls": [
-                {"id": "c9", "function": {"name": "submit_answer", "arguments": '{"answer": "42"}'}}
-            ],
-        }
-    )
+    backend = LocalBackend(model="m", base_url="http://x/v1")
+    blocks = backend.next_assistant_content("SYS", tools, messages)
+
+    # response (string-encoded arguments, as ollama/vLLM emit) → content blocks
     assert blocks[0] == {"type": "text", "text": "done"}
     assert blocks[1] == {
         "type": "tool_use",
@@ -236,3 +256,14 @@ def test_local_backend_openai_roundtrip() -> None:
         "name": "submit_answer",
         "input": {"answer": "42"},
     }
+
+    # outbound payload → OpenAI wire format
+    wire = captured["payload"]
+    assert wire["messages"][0] == {"role": "system", "content": "SYS"}
+    assert wire["messages"][1] == {"role": "user", "content": "look up PO-8801"}
+    assert wire["messages"][2]["tool_calls"][0]["function"]["name"] == "get_po"
+    assert json.loads(wire["messages"][2]["tool_calls"][0]["function"]["arguments"]) == {
+        "po_id": "PO-8801"
+    }
+    assert wire["messages"][3] == {"role": "tool", "tool_call_id": "c1", "content": "{}"}
+    assert wire["tools"][0]["function"]["name"] == "get_po"

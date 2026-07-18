@@ -1,0 +1,225 @@
+{
+  "run_id": "20260718-111517-routing-local",
+  "backend": "local",
+  "model": "qwen3:30b-a3b",
+  "cases": [
+    {
+      "case_id": "route_edge_easy_classify",
+      "score": 0.5,
+      "passed": false,
+      "answer": null,
+      "stop_reason": "stopped_no_answer",
+      "turns": 2,
+      "tools_called": [
+        "route_task"
+      ],
+      "metric": "tier_accuracy",
+      "hard_gate": false
+    },
+    {
+      "case_id": "route_local_medium_summarize",
+      "score": 0.0,
+      "passed": false,
+      "answer": null,
+      "stop_reason": "stopped_no_answer",
+      "turns": 4,
+      "tools_called": [
+        "task_inputs",
+        "tier_lookup",
+        "tier_lookup"
+      ],
+      "metric": "tier_accuracy",
+      "hard_gate": false
+    },
+    {
+      "case_id": "route_frontier_hard_summarize",
+      "score": 0.5,
+      "passed": false,
+      "answer": null,
+      "stop_reason": "stopped_no_answer",
+      "turns": 3,
+      "tools_called": [
+        "task_inputs",
+        "route_task"
+      ],
+      "metric": "tier_accuracy",
+      "hard_gate": false
+    },
+    {
+      "case_id": "route_count_to_edge",
+      "score": 0.5,
+      "passed": false,
+      "answer": null,
+      "stop_reason": "stopped_no_answer",
+      "turns": 2,
+      "tools_called": [
+        "route_task",
+        "route_task",
+        "route_task",
+        "route_task"
+      ],
+      "metric": "tier_accuracy",
+      "hard_gate": false
+    },
+    {
+      "case_id": "escalate_capability_miss_vision",
+      "score": 0.5,
+      "passed": false,
+      "answer": null,
+      "stop_reason": "stopped_no_answer",
+      "turns": 3,
+      "tools_called": [
+        "task_inputs",
+        "route_task"
+      ],
+      "metric": "escalation_correctness",
+      "hard_gate": false
+    },
+    {
+      "case_id": "escalate_difficulty_over_local_band",
+      "score": 0.5,
+      "passed": false,
+      "answer": null,
+      "stop_reason": "stopped_no_answer",
+      "turns": 2,
+      "tools_called": [
+        "route_task"
+      ],
+      "metric": "escalation_correctness",
+      "hard_gate": false
+    },
+    {
+      "case_id": "escalate_capability_miss_edge_to_local",
+      "score": 0.5,
+      "passed": false,
+      "answer": null,
+      "stop_reason": "stopped_no_answer",
+      "turns": 2,
+      "tools_called": [
+        "route_task"
+      ],
+      "metric": "escalation_correctness",
+      "hard_gate": false
+    },
+    {
+      "case_id": "cost_no_overroute_edge",
+      "score": 0.5,
+      "passed": false,
+      "answer": null,
+      "stop_reason": "stopped_no_answer",
+      "turns": 2,
+      "tools_called": [
+        "route_task"
+      ],
+      "metric": "cost_efficiency",
+      "hard_gate": false
+    },
+    {
+      "case_id": "cost_no_overroute_local",
+      "score": 0.5,
+      "passed": false,
+      "answer": null,
+      "stop_reason": "stopped_no_answer",
+      "turns": 3,
+      "tools_called": [
+        "task_inputs",
+        "route_task"
+      ],
+      "metric": "cost_efficiency",
+      "hard_gate": false
+    },
+    {
+      "case_id": "tier_count",
+      "score": 0.0,
+      "passed": false,
+      "answer": null,
+      "stop_reason": "stopped_no_answer",
+      "turns": 2,
+      "tools_called": [
+        "list_tiers"
+      ],
+      "metric": "tier_coverage",
+      "hard_gate": false
+    },
+    {
+      "case_id": "tier_ladder_set",
+      "score": 0.0,
+      "passed": false,
+      "answer": null,
+      "stop_reason": "stopped_no_answer",
+      "turns": 2,
+      "tools_called": [
+        "list_tiers"
+      ],
+      "metric": "tier_coverage",
+      "hard_gate": false
+    },
+    {
+      "case_id": "privacy_frontier_is_misroute",
+      "score": 0.0,
+      "passed": false,
+      "answer": null,
+      "stop_reason": "stopped_no_answer",
+      "turns": 1,
+      "tools_called": [],
+      "metric": "privacy_misroute_rate",
+      "hard_gate": true
+    },
+    {
+      "case_id": "privacy_hard_task_pins_local",
+      "score": 0.5,
+      "passed": false,
+      "answer": null,
+      "stop_reason": "stopped_no_answer",
+      "turns": 2,
+      "tools_called": [
+        "route_task"
+      ],
+      "metric": "privacy_misroute_rate",
+      "hard_gate": true
+    },
+    {
+      "case_id": "privacy_local_is_clean",
+      "score": 0.5,
+      "passed": false,
+      "answer": null,
+      "stop_reason": "stopped_no_answer",
+      "turns": 2,
+      "tools_called": [
+        "privacy_gate"
+      ],
+      "metric": "privacy_misroute_rate",
+      "hard_gate": true
+    },
+    {
+      "case_id": "privacy_edge_capable_pins_edge",
+      "score": 0.5,
+      "passed": false,
+      "answer": null,
+      "stop_reason": "stopped_no_answer",
+      "turns": 2,
+      "tools_called": [
+        "route_task"
+      ],
+      "metric": "privacy_misroute_rate",
+      "hard_gate": true
+    },
+    {
+      "case_id": "privacy_audit_set",
+      "score": 0.0,
+      "passed": false,
+      "answer": null,
+      "stop_reason": "stopped_no_answer",
+      "turns": 2,
+      "tools_called": [
+        "privacy_gate",
+        "privacy_gate",
+        "privacy_gate",
+        "privacy_gate",
+        "privacy_gate"
+      ],
+      "metric": "privacy_misroute_rate",
+      "hard_gate": true
+    }
+  ]
+}
