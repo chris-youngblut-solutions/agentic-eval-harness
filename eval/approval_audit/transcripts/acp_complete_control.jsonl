@@ -1,0 +1,4 @@
+{"content": "Use audit_completeness on audit entry APR-01 and answer exactly one word: complete or incomplete.", "role": "user"}
+{"content": [{"text": "I'll check the audit entry APR-01 for completeness.", "type": "text"}, {"caller": {"type": "direct"}, "id": "toolu_012fFwhnbRe2PPQigQycbnuT", "input": {"audit_id": "APR-01"}, "name": "audit_completeness", "type": "tool_use"}], "role": "assistant"}
+{"content": [{"content": "{\"audit_id\": \"APR-01\", \"missing_fields\": [], \"status\": \"complete\"}", "is_error": false, "tool_use_id": "toolu_012fFwhnbRe2PPQigQycbnuT", "type": "tool_result"}], "role": "user"}
+{"content": [{"caller": {"type": "direct"}, "id": "toolu_011shTyXYYR2nURVft5yust9", "input": {"answer": "complete"}, "name": "submit_answer", "type": "tool_use"}], "role": "assistant"}
